@@ -250,20 +250,21 @@ public class LOGClient {
 
     private byte[] GzipFrom(byte[] jsonByte) throws LogException {
         ByteArrayOutputStream out = null;
+        Deflater compresser = new Deflater();
         try{
-            out = new ByteArrayOutputStream(jsonByte.length);
-            Deflater compresser = new Deflater();
+            out = new ByteArrayOutputStream(jsonByte.length); 
             compresser.setInput(jsonByte);
             compresser.finish();
             byte[] buf = new byte[10240];
             while (compresser.finished() == false) {
                 int count = compresser.deflate(buf);
                 out.write(buf, 0, count);
-            }
+            }  
             return out.toByteArray();
         } catch(Exception e){
             throw new LogException("LogClientError","fail to zip data", "");
         } finally {
+        	compresser.end();
             try {
                 if (out.size() != 0) out.close();
             } catch (IOException e) {
