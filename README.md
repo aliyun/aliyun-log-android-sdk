@@ -21,6 +21,35 @@ aliyun日志服务Android SDK.
        
 ```
 
+# A sample for CachedLogGroup
+```
+CachedLogGroup logGroupWrapper = new CachedLogGroup("$topic", "$source");
+ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+Runnable ioLoop = new Runnable() {
+    @Override
+    public void run() {
+        LogGroup logGroup = null;
+        try {
+            logGroup = logGroupWrapper.takeOneLogGroup();
+            if (logGroup != null) {
+                client.PostLog(logGroup, "android-sdk-ack");
+                android.util.Log.d(TAG,"send log ok");
+            }
+        } catch (LogException ex) {
+            ex.printStackTrace();
+            logGroupWrapper.addLogGroup(logGroup);
+        }
+    }
+};
+service.scheduleAtFixedRate(ioLoop, InitDelay , Period, TimeUnit.MILLISECONDS);
+
+/* 存入一条log */
+Log log = new Log();
+log.PutContent("key_1", "value_1");
+log.PutContent("key_2", "value_2");
+logGroupWrapper.PutLog(log);
+```
+
 # Maven
 ```
 <dependency>
