@@ -11,7 +11,7 @@ import com.alibaba.fastjson.JSONObject;
 public class LogGroup {
     private String mTopic = "";
     private String mSource = "";
-    private List<Map<String,Object>> mContent = new ArrayList<Map<String,Object>>();
+    protected List<Log> mContent = new ArrayList<Log>();
 
     public LogGroup()
     {
@@ -27,7 +27,7 @@ public class LogGroup {
         mSource = source;
     }
     public void PutLog(Log log){
-        mContent.add(log.GetContent());
+        mContent.add(log);
     }
 
     public String LogGroupToJsonString(){
@@ -36,12 +36,12 @@ public class LogGroup {
         json_log_group.put("__topic__", mTopic);
         JSONArray log_arrays = new JSONArray();
 
-        for(Map<String,Object> obj:mContent) {
-            Map<String, Object> map = (Map<String, Object>) obj;
+        for(Log log: mContent) {
+            Map<String, Object> map = log.GetContent();
             JSONObject json_log = new JSONObject(map);
             log_arrays.add(json_log);
         }
-        json_log_group.put("__logs__",log_arrays );
+        json_log_group.put("__logs__",log_arrays);
         String s = json_log_group.toJSONString();
         return s;
     }
