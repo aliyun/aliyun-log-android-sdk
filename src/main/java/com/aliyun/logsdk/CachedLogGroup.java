@@ -7,7 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class CachedLogGroup extends LogGroup {
     private static final String TAG = CachedLogGroup.class.getSimpleName();
-    public static final int CounterThreshold = 10;
+    public static final int DefaultCounterThreshold = 10;
 
     private String topic;
     private String source;
@@ -29,12 +29,19 @@ public class CachedLogGroup extends LogGroup {
         this.source = source;
     }
 
-    public LogGroup takeOneLogGroup() {
+    public LogGroup takeOneLogGroup(int threshold) {
         if (logs.size() == 0) {
             return null;
         }
         LogGroup group = new LogGroup(this.topic,this.source);
-        for (int i = 0;i < CounterThreshold;i++) {
+        if (threshold == 0) {
+            Log log;
+            while ((log = logs.poll()) != null) {
+                group.PutLog(log);
+            }
+            return group;
+        }
+        for (int i = 0;i < threshold;i++) {
             Log log = logs.poll();
             if (log == null) {
                 break;
@@ -48,6 +55,10 @@ public class CachedLogGroup extends LogGroup {
         for (Log log : logGroup.mContent) {
             logs.offer(log);
         }
+    }
+
+    public int getSize() {
+        return this.logs.size();
     }
 
     @Override
