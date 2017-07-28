@@ -1,61 +1,56 @@
-# aliyun-log-android-sdk
-aliyun日志服务Android SDK.
+﻿# Alibaba Cloud SLS SDK for Android
 
-# Sample
-```
-      LOGClient myClient = new LOGClient("$aliyun_log_endpoint", "$your_access_key_id",
-                "$your_access_key", "$projec_name");
-       myClient.SetToken(""); //
-       /* 创建logGroup */
-       final LogGroup logGroup = new LogGroup("", "$host_ip");
+## [README of Chinese](https://github.com/aliyun/aliyun-log-android-sdk/blob/master/README-CN.md)
 
-        /* 存入一条log */
-        Log log = new Log();
-        log.PutContent("key_1", "value_1");
-        log.PutContent("key_2", "value_2");
+## Introduction
 
-        logGroup.PutLog(log);
+This document mainly describes how to install and use the SLS Android SDK. If you have not yet activated or do not know about the SLS service, log on to the [SLS Product Homepage](https://www.aliyun.com/product/sls/) for more help.
 
-        /* 发送log */
-        myClient.PostLog(logGroup, "$log_store");
-       
-```
+## Environment requirements
 
-# A sample for CachedLogGroup
-```
-CachedLogGroup logGroupWrapper = new CachedLogGroup("$topic", "$source");
-ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-Runnable ioLoop = new Runnable() {
-    @Override
-    public void run() {
-        LogGroup logGroup = null;
-        try {
-            logGroup = logGroupWrapper.takeOneLogGroup(100);
-            if (logGroup != null) {
-                client.PostLog(logGroup, "android-sdk-ack");
-                android.util.Log.d(TAG,"send log ok");
-            }
-        } catch (LogException ex) {
-            ex.printStackTrace();
-            logGroupWrapper.addLogGroup(logGroup);
-        }
-    }
-};
-service.scheduleAtFixedRate(ioLoop, InitDelay , Period, TimeUnit.MILLISECONDS);
+- Android ***2.3*** or above
+- You must have registered an Alibaba Cloud account with the SLS activated.
 
-/* 存入一条log */
-Log log = new Log();
-log.PutContent("key_1", "value_1");
-log.PutContent("key_2", "value_2");
-logGroupWrapper.PutLog(log);
-```
+## Installation
 
-# Maven
+SLS Android SDK is dependent on [fastjson](https://github.com/alibaba/fastjson). 
+
+you can use it through the Maven dependency. 
+
+
+### Maven dependency
+
 ```
 <dependency>
   <groupId>com.aliyun.openservices</groupId>
   <artifactId>aliyun-log-android-sdk</artifactId>
   <version>0.3.1</version>
 </dependency>
+```
+
+
+
+### Configure permissions
+
+The following are the Android permissions needed by the SLS Android SDK. Please make sure these permissions are already set in your `AndroidManifest.xml` file. Otherwise, the SDK will not work normally.
 
 ```
+<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+```
+
+
+
+## Quick start
+
+The basic processes for uploading log is demonstrated below. For details, you can refer to the following directories of this project:
+
+the sample directory: [click to view details](https://github.com/aliyun/aliyun-log-android-sdk/tree/master/app).
+
+
+## License
+
+* Apache License 2.0.
+
+## Contact us
+
+* [Alibaba Cloud SLS official documentation center](https://www.aliyun.com/product/sls/).
