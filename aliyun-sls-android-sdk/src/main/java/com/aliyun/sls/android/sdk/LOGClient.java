@@ -1,18 +1,19 @@
 package com.aliyun.sls.android.sdk;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -26,9 +27,14 @@ import java.util.zip.Deflater;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
+import okio.Source;
 
 /**
  * Created by wangjwchn on 16/8/2.
@@ -101,75 +107,58 @@ public class LOGClient {
     }
 
     public void HttpPostRequest(String url, Map<String, String> headers, byte[] body) throws LogException {
-        URL u;
-        try {
-            u = new URL(url);
-        } catch (MalformedURLException e) {
-            throw new LogException("LogClientError", "illegal post url", e, "");
-        }
 
-        HttpURLConnection conn;
-        try {
-            conn = (HttpURLConnection) u.openConnection();
-        } catch (IOException e) {
-            throw new LogException("LogClientError", "fail to create HttpURLConnection", e, "");
-        }
+        OkHttpClient client = new OkHttpClient();
 
+        Request.Builder requestBuilder = new Request.Builder();
 
-        try {
-            conn.setRequestMethod("POST");
-        } catch (ProtocolException e) {
-            throw new LogException("LogClientError", "fail to set http request method to  POST", e, "");
-        }
-        conn.setDoOutput(true);
+        requestBuilder.url(url);
 
         for (Map.Entry<String, String> entry : headers.entrySet()) {
-            conn.setRequestProperty(entry.getKey(), entry.getValue());
+            requestBuilder.addHeader(entry.getKey(), entry.getValue());
         }
 
-        try {
-            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-            wr.write(body);
-            wr.flush();
-            wr.close();
-        } catch (IOException e) {
-            throw new LogException("LogClientError", "fail to post data to URL:" + url, e, "");
-        }
+        DataRequestBody dataRequestBody = new DataRequestBody(body,"application/json");
+        requestBuilder.post(dataRequestBody);
 
+        Request request = requestBuilder.build();
 
-        try {
-            int responseCode = conn.getResponseCode();
-            String request_id = conn.getHeaderField("x-log-requestid");
+        try{
+            Response response = client.newCall(request).execute();
+            if (!response.isSuccessful())
+                throw new IOException("Unexpected code " + response);
+
+            int responseCode = response.code();
+            String request_id = response.header("x-log-requestid");
 
             if (request_id == null) {
                 request_id = "";
             }
             if (responseCode != 200) {
-                InputStream error_stream = conn.getErrorStream();
+                InputStream error_stream = response.body().byteStream();
                 if (error_stream != null) {
                     BufferedReader in = new BufferedReader(
                             new InputStreamReader(error_stream));
                     String inputLine;
-                    StringBuffer response = new StringBuffer();
+                    StringBuffer stringBuffer = new StringBuffer();
 
                     while ((inputLine = in.readLine()) != null) {
-                        response.append(inputLine);
+                        stringBuffer.append(inputLine);
                     }
                     in.close();
-                    CheckError(response.toString(), request_id);
+                    CheckError(stringBuffer.toString(), request_id);
                     throw new LogException("LogServerError", "Response code:"
                             + String.valueOf(responseCode) + "\nMessage:"
-                            + response.toString(), request_id);
+                            + stringBuffer.toString(), request_id);
                 } else {
                     throw new LogException("LogServerError", "Response code:"
                             + String.valueOf(responseCode)
                             + "\nMessage: fail to connect to the server",
                             request_id);
                 }
-            }// else success
-        } catch (IOException e) {
-            throw new LogException("LogServerError",
-                    "Failed to parse response data", "");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -271,6 +260,75 @@ public class LOGClient {
             try {
                 if (out.size() != 0) out.close();
             } catch (IOException e) {
+            }
+        }
+    }
+
+    class DataRequestBody extends RequestBody {
+
+        private static final int SEGMENT_SIZE = 2048; // okio.Segment.SIZE
+
+        private byte[] data;
+        private File file;
+        private InputStream inputStream;
+        private String contentType;
+        private long contentLength;
+
+        public DataRequestBody(File file, String contentType) {
+            this.file = file;
+            this.contentType = contentType;
+            this.contentLength = file.length();
+        }
+
+        public DataRequestBody(byte[] data, String contentType) {
+            this.data = data;
+            this.contentType = contentType;
+            this.contentLength = data.length;
+        }
+
+        public DataRequestBody(InputStream input, long contentLength, String contentType) {
+            this.inputStream = input;
+            this.contentType = contentType;
+            this.contentLength = contentLength;
+        }
+
+        @Override
+        public MediaType contentType() {
+            return MediaType.parse(this.contentType);
+        }
+
+        @Override
+        public long contentLength() throws IOException {
+            return this.contentLength;
+        }
+
+        @Override
+        public void writeTo(BufferedSink sink) throws IOException {
+            Source source = null;
+            if (this.file != null) {
+                source = Okio.source(this.file);
+            } else if (this.data != null) {
+                source = Okio.source(new ByteArrayInputStream(this.data));
+            } else if (this.inputStream != null) {
+                source = Okio.source(this.inputStream);
+            }
+            long total = 0;
+            long read, toRead, remain;
+
+            while (total < contentLength) {
+                remain = contentLength - total;
+                toRead = Math.min(remain, SEGMENT_SIZE);
+
+                read = source.read(sink.buffer(), toRead);
+                if (read == -1) {
+                    break;
+                }
+
+                total += read;
+                sink.flush();
+            }
+            if(source != null){
+                source.close();
             }
         }
     }

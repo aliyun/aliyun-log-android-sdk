@@ -25,11 +25,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 填入必要的参数
      */
-    public String endpoint = "******";
-    public String accesskeyID = "******";
-    public String accessKeySecret = "******";
-    public String project = "******";
-    public String logStore = "******";
+    public String endpoint = "http://cn-qingdao.log.aliyuncs.com";
+    public String accesskeyID = "LTAIdJcQW6Uap6cL";
+    public String accessKeySecret = "ssnJED1Ro4inSpE2NF71bGZD6IEbN1";
+    public String project = "zhuoqinsls001";
+    public String logStore = "zhuoqinsls001-logstore001";
     public String source_ip = "";
 
 
