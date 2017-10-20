@@ -2,7 +2,7 @@ package com.aliyun.sls.android.sdk.core;
 
 import com.aliyun.sls.android.sdk.ClientConfiguration;
 import com.aliyun.sls.android.sdk.ResponseParsers;
-import com.aliyun.sls.android.sdk.core.http.CommonHeaders;
+import com.aliyun.sls.android.sdk.CommonHeaders;
 import com.aliyun.sls.android.sdk.Constants;
 import com.aliyun.sls.android.sdk.core.http.HttpMethod;
 import com.aliyun.sls.android.sdk.model.LogGroup;
@@ -13,6 +13,7 @@ import com.aliyun.sls.android.sdk.core.auth.OSSCredentialProvider;
 import com.aliyun.sls.android.sdk.core.auth.OSSFederationToken;
 import com.aliyun.sls.android.sdk.core.auth.OSSPlainTextAKSKCredentialProvider;
 import com.aliyun.sls.android.sdk.core.auth.OSSStsTokenCredentialProvider;
+import com.aliyun.sls.android.sdk.utils.HttpHeaders;
 import com.aliyun.sls.android.sdk.utils.Utils;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
 import com.aliyun.sls.android.sdk.result.PostLogResult;
@@ -89,6 +90,7 @@ public class RequestOperation {
         LogGroup logGroup = postLogRequest.mLogGroup;
         String logStoreName = postLogRequest.mLogStoreName;
         String project = postLogRequest.mProject;
+        String contentType = postLogRequest.logContentType;
 
         RequestMessage requestMessage = new RequestMessage();
 
@@ -101,18 +103,18 @@ public class RequestOperation {
         //设置header信息
         Map<String, String> headers = requestMessage.headers;
 
-        headers.put("x-log-apiversion", "0.6.0");
-        headers.put("x-log-signaturemethod", "hmac-sha1");
-        headers.put("Content-Type", "application/json");
-        headers.put("Date", Utils.GetMGTTime());
-        headers.put("Host", host);
+        headers.put(CommonHeaders.COMMON_HEADER_APIVERSION, Constants.API_VERSION);
+        headers.put(CommonHeaders.COMMON_HEADER_SIGNATURE_METHOD, Constants.SIGNATURE_METHOD);
+        headers.put(HttpHeaders.CONTENT_TYPE, contentType);
+        headers.put(HttpHeaders.DATE, Utils.GetMGTTime());
+        headers.put(HttpHeaders.HOST, host);
 
         try {
             byte[] httpPostBody = logGroup.LogGroupToJsonString().getBytes("UTF-8");
             byte[] httpPostBodyZipped = Utils.GzipFrom(httpPostBody);
             requestMessage.setUploadData(httpPostBodyZipped);
-            headers.put("Content-MD5", Utils.ParseToMd5U32(httpPostBodyZipped));
-            headers.put("Content-Length", String.valueOf(httpPostBodyZipped.length));
+            headers.put(HttpHeaders.CONTENT_MD5, Utils.ParseToMd5U32(httpPostBodyZipped));
+            headers.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(httpPostBodyZipped.length));
             headers.put("x-log-bodyrawsize", String.valueOf(httpPostBody.length));
             headers.put("x-log-compresstype", "deflate");
         } catch (Exception e) {
@@ -122,20 +124,19 @@ public class RequestOperation {
 
 
         StringBuilder signStringBuf = new StringBuilder("POST" + "\n").
-                append(headers.get("Content-MD5") + "\n").
-                append(headers.get("Content-Type") + "\n").
-                append(headers.get("Date") + "\n");
+                append(headers.get(HttpHeaders.CONTENT_MD5) + "\n").
+                append(headers.get(HttpHeaders.CONTENT_TYPE) + "\n").
+                append(headers.get(HttpHeaders.DATE) + "\n");
 
         OSSFederationToken federationToken = null;
         if (credentialProvider instanceof OSSStsTokenCredentialProvider) {
             federationToken = ((OSSStsTokenCredentialProvider) credentialProvider).getFederationToken();
-            headers.put(CommonHeaders.COMMON_HEADER_SECURITY_TOKEN, federationToken.getSecurityToken());
         }
 
         String token = federationToken == null ? "" : federationToken.getSecurityToken();
         if (token != null && token != "") {
-            headers.put("x-acs-security-token", token);
-            signStringBuf.append("x-acs-security-token:" + token + "\n");
+            headers.put(CommonHeaders.COMMON_HEADER_SECURITY_TOKEN, token);
+            signStringBuf.append(CommonHeaders.COMMON_HEADER_SECURITY_TOKEN + ":" + token + "\n");
         }
         signStringBuf.append("x-log-apiversion:0.6.0\n").
                 append("x-log-bodyrawsize:" + headers.get("x-log-bodyrawsize") + "\n").

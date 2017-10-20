@@ -3,7 +3,7 @@ package com.aliyun.sls.android.sdk.core.parser;
 
 import com.aliyun.sls.android.sdk.core.Result;
 import com.aliyun.sls.android.sdk.SLSLog;
-import com.aliyun.sls.android.sdk.core.http.CommonHeaders;
+import com.aliyun.sls.android.sdk.CommonHeaders;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;

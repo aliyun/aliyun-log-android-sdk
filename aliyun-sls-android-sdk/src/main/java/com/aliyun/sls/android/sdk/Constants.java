@@ -7,6 +7,13 @@ public final class Constants {
 
     public static final String SDK_VERSION = "0.3.1";
 
+    public static final String API_VERSION = "0.6.0";
+
+    public static final String SIGNATURE_METHOD = "hmac-sha1";
+
+    public static final String APPLICATION_JSON = "application/json";
+
+
     public static final int DEFAULT_RETRY_COUNT = 2;
     public static final int DEFAULT_BASE_THREAD_POOL_SIZE = 5;
 }

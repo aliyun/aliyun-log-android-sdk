@@ -20,6 +20,7 @@ public class RequestMessage {
 
     public String url;
 
+    //可以提供字节流，文件，内存数据块等方式直接上传
     private byte[] uploadData;
     private String uploadFilePath;
     private InputStream uploadInputStream;

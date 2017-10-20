@@ -4,6 +4,10 @@ package com.aliyun.sls.android.sdk.core.retry;
 import android.text.TextUtils;
 
 import com.aliyun.sls.android.sdk.LogException;
+import com.aliyun.sls.android.sdk.SLSLog;
+
+import java.io.InterruptedIOException;
+import java.net.SocketTimeoutException;
 
 /**
  * Created by zhouzhuo on 11/6/15.
@@ -30,6 +34,7 @@ public class RetryHandler {
             return RetryType.RetryTypeShouldNotRetry;
         }
 
+        //如果是因为网络原因，如果是服务器内部错误（httpcode > 500，需要尝试重试）
         String errorCode = e.getErrorCode();
         String errorMessage = e.getErrorMessage();
 
@@ -39,12 +44,22 @@ public class RetryHandler {
             }
         }
 
-        if (!TextUtils.isEmpty(errorMessage)){
-            if (errorMessage.contains("RequestTimeTooSkewed")){
-                return RetryType.RetryTypeShouldFixedTimeSkewedAndRetry;
-            }
+//        //发起请求的时间和服务器时间超出15分钟,会要求重试，不知道SLS是否有这个逻辑
+//        if (!TextUtils.isEmpty(errorMessage)){
+//            if (errorMessage.contains("RequestTimeTooSkewed")){
+//                return RetryType.RetryTypeShouldFixedTimeSkewedAndRetry;
+//            }
+//        }
+
+        Exception localException = (Exception) e.getCause();
+        if (localException instanceof InterruptedIOException
+                && !(localException instanceof SocketTimeoutException)) {
+            SLSLog.logError("[shouldRetry] - is interrupted!");
+            return RetryType.RetryTypeShouldNotRetry;
+        } else if (localException instanceof IllegalArgumentException) {
+            return RetryType.RetryTypeShouldNotRetry;
         }
 
-        return RetryType.RetryTypeShouldNotRetry;
+        return RetryType.RetryTypeShouldRetry;
     }
 }

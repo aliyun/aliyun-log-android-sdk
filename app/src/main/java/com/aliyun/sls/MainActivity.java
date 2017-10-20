@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.aliyun.sls.android.sdk.ClientException;
 import com.aliyun.sls.android.sdk.LOGClient;
+import com.aliyun.sls.android.sdk.LogException;
 import com.aliyun.sls.android.sdk.model.Log;
 import com.aliyun.sls.android.sdk.model.LogGroup;
 import com.aliyun.sls.android.sdk.ServiceException;
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(PostLogRequest request, ClientException clientException, ServiceException serviceException) {
+                public void onFailure(PostLogRequest request, LogException exception) {
                     Toast.makeText(MainActivity.this,"failure",Toast.LENGTH_SHORT).show();
                 }
             });

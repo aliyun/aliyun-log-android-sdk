@@ -10,7 +10,7 @@ package com.aliyun.sls.android.sdk.utils;
 /**
  * Contains the common HTTP headers.
  */
-public interface HttpHeaders {
+public class HttpHeaders {
 
     public static final String AUTHORIZATION = "Authorization";
     public static final String CACHE_CONTROL = "Cache-Control";

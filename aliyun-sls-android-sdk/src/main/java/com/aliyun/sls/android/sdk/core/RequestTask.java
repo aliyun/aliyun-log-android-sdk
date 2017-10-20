@@ -4,11 +4,9 @@ package com.aliyun.sls.android.sdk.core;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.sls.android.sdk.ClientException;
 import com.aliyun.sls.android.sdk.LogException;
 import com.aliyun.sls.android.sdk.SLSLog;
-import com.aliyun.sls.android.sdk.ServiceException;
-import com.aliyun.sls.android.sdk.core.http.CommonHeaders;
+import com.aliyun.sls.android.sdk.CommonHeaders;
 import com.aliyun.sls.android.sdk.core.parser.ResponseParser;
 import com.aliyun.sls.android.sdk.core.retry.RetryHandler;
 import com.aliyun.sls.android.sdk.core.retry.RetryType;
@@ -70,7 +68,6 @@ public class RequestTask<T extends Result> implements Callable<T> {
 
         try {
             SLSLog.logDebug("[call] - ");
-
 
             if (context.getCancellationHandler().isCancelled()) {
                 throw new InterruptedIOException("This task is cancelled!");

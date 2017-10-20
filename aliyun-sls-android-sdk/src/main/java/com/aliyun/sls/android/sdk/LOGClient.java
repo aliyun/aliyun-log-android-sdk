@@ -31,6 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.sls.android.sdk.core.AsyncTask;
 import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
 import com.aliyun.sls.android.sdk.core.auth.OSSCredentialProvider;
 import com.aliyun.sls.android.sdk.core.RequestOperation;
@@ -41,17 +42,48 @@ import com.aliyun.sls.android.sdk.utils.Base64Kit;
 
 /**
  * Created by wangjwchn on 16/8/2.
+ * edited by wangzheng on 17/10/15
  */
 public class LOGClient {
-    private String mEndPoint;
+
     private URI endpointURI;
+    private RequestOperation requestOperation;
+
+    public LOGClient(String endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
+        try {
+            endpoint = endpoint.trim();
+            if (!endpoint.startsWith("http")) {
+                endpoint = "http://" + endpoint;
+            }
+            this.endpointURI = new URI(endpoint);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Endpoint must be a string like 'http://cn-****.log.aliyuncs.com'," +
+                    "or your cname like 'http://image.cnamedomain.com'!");
+        }
+
+        if (credentialProvider == null) {
+            throw new IllegalArgumentException("CredentialProvider can't be null.");
+        }
+
+        requestOperation = new RequestOperation(endpointURI, credentialProvider, (conf == null ? ClientConfiguration.getDefaultConf() : conf));
+    }
+
+    public AsyncTask<PostLogResult> postLog(PostLogRequest request, CompletedCallback<PostLogRequest, PostLogResult> completedCallback)
+            throws LogException {
+        return requestOperation.postLog(request, completedCallback);
+    }
+
+
+    /*
+     *  以下是0.3.1（包含）以前的版本。
+     */
+    //=================================================
+    private String mEndPoint;
     private String mAccessKeyID;
     private String mAccessKeySecret;
     private String mAccessToken;
     private String mProject;
     private String mHttpType;
-
-    private RequestOperation requestOperation;
 
     public LOGClient(String endPoint, String accessKeyID, String accessKeySecret, String projectName) {
         mHttpType = "http://";
@@ -79,30 +111,7 @@ public class LOGClient {
         mAccessToken = "";
     }
 
-    public LOGClient(String endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
 
-        try {
-            endpoint = endpoint.trim();
-            if (!endpoint.startsWith("http")) {
-                endpoint = "http://" + endpoint;
-            }
-            this.endpointURI = new URI(endpoint);
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
-                    "or your cname like 'http://image.cnamedomain.com'!");
-        }
-
-        if (credentialProvider == null) {
-            throw new IllegalArgumentException("CredentialProvider can't be null.");
-        }
-
-        requestOperation = new RequestOperation(endpointURI, credentialProvider, (conf == null ? ClientConfiguration.getDefaultConf() : conf));
-    }
-
-    public PostLogResult postLog(PostLogRequest request,CompletedCallback<PostLogRequest, PostLogResult> completedCallback)
-            throws ClientException, ServiceException {
-        return requestOperation.postLog(request, completedCallback).getResult();
-    }
 
     public void SetToken(String token) {
         mAccessToken = token;
@@ -311,4 +320,6 @@ public class LOGClient {
             }
         }
     }
+
+    //=================================================
 }
