@@ -11,10 +11,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aliyun.sls.android.sdk.ClientException;
 import com.aliyun.sls.android.sdk.LOGClient;
 import com.aliyun.sls.android.sdk.Log;
 import com.aliyun.sls.android.sdk.LogGroup;
-import com.aliyun.sls.android.sdk.utils.IPService;
+import com.aliyun.sls.android.sdk.ServiceException;
+import com.aliyun.sls.android.sdk.callback.OSSCompletedCallback;
+import com.aliyun.sls.android.sdk.common.auth.OSSPlainTextAKSKCredentialProvider;
+import com.aliyun.sls.android.sdk.network.utils.IPService;
+import com.aliyun.sls.android.sdk.request.PostLogRequest;
+import com.aliyun.sls.android.sdk.result.PostLogResult;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -25,11 +31,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 填入必要的参数
      */
-    public String endpoint = "******";
-    public String accesskeyID = "******";
-    public String accessKeySecret = "******";
-    public String project = "******";
-    public String logStore = "******";
+    public String endpoint = "http://cn-qingdao.log.aliyuncs.com";
+    public String accesskeyID = "LTAIdJcQW6Uap6cL";
+    public String accessKeySecret = "ssnJED1Ro4inSpE2NF71bGZD6IEbN1";
+    public String project = "zhuoqinsls001";
+    public String logStore = "zhuoqinsls001-logstore001";
     public String source_ip = "";
 
 
@@ -64,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         logText = (TextView) findViewById(R.id.ip);
         upload = (Button) findViewById(R.id.upload);
         try {
-            IPService.getInstance().AsyncGetIp(IPService.DEFAULT_URL,handler);
+            IPService.getInstance().asyncGetIp(IPService.DEFAULT_URL,handler);
         } catch (Exception e) {
             e.printStackTrace();
             logText.setText(e.getMessage());
@@ -85,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         }
         final LOGClient logClient = new LOGClient(endpoint, accesskeyID,
                 accessKeySecret, project);
-
         /* 创建logGroup */
         final LogGroup logGroup = new LogGroup("sls test", ip);
 
@@ -93,9 +98,6 @@ public class MainActivity extends AppCompatActivity {
         Log log = new Log();
         log.PutContent("bbb", "value_3");
         log.PutContent("aaa", "value_5");
-
-        logGroup.PutLog(log);
-
 
         new Thread(new Runnable() {
             @Override
@@ -116,7 +118,42 @@ public class MainActivity extends AppCompatActivity {
                 message.sendToTarget();
             }
         }).start();
+    }
 
+    private void asyncUploadLog(@Nullable String ip) {
+        if (TextUtils.isEmpty(ip)){
+            Toast.makeText(MainActivity.this,"请先获取ip地址",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        OSSPlainTextAKSKCredentialProvider plainTextAKSKCredentialProvider =
+                new OSSPlainTextAKSKCredentialProvider(accesskeyID,accessKeySecret);
+
+        LOGClient logClient = new LOGClient(endpoint, plainTextAKSKCredentialProvider, null);
+        /* 创建logGroup */
+        LogGroup logGroup = new LogGroup("sls test", ip);
+
+        /* 存入一条log */
+        Log log = new Log();
+        log.PutContent("bbb", "value_3");
+        log.PutContent("aaa", "value_5");
+
+        try{
+            PostLogRequest request = new PostLogRequest(project,logStore,logGroup);
+            logClient.postLog(request, new OSSCompletedCallback<PostLogRequest, PostLogResult>() {
+                @Override
+                public void onSuccess(PostLogRequest request, PostLogResult result) {
+                    Toast.makeText(MainActivity.this,"success",Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(PostLogRequest request, ClientException clientException, ServiceException serviceException) {
+                    Toast.makeText(MainActivity.this,"failure",Toast.LENGTH_SHORT).show();
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+            return;
+        }
 
 
     }

@@ -1,6 +1,8 @@
 package com.aliyun.sls.android.sdk;
 
 
+import android.content.Context;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -12,6 +14,8 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,17 +33,24 @@ import javax.crypto.spec.SecretKeySpec;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.sls.android.sdk.callback.OSSCompletedCallback;
+import com.aliyun.sls.android.sdk.common.auth.OSSCredentialProvider;
+import com.aliyun.sls.android.sdk.request.PostLogRequest;
+import com.aliyun.sls.android.sdk.result.PostLogResult;
 
 /**
  * Created by wangjwchn on 16/8/2.
  */
 public class LOGClient {
     private String mEndPoint;
+    private URI endpointURI;
     private String mAccessKeyID;
     private String mAccessKeySecret;
     private String mAccessToken;
     private String mProject;
     private String mHttpType;
+
+    private RequestOperation requestOperation;
 
     public LOGClient(String endPoint, String accessKeyID, String accessKeySecret, String projectName) {
         mHttpType = "http://";
@@ -65,6 +76,31 @@ public class LOGClient {
         else throw new NullPointerException("projectName is null");
 
         mAccessToken = "";
+    }
+
+    public LOGClient(String endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
+
+        try {
+            endpoint = endpoint.trim();
+            if (!endpoint.startsWith("http")) {
+                endpoint = "http://" + endpoint;
+            }
+            this.endpointURI = new URI(endpoint);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Endpoint must be a string like 'http://oss-cn-****.aliyuncs.com'," +
+                    "or your cname like 'http://image.cnamedomain.com'!");
+        }
+
+        if (credentialProvider == null) {
+            throw new IllegalArgumentException("CredentialProvider can't be null.");
+        }
+
+        requestOperation = new RequestOperation(endpointURI, credentialProvider, (conf == null ? ClientConfiguration.getDefaultConf() : conf));
+    }
+
+    public PostLogResult postLog(PostLogRequest request,OSSCompletedCallback<PostLogRequest, PostLogResult> completedCallback)
+            throws ClientException, ServiceException {
+        return requestOperation.postLog(request, completedCallback).getResult();
     }
 
     public void SetToken(String token) {
