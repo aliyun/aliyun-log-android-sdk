@@ -50,8 +50,4 @@ public class LogGroup {
         return s;
     }
 
-    public int getLogSize(){
-        return mContent.size();
-    }
-
 }

@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sampleUploadLog(source_ip);
+                asyncUploadLog(source_ip);
             }
         });
 
@@ -98,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
         Log log = new Log();
         log.PutContent("bbb", "value_3");
         log.PutContent("aaa", "value_5");
+
+        logGroup.PutLog(log);
 
         new Thread(new Runnable() {
             @Override
@@ -136,6 +138,8 @@ public class MainActivity extends AppCompatActivity {
         Log log = new Log();
         log.PutContent("bbb", "value_3");
         log.PutContent("aaa", "value_5");
+
+        logGroup.PutLog(log);
 
         try{
             PostLogRequest request = new PostLogRequest(project,logStore,logGroup);
