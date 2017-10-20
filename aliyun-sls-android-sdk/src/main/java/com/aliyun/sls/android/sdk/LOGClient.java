@@ -1,8 +1,6 @@
 package com.aliyun.sls.android.sdk;
 
 
-import android.content.Context;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -33,10 +31,13 @@ import javax.crypto.spec.SecretKeySpec;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.sls.android.sdk.callback.OSSCompletedCallback;
-import com.aliyun.sls.android.sdk.common.auth.OSSCredentialProvider;
+import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
+import com.aliyun.sls.android.sdk.core.auth.OSSCredentialProvider;
+import com.aliyun.sls.android.sdk.core.RequestOperation;
+import com.aliyun.sls.android.sdk.model.LogGroup;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
 import com.aliyun.sls.android.sdk.result.PostLogResult;
+import com.aliyun.sls.android.sdk.utils.Base64Kit;
 
 /**
  * Created by wangjwchn on 16/8/2.
@@ -98,7 +99,7 @@ public class LOGClient {
         requestOperation = new RequestOperation(endpointURI, credentialProvider, (conf == null ? ClientConfiguration.getDefaultConf() : conf));
     }
 
-    public PostLogResult postLog(PostLogRequest request,OSSCompletedCallback<PostLogRequest, PostLogResult> completedCallback)
+    public PostLogResult postLog(PostLogRequest request,CompletedCallback<PostLogRequest, PostLogResult> completedCallback)
             throws ClientException, ServiceException {
         return requestOperation.postLog(request, completedCallback).getResult();
     }

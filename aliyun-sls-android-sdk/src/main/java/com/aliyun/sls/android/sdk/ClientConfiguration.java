@@ -7,8 +7,6 @@
 
 package com.aliyun.sls.android.sdk;
 
-import com.aliyun.sls.android.sdk.common.Constants;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

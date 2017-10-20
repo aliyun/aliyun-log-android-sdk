@@ -13,12 +13,12 @@ import android.widget.Toast;
 
 import com.aliyun.sls.android.sdk.ClientException;
 import com.aliyun.sls.android.sdk.LOGClient;
-import com.aliyun.sls.android.sdk.Log;
-import com.aliyun.sls.android.sdk.LogGroup;
+import com.aliyun.sls.android.sdk.model.Log;
+import com.aliyun.sls.android.sdk.model.LogGroup;
 import com.aliyun.sls.android.sdk.ServiceException;
-import com.aliyun.sls.android.sdk.callback.OSSCompletedCallback;
-import com.aliyun.sls.android.sdk.common.auth.OSSPlainTextAKSKCredentialProvider;
-import com.aliyun.sls.android.sdk.network.utils.IPService;
+import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
+import com.aliyun.sls.android.sdk.core.auth.OSSPlainTextAKSKCredentialProvider;
+import com.aliyun.sls.android.sdk.utils.IPService;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
 import com.aliyun.sls.android.sdk.result.PostLogResult;
 
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
         try{
             PostLogRequest request = new PostLogRequest(project,logStore,logGroup);
-            logClient.postLog(request, new OSSCompletedCallback<PostLogRequest, PostLogResult>() {
+            logClient.postLog(request, new CompletedCallback<PostLogRequest, PostLogResult>() {
                 @Override
                 public void onSuccess(PostLogRequest request, PostLogResult result) {
                     Toast.makeText(MainActivity.this,"success",Toast.LENGTH_SHORT).show();
