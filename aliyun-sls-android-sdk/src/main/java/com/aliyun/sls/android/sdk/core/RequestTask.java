@@ -1,7 +1,6 @@
 package com.aliyun.sls.android.sdk.core;
 
 
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.sls.android.sdk.LogException;
@@ -130,10 +129,10 @@ public class RequestTask<T extends Result> implements Callable<T> {
             Map<String, List<String>> headerMap = response.headers().toMultimap();
             StringBuilder printRsp = new StringBuilder();
             printRsp.append("response:---------------------\n");
-            printRsp.append("response code: " + response.code() + " for url: " + request.url()+"\n");
-            printRsp.append("response msg: "+ response.message()+"\n");
-            for(String key : headerMap.keySet()){
-                printRsp.append("responseHeader ["+key+"]: ").append(headerMap.get(key).get(0)+"\n");
+            printRsp.append("response code: " + response.code() + " for url: " + request.url() + "\n");
+            printRsp.append("response msg: " + response.message() + "\n");
+            for (String key : headerMap.keySet()) {
+                printRsp.append("responseHeader [" + key + "]: ").append(headerMap.get(key).get(0) + "\n");
             }
             SLSLog.logDebug(printRsp.toString());
 
@@ -142,14 +141,14 @@ public class RequestTask<T extends Result> implements Callable<T> {
             if (SLSLog.isEnableLog()) {
                 e.printStackTrace();
             }
-            exception = new LogException("","",e.getCause(),"");
+            exception = new LogException("", "", e.getCause(), "");
         }
 
         //先检查request 是否 cancel
         // reconstruct exception caused by manually cancelling
         if ((call != null && call.isCanceled())
                 || context.getCancellationHandler().isCancelled()) {
-            exception = new LogException("","Task is cancelled!", "");
+            exception = new LogException("", "Task is cancelled!", "");
             exception.canceled = true;
         }
 
@@ -167,7 +166,7 @@ public class RequestTask<T extends Result> implements Callable<T> {
 
         //如果联网过程中没有出现异常
         T result = null;
-        if (exception == null){
+        if (exception == null) {
             int responseCode = response.code();
             String request_id = response.header(CommonHeaders.COMMON_HEADER_REQUEST_ID);
 
@@ -186,16 +185,16 @@ public class RequestTask<T extends Result> implements Callable<T> {
                     }
                 }
             } else {
-                exception =  new LogException("LogServerError", "Response code:"
+                exception = new LogException("LogServerError", "Response code:"
                         + String.valueOf(responseCode) + "\nMessage: internal error", request_id);
                 byte[] body = response.body().bytes();
-                if (body != null && body.length > 0){
-                    String bodyString = new String(body,"utf-8");
+                if (body != null && body.length > 0) {
+                    String bodyString = new String(body, "utf-8");
                     JSONObject obj = JSON.parseObject(bodyString);
                     if (obj != null && obj.containsKey("errorCode") && obj.containsKey("errorMessage")) {
-                        exception =  new LogException(obj.getString("errorCode"), obj.getString("errorMessage"), request_id);
-                    }else{
-                        exception =  new LogException("LogServerError", "Response code:"
+                        exception = new LogException(obj.getString("errorCode"), obj.getString("errorMessage"), request_id);
+                    } else {
+                        exception = new LogException("LogServerError", "Response code:"
                                 + String.valueOf(responseCode) + "\nMessage:"
                                 + bodyString, request_id);
                     }
@@ -203,7 +202,7 @@ public class RequestTask<T extends Result> implements Callable<T> {
             }
         }
 
-        if (result == null){
+        if (result == null) {
             //如果访问正常是不会执行到这里的，出错才会要求重试。
             RetryType retryType = retryHandler.shouldRetry(exception, currentRetryCount);
             SLSLog.logError("[run] - retry, retry type: " + retryType);
@@ -219,11 +218,11 @@ public class RequestTask<T extends Result> implements Callable<T> {
                 return call();
             } else {
                 if (context.getCompletedCallback() != null) {
-                    context.getCompletedCallback().onFailure(context.getRequest(),exception);
+                    context.getCompletedCallback().onFailure(context.getRequest(), exception);
                 }
                 throw exception;
             }
-        }else{
+        } else {
             return result;
         }
     }
@@ -291,7 +290,7 @@ public class RequestTask<T extends Result> implements Callable<T> {
                 total += read;
                 sink.flush();
             }
-            if(source != null){
+            if (source != null) {
                 source.close();
             }
         }
