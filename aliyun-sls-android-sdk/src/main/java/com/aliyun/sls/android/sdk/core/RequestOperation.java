@@ -1,10 +1,12 @@
 package com.aliyun.sls.android.sdk.core;
 
 import com.aliyun.sls.android.sdk.ClientConfiguration;
+import com.aliyun.sls.android.sdk.LogException;
 import com.aliyun.sls.android.sdk.ResponseParsers;
 import com.aliyun.sls.android.sdk.CommonHeaders;
 import com.aliyun.sls.android.sdk.Constants;
 import com.aliyun.sls.android.sdk.core.http.HttpMethod;
+import com.aliyun.sls.android.sdk.model.Log;
 import com.aliyun.sls.android.sdk.model.LogGroup;
 import com.aliyun.sls.android.sdk.core.parser.ResponseParser;
 import com.aliyun.sls.android.sdk.SLSLog;
@@ -85,29 +87,41 @@ public class RequestOperation {
         return innerClient;
     }
 
-    public AsyncTask<PostLogResult> postLog(PostLogRequest postLogRequest, CompletedCallback<PostLogRequest, PostLogResult> completedCallback) {
+    private void buildUrl(PostLogRequest postLogRequest, RequestMessage requestMessage) throws
+            LogException {
+        if (postLogRequest == null || requestMessage == null) {
+            LogException exception = new LogException("", "postLogRequest or requestMessage when buildUrl is not null", null, "");
+            throw exception;
+        }
+        String logStoreName = postLogRequest.mLogStoreName;
+        String project = postLogRequest.mProject;
+        String scheme = endpoint.getScheme();
+        String host = project + "." + endpoint.getHost();
+        String url = scheme + "://" + host + "/logstores/" + logStoreName + "/shards/lb";
+        requestMessage.url = url;
+        requestMessage.method = HttpMethod.POST;
+    }
 
+    private void buildHeaders(PostLogRequest postLogRequest, RequestMessage requestMessage) throws
+            LogException {
+        if (postLogRequest == null || requestMessage == null) {
+            LogException exception = new LogException("", "postLogRequest or requestMessage when buildheaders is not null", null, "");
+            throw exception;
+        }
         LogGroup logGroup = postLogRequest.mLogGroup;
         String logStoreName = postLogRequest.mLogStoreName;
         String project = postLogRequest.mProject;
         String contentType = postLogRequest.logContentType;
-
-        RequestMessage requestMessage = new RequestMessage();
-
         String host = project + "." + endpoint.getHost();
 
-        requestMessage.method = HttpMethod.POST;
-        requestMessage.url = "http://" + host + "/logstores/" + logStoreName + "/shards/lb";
-
-
-        //设置header信息
         Map<String, String> headers = requestMessage.headers;
-
         headers.put(CommonHeaders.COMMON_HEADER_APIVERSION, Constants.API_VERSION);
         headers.put(CommonHeaders.COMMON_HEADER_SIGNATURE_METHOD, Constants.SIGNATURE_METHOD);
+        headers.put(CommonHeaders.COMMON_HEADER_COMPRESSTYPE, Constants.COMPRESSTYPE_DEFLATE);
         headers.put(HttpHeaders.CONTENT_TYPE, contentType);
         headers.put(HttpHeaders.DATE, Utils.GetMGTTime());
         headers.put(HttpHeaders.HOST, host);
+
 
         try {
             byte[] httpPostBody = logGroup.LogGroupToJsonString().getBytes("UTF-8");
@@ -115,13 +129,11 @@ public class RequestOperation {
             requestMessage.setUploadData(httpPostBodyZipped);
             headers.put(HttpHeaders.CONTENT_MD5, Utils.ParseToMd5U32(httpPostBodyZipped));
             headers.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(httpPostBodyZipped.length));
-            headers.put("x-log-bodyrawsize", String.valueOf(httpPostBody.length));
-            headers.put("x-log-compresstype", "deflate");
+            headers.put(CommonHeaders.COMMON_HEADER_BODYRAWSIZE, String.valueOf(httpPostBody.length));
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            LogException exception = new LogException("", "postLogRequest or requestMessage is not null", null, "");
+            throw exception;
         }
-
 
         StringBuilder signStringBuf = new StringBuilder("POST" + "\n").
                 append(headers.get(HttpHeaders.CONTENT_MD5) + "\n").
@@ -138,10 +150,10 @@ public class RequestOperation {
             headers.put(CommonHeaders.COMMON_HEADER_SECURITY_TOKEN, token);
             signStringBuf.append(CommonHeaders.COMMON_HEADER_SECURITY_TOKEN + ":" + token + "\n");
         }
-        signStringBuf.append("x-log-apiversion:0.6.0\n").
-                append("x-log-bodyrawsize:" + headers.get("x-log-bodyrawsize") + "\n").
-                append("x-log-compresstype:deflate\n").
-                append("x-log-signaturemethod:hmac-sha1\n").
+        signStringBuf.append(CommonHeaders.COMMON_HEADER_APIVERSION + ":" + Constants.API_VERSION + "\n").
+                append(CommonHeaders.COMMON_HEADER_BODYRAWSIZE + ":" + headers.get(CommonHeaders.COMMON_HEADER_BODYRAWSIZE) + "\n").
+                append(CommonHeaders.COMMON_HEADER_COMPRESSTYPE + ":" + Constants.COMPRESSTYPE_DEFLATE + "\n").
+                append(CommonHeaders.COMMON_HEADER_SIGNATURE_METHOD + ":" + Constants.SIGNATURE_METHOD + "\n").
                 append("/logstores/" + logStoreName + "/shards/lb");
         String signString = signStringBuf.toString();
 
@@ -159,6 +171,20 @@ public class RequestOperation {
 
         headers.put(CommonHeaders.AUTHORIZATION, signature);
 
+
+    }
+
+    public AsyncTask<PostLogResult> postLog(PostLogRequest postLogRequest, CompletedCallback<PostLogRequest, PostLogResult> completedCallback) throws
+            LogException {
+
+        RequestMessage requestMessage = new RequestMessage();
+
+        try {
+            buildUrl(postLogRequest, requestMessage);
+            buildHeaders(postLogRequest, requestMessage);
+        } catch (LogException e) {
+            throw e;
+        }
 
         ResponseParser<PostLogResult> parser = new ResponseParsers.PostLogResponseParser();
 

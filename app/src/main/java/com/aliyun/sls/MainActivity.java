@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
         try{
             PostLogRequest request = new PostLogRequest(project,logStore,logGroup);
-            logClient.postLog(request, new CompletedCallback<PostLogRequest, PostLogResult>() {
+            logClient.asyncPostLog(request, new CompletedCallback<PostLogRequest, PostLogResult>() {
                 @Override
                 public void onSuccess(PostLogRequest request, PostLogResult result) {
                     Toast.makeText(MainActivity.this,"success",Toast.LENGTH_SHORT).show();
@@ -157,9 +157,6 @@ public class MainActivity extends AppCompatActivity {
             });
         }catch (Exception e){
             e.printStackTrace();
-            return;
         }
-
-
     }
 }

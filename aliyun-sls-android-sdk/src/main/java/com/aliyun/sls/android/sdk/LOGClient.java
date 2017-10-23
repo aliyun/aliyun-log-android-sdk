@@ -68,11 +68,16 @@ public class LOGClient {
         requestOperation = new RequestOperation(endpointURI, credentialProvider, (conf == null ? ClientConfiguration.getDefaultConf() : conf));
     }
 
-    public AsyncTask<PostLogResult> postLog(PostLogRequest request, CompletedCallback<PostLogRequest, PostLogResult> completedCallback)
+    public AsyncTask<PostLogResult> asyncPostLog(PostLogRequest request, CompletedCallback<PostLogRequest, PostLogResult> completedCallback)
             throws LogException {
         return requestOperation.postLog(request, completedCallback);
     }
 
+
+    public PostLogResult syncPostLog(PostLogRequest request, CompletedCallback<PostLogRequest, PostLogResult> completedCallback)
+            throws LogException {
+        return requestOperation.postLog(request, completedCallback).getResult();
+    }
 
     /*
      *  以下是0.3.1（包含）以前的版本。

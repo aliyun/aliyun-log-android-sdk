@@ -13,6 +13,9 @@ public final class Constants {
 
     public static final String APPLICATION_JSON = "application/json";
 
+    public static final String COMPRESSTYPE_DEFLATE = "deflate";
+
+
 
     public static final int DEFAULT_RETRY_COUNT = 2;
     public static final int DEFAULT_BASE_THREAD_POOL_SIZE = 5;

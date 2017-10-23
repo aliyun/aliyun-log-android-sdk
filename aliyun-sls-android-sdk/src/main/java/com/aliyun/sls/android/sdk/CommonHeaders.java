@@ -11,6 +11,12 @@ public class CommonHeaders extends HttpHeaders {
 
     public final static  String COMMON_HEADER_APIVERSION = "x-log-apiversion";
 
+    public final static  String COMMON_HEADER_BODYRAWSIZE = "x-log-bodyrawsize";
+
+    public final static  String COMMON_HEADER_COMPRESSTYPE = "x-log-compresstype";
+
+
+
     public final static  String COMMON_HEADER_SIGNATURE_METHOD = "x-log-signaturemethod";
 
 

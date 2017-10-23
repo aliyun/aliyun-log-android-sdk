@@ -1,10 +1,8 @@
 package com.aliyun.sls.android.sdk.core;
 
 
-import com.aliyun.sls.android.sdk.ClientException;
-import com.aliyun.sls.android.sdk.ServiceException;
+import com.aliyun.sls.android.sdk.LogException;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -40,25 +38,14 @@ public class AsyncTask<T extends Result> {
     /**
      * Waits and gets the result.
      * @return
-     * @throws ClientException
-     * @throws ServiceException
+     * @throws LogException
      */
-    public T getResult() throws ClientException, ServiceException {
+    public T getResult() throws LogException{
         try {
             T result = future.get();
             return result;
-        } catch (InterruptedException e) {
-            throw new ClientException(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof ClientException) {
-                throw (ClientException) cause;
-            } else if (cause instanceof ServiceException) {
-                throw (ServiceException) cause;
-            } else {
-                cause.printStackTrace();
-                throw new ClientException("Unexpected exception!" + cause.getMessage());
-            }
+        } catch (Exception e) {
+            throw new LogException("","",e.getCause(), "");
         }
     }
 
