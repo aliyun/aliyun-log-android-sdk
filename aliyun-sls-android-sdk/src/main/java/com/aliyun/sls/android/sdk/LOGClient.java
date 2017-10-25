@@ -12,6 +12,8 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,11 +31,58 @@ import javax.crypto.spec.SecretKeySpec;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.sls.android.sdk.core.AsyncTask;
+import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
+import com.aliyun.sls.android.sdk.core.auth.CredentialProvider;
+import com.aliyun.sls.android.sdk.core.RequestOperation;
+import com.aliyun.sls.android.sdk.model.LogGroup;
+import com.aliyun.sls.android.sdk.request.PostLogRequest;
+import com.aliyun.sls.android.sdk.result.PostLogResult;
+import com.aliyun.sls.android.sdk.utils.Base64Kit;
 
 /**
  * Created by wangjwchn on 16/8/2.
+ * edited by wangzheng on 17/10/15
  */
 public class LOGClient {
+
+    private URI endpointURI;
+    private RequestOperation requestOperation;
+
+    public LOGClient(String endpoint, CredentialProvider credentialProvider, ClientConfiguration conf) {
+        try {
+            endpoint = endpoint.trim();
+            if (!endpoint.startsWith("http")) {
+                endpoint = "http://" + endpoint;
+            }
+            this.endpointURI = new URI(endpoint);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Endpoint must be a string like 'http://cn-****.log.aliyuncs.com'," +
+                    "or your cname like 'http://image.cnamedomain.com'!");
+        }
+
+        if (credentialProvider == null) {
+            throw new IllegalArgumentException("CredentialProvider can't be null.");
+        }
+
+        requestOperation = new RequestOperation(endpointURI, credentialProvider, (conf == null ? ClientConfiguration.getDefaultConf() : conf));
+    }
+
+    public AsyncTask<PostLogResult> asyncPostLog(PostLogRequest request, CompletedCallback<PostLogRequest, PostLogResult> completedCallback)
+            throws LogException {
+        return requestOperation.postLog(request, completedCallback);
+    }
+
+
+    public PostLogResult syncPostLog(PostLogRequest request, CompletedCallback<PostLogRequest, PostLogResult> completedCallback)
+            throws LogException {
+        return requestOperation.postLog(request, completedCallback).getResult();
+    }
+
+    /*
+     *  以下是0.3.1（包含）以前的版本。
+     */
+    //=================================================
     private String mEndPoint;
     private String mAccessKeyID;
     private String mAccessKeySecret;
@@ -66,6 +115,8 @@ public class LOGClient {
 
         mAccessToken = "";
     }
+
+
 
     public void SetToken(String token) {
         mAccessToken = token;
@@ -274,4 +325,6 @@ public class LOGClient {
             }
         }
     }
+
+    //=================================================
 }

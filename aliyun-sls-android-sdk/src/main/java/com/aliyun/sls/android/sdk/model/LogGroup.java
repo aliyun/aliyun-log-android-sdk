@@ -1,4 +1,4 @@
-package com.aliyun.sls.android.sdk;
+package com.aliyun.sls.android.sdk.model;
 
 import java.util.*;
 
@@ -8,6 +8,7 @@ import java.util.*;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.sls.android.sdk.model.Log;
 
 public class LogGroup {
     private String mTopic = "";

@@ -1,4 +1,4 @@
-package com.aliyun.sls.android.sdk;
+package com.aliyun.sls.android.sdk.utils;
 /**
  * Created by wangjwchn on 16/8/2.
  */

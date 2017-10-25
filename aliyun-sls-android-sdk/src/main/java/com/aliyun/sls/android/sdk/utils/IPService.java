@@ -16,7 +16,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
-
 /**
  * Created by wangzheng on 2017/7/27.
  * 得到一些域名的ip地址
@@ -51,7 +50,7 @@ public class IPService {
     /*
         异步获取ip地址。handler回传
      */
-    public void AsyncGetIp(String url, final Handler handler){
+    public void asyncGetIp(String url, final Handler handler){
         ExecutorService es = Executors.newSingleThreadExecutor();
         IP ip = new IP(url);
         futureTask = new FutureTask<String>(ip){
@@ -77,7 +76,7 @@ public class IPService {
     /*
         同步获取ip地址。注，最好不要在主线程操作
      */
-    public String SyncGetIp(String url) throws Exception{
+    public String syncGetIp(String url) throws Exception{
         ExecutorService es = Executors.newSingleThreadExecutor();
         Future<String> future = es.submit(new IP(url));
         String ip = "";
