@@ -18,6 +18,7 @@ import com.aliyun.sls.android.sdk.utils.HttpHeaders;
 import com.aliyun.sls.android.sdk.utils.Utils;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
 import com.aliyun.sls.android.sdk.result.PostLogResult;
+import com.aliyun.sls.android.sdk.utils.VersionInfoUtils;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -170,6 +171,7 @@ public class RequestOperation {
 
         headers.put(CommonHeaders.AUTHORIZATION, signature);
 
+        headers.put(HttpHeaders.USER_AGENT, VersionInfoUtils.getUserAgent());
 
     }
 

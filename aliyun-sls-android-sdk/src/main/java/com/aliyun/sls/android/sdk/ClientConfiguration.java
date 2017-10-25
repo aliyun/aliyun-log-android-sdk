@@ -17,8 +17,7 @@ import java.util.List;
  * The client side configuration
  */
 public class ClientConfiguration {
-
-    private static final String DEFAULT_USER_AGENT = VersionInfoUtils.getUserAgent();
+    
     private static final int DEFAULT_MAX_RETRIES = 2;
 
     private int maxConcurrentRequest = 5;
@@ -33,7 +32,7 @@ public class ClientConfiguration {
      * Constructor
      */
     public ClientConfiguration(){
-        String a = DEFAULT_USER_AGENT;
+
     }
 
     /**
