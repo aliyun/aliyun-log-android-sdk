@@ -7,7 +7,7 @@ package com.aliyun.sls.android.sdk.core.auth;
  * We recommend to use STS authentication or custom authentication.
  */
 @Deprecated
-public class OSSPlainTextAKSKCredentialProvider extends OSSCredentialProvider {
+public class PlainTextAKSKCredentialProvider extends CredentialProvider {
     private String accessKeyId;
     private String accessKeySecret;
 
@@ -17,7 +17,7 @@ public class OSSPlainTextAKSKCredentialProvider extends OSSCredentialProvider {
      * @param accessKeyId
      * @param accessKeySecret
      */
-    public OSSPlainTextAKSKCredentialProvider(String accessKeyId, String accessKeySecret) {
+    public PlainTextAKSKCredentialProvider(String accessKeyId, String accessKeySecret) {
         setAccessKeyId(accessKeyId.trim());
         setAccessKeySecret(accessKeySecret.trim());
     }

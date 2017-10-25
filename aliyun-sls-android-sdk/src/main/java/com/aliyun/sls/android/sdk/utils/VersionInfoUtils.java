@@ -18,7 +18,7 @@ public class VersionInfoUtils {
 
     public static String getUserAgent() {
         if (userAgent == null) {
-            userAgent = "aliyun-sdk-android/" + getVersion() + "/" + getDefaultUserAgent();
+            userAgent = "aliyun-log-sdk-android/" + getVersion() + "/" + getDefaultUserAgent();
         }
         return userAgent;
     }
@@ -40,5 +40,6 @@ public class VersionInfoUtils {
         }
         return result.replaceAll("[^\\p{ASCII}]", "?");
     }
+
 
 }

@@ -3,7 +3,7 @@ package com.aliyun.sls.android.sdk.core.auth;
 /**
  * Created by zhouzhuo on 1/22/16.
  */
-public class OSSStsTokenCredentialProvider extends OSSCredentialProvider {
+public class StsTokenCredentialProvider extends CredentialProvider {
 
     private String accessKeyId;
     private String secretKeyId;
@@ -17,7 +17,7 @@ public class OSSStsTokenCredentialProvider extends OSSCredentialProvider {
      * @param secretKeyId
      * @param securityToken
      */
-    public OSSStsTokenCredentialProvider(String accessKeyId, String secretKeyId, String securityToken) {
+    public StsTokenCredentialProvider(String accessKeyId, String secretKeyId, String securityToken) {
         setAccessKeyId(accessKeyId.trim());
         setSecretKeyId(secretKeyId.trim());
         setSecurityToken(securityToken.trim());
@@ -47,7 +47,7 @@ public class OSSStsTokenCredentialProvider extends OSSCredentialProvider {
         this.securityToken = securityToken;
     }
 
-    public OSSFederationToken getFederationToken() {
-        return new OSSFederationToken(accessKeyId, secretKeyId, securityToken, Long.MAX_VALUE);
+    public FederationToken getFederationToken() {
+        return new FederationToken(accessKeyId, secretKeyId, securityToken, Long.MAX_VALUE);
     }
 }

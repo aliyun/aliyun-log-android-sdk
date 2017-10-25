@@ -15,20 +15,20 @@ import java.util.TimeZone;
  * Mar 26, 2015
  *
  */
-public class OSSFederationToken {
+public class FederationToken {
     private String tempAk;
     private String tempSk;
     private String securityToken;
     private long expiration;
 
     /**
-     * Creates a new instance of OSSFederationToken
+     * Creates a new instance of FederationToken
      * @param tempAK AccessKeyId returned from STS
      * @param tempSK AccessKeySecret returned from STS
      * @param securityToken SecurityToken returned from STS
      * @param expiration The expiration time in seconds from STS, in the Unix Epoch format.
      */
-    public OSSFederationToken(String tempAK, String tempSK, String securityToken, long expiration) {
+    public FederationToken(String tempAK, String tempSK, String securityToken, long expiration) {
         setTempAk(tempAK);
         setTempSk(tempSK);
         setSecurityToken(securityToken);
@@ -36,13 +36,13 @@ public class OSSFederationToken {
     }
 
     /**
-     * Creates a new instance of OSSFederationToken
+     * Creates a new instance of FederationToken
      * @param tempAK AccessKeyId returned from STS
      * @param tempSK AccessKeySecret returned from STS
      * @param securityToken SecurityToken returned from STS
      * @param expirationInGMTFormat The expiration time in seconds from STS, in the GMT format.
      */
-    public OSSFederationToken(String tempAK, String tempSK, String securityToken, String expirationInGMTFormat) {
+    public FederationToken(String tempAK, String tempSK, String securityToken, String expirationInGMTFormat) {
         setTempAk(tempAK);
         setTempSk(tempSK);
         setSecurityToken(securityToken);
@@ -51,7 +51,7 @@ public class OSSFederationToken {
 
     @Override
     public String toString() {
-        return "OSSFederationToken [tempAk=" + tempAk + ", tempSk=" + tempSk + ", securityToken="
+        return "FederationToken [tempAk=" + tempAk + ", tempSk=" + tempSk + ", securityToken="
                 + securityToken + ", expiration=" + expiration + "]";
     }
 

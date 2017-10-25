@@ -7,6 +7,8 @@
 
 package com.aliyun.sls.android.sdk;
 
+import com.aliyun.sls.android.sdk.utils.VersionInfoUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,13 +18,12 @@ import java.util.List;
  */
 public class ClientConfiguration {
 
-    private static final String DEFAULT_USER_AGENT = Constants.SDK_VERSION;
+    private static final String DEFAULT_USER_AGENT = VersionInfoUtils.getUserAgent();
     private static final int DEFAULT_MAX_RETRIES = 2;
 
     private int maxConcurrentRequest = 5;
     private int socketTimeout = 15 * 1000;
     private int connectionTimeout = 15 * 1000;
-    private long max_log_size = 5 * 1024 * 1024;
     private int maxErrorRetry = DEFAULT_MAX_RETRIES;
     private List<String> customCnameExcludeList = new ArrayList<String>();
     private String proxyHost;
@@ -32,6 +33,7 @@ public class ClientConfiguration {
      * Constructor
      */
     public ClientConfiguration(){
+        String a = DEFAULT_USER_AGENT;
     }
 
     /**
@@ -98,13 +100,13 @@ public class ClientConfiguration {
      * set max log file size  default 5mb
      * @param max_log_size
      */
-    public void setMaxLogSize(long max_log_size) {
-        this.max_log_size = max_log_size;
-    }
-
-    public long getMaxLogSize() {
-        return max_log_size;
-    }
+//    public void setMaxLogSize(long max_log_size) {
+//        this.max_log_size = max_log_size;
+//    }
+//
+//    public long getMaxLogSize() {
+//        return max_log_size;
+//    }
 
     /**
      * Gets the max retry count after the recoverable failure. By default it's 2.

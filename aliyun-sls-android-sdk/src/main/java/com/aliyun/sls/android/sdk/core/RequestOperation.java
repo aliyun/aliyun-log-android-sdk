@@ -5,16 +5,15 @@ import com.aliyun.sls.android.sdk.LogException;
 import com.aliyun.sls.android.sdk.ResponseParsers;
 import com.aliyun.sls.android.sdk.CommonHeaders;
 import com.aliyun.sls.android.sdk.Constants;
+import com.aliyun.sls.android.sdk.core.auth.FederationToken;
 import com.aliyun.sls.android.sdk.core.http.HttpMethod;
-import com.aliyun.sls.android.sdk.model.Log;
 import com.aliyun.sls.android.sdk.model.LogGroup;
 import com.aliyun.sls.android.sdk.core.parser.ResponseParser;
 import com.aliyun.sls.android.sdk.SLSLog;
 import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
-import com.aliyun.sls.android.sdk.core.auth.OSSCredentialProvider;
-import com.aliyun.sls.android.sdk.core.auth.OSSFederationToken;
-import com.aliyun.sls.android.sdk.core.auth.OSSPlainTextAKSKCredentialProvider;
-import com.aliyun.sls.android.sdk.core.auth.OSSStsTokenCredentialProvider;
+import com.aliyun.sls.android.sdk.core.auth.CredentialProvider;
+import com.aliyun.sls.android.sdk.core.auth.PlainTextAKSKCredentialProvider;
+import com.aliyun.sls.android.sdk.core.auth.StsTokenCredentialProvider;
 import com.aliyun.sls.android.sdk.utils.HttpHeaders;
 import com.aliyun.sls.android.sdk.utils.Utils;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
@@ -43,12 +42,12 @@ public class RequestOperation {
 
     private volatile URI endpoint;
     private OkHttpClient innerClient;
-    private OSSCredentialProvider credentialProvider;
+    private CredentialProvider credentialProvider;
     private int maxRetryCount = Constants.DEFAULT_RETRY_COUNT;
 
     private static ExecutorService executorService = Executors.newFixedThreadPool(Constants.DEFAULT_BASE_THREAD_POOL_SIZE);
 
-    public RequestOperation(final URI endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
+    public RequestOperation(final URI endpoint, CredentialProvider credentialProvider, ClientConfiguration conf) {
         this.endpoint = endpoint;
         this.credentialProvider = credentialProvider;
 
@@ -140,9 +139,9 @@ public class RequestOperation {
                 append(headers.get(HttpHeaders.CONTENT_TYPE) + "\n").
                 append(headers.get(HttpHeaders.DATE) + "\n");
 
-        OSSFederationToken federationToken = null;
-        if (credentialProvider instanceof OSSStsTokenCredentialProvider) {
-            federationToken = ((OSSStsTokenCredentialProvider) credentialProvider).getFederationToken();
+        FederationToken federationToken = null;
+        if (credentialProvider instanceof StsTokenCredentialProvider) {
+            federationToken = ((StsTokenCredentialProvider) credentialProvider).getFederationToken();
         }
 
         String token = federationToken == null ? "" : federationToken.getSecurityToken();
@@ -159,11 +158,11 @@ public class RequestOperation {
 
 
         String signature = "---initValue---";
-        if (credentialProvider instanceof OSSStsTokenCredentialProvider) {
+        if (credentialProvider instanceof StsTokenCredentialProvider) {
             signature = Utils.sign(federationToken.getTempAK(), federationToken.getTempSK(), signString);
-        } else if (credentialProvider instanceof OSSPlainTextAKSKCredentialProvider) {
-            signature = Utils.sign(((OSSPlainTextAKSKCredentialProvider) credentialProvider).getAccessKeyId(),
-                    ((OSSPlainTextAKSKCredentialProvider) credentialProvider).getAccessKeySecret(), signString);
+        } else if (credentialProvider instanceof PlainTextAKSKCredentialProvider) {
+            signature = Utils.sign(((PlainTextAKSKCredentialProvider) credentialProvider).getAccessKeyId(),
+                    ((PlainTextAKSKCredentialProvider) credentialProvider).getAccessKeySecret(), signString);
         }
 
         SLSLog.logDebug("signed content: " + signString + "   \n ---------   signature: " + signature, false);

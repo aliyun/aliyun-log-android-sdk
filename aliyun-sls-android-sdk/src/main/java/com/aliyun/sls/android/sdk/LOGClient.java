@@ -33,7 +33,7 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.sls.android.sdk.core.AsyncTask;
 import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
-import com.aliyun.sls.android.sdk.core.auth.OSSCredentialProvider;
+import com.aliyun.sls.android.sdk.core.auth.CredentialProvider;
 import com.aliyun.sls.android.sdk.core.RequestOperation;
 import com.aliyun.sls.android.sdk.model.LogGroup;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
@@ -49,7 +49,7 @@ public class LOGClient {
     private URI endpointURI;
     private RequestOperation requestOperation;
 
-    public LOGClient(String endpoint, OSSCredentialProvider credentialProvider, ClientConfiguration conf) {
+    public LOGClient(String endpoint, CredentialProvider credentialProvider, ClientConfiguration conf) {
         try {
             endpoint = endpoint.trim();
             if (!endpoint.startsWith("http")) {

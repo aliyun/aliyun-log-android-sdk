@@ -11,14 +11,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.aliyun.sls.android.sdk.ClientException;
 import com.aliyun.sls.android.sdk.LOGClient;
 import com.aliyun.sls.android.sdk.LogException;
 import com.aliyun.sls.android.sdk.model.Log;
 import com.aliyun.sls.android.sdk.model.LogGroup;
-import com.aliyun.sls.android.sdk.ServiceException;
 import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
-import com.aliyun.sls.android.sdk.core.auth.OSSPlainTextAKSKCredentialProvider;
+import com.aliyun.sls.android.sdk.core.auth.PlainTextAKSKCredentialProvider;
 import com.aliyun.sls.android.sdk.utils.IPService;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
 import com.aliyun.sls.android.sdk.result.PostLogResult;
@@ -129,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this,"请先获取ip地址",Toast.LENGTH_SHORT).show();
             return;
         }
-        OSSPlainTextAKSKCredentialProvider plainTextAKSKCredentialProvider =
-                new OSSPlainTextAKSKCredentialProvider(accesskeyID,accessKeySecret);
+        PlainTextAKSKCredentialProvider plainTextAKSKCredentialProvider =
+                new PlainTextAKSKCredentialProvider(accesskeyID,accessKeySecret);
 
         LOGClient logClient = new LOGClient(endpoint, plainTextAKSKCredentialProvider, null);
         /* 创建logGroup */
