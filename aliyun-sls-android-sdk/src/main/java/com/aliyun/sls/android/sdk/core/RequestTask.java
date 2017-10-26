@@ -1,6 +1,8 @@
 package com.aliyun.sls.android.sdk.core;
 
 
+import android.text.TextUtils;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.sls.android.sdk.LogException;
@@ -129,13 +131,12 @@ public class RequestTask<T extends Result> implements Callable<T> {
             Map<String, List<String>> headerMap = response.headers().toMultimap();
             StringBuilder printRsp = new StringBuilder();
             printRsp.append("response:---------------------\n");
-            printRsp.append("response code: " + response.code() + " for url: " + request.url() + "\n");
-            printRsp.append("response msg: " + response.message() + "\n");
+            printRsp.append("response code : " + response.code() + " for url : " + request.url() + "\n");
+            printRsp.append("response msg : " + response.message() + "\n");
             for (String key : headerMap.keySet()) {
                 printRsp.append("responseHeader [" + key + "]: ").append(headerMap.get(key).get(0) + "\n");
             }
             SLSLog.logDebug(printRsp.toString());
-
         } catch (Exception e) {
             SLSLog.logError("Encounter local execpiton: " + e.toString());
             if (SLSLog.isEnableLog()) {
@@ -170,8 +171,8 @@ public class RequestTask<T extends Result> implements Callable<T> {
             int responseCode = response.code();
             String request_id = response.header(CommonHeaders.COMMON_HEADER_REQUEST_ID);
 
-            if (request_id == null) {
-                request_id = "";
+            if (TextUtils.isEmpty(request_id)) {
+                request_id = "no request id";
             }
 
             if (responseCode == 200) {

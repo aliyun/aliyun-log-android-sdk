@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(PostLogRequest request, LogException exception) {
-                    Toast.makeText(MainActivity.this,"failure",Toast.LENGTH_SHORT).show();
+
                 }
             });
         }catch (Exception e){
