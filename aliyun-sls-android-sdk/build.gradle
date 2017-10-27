@@ -51,7 +51,7 @@ install {
         pom {
             project {
                 packaging 'aar'
-                groupId 'com.aliyun.openservices' //自己定义的组名
+                groupId 'com.aliyun.openservices'
                 artifactId 'aliyun-log-android-sdk'
                 // Add your description here
                 name 'aliyun log sdk for android'     // project name
