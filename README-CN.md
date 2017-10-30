@@ -14,16 +14,29 @@
 
 日志服务 Android SDK依赖于[fastjson](https://github.com/alibaba/fastjson)。
 
-在项目中使用时可以通过maven依赖。
-
-### Maven依赖
+通过Gradle获取依赖
 
 ```
-<dependency>
-  <groupId>com.aliyun.openservices</groupId>
-  <artifactId>aliyun-log-android-sdk</artifactId>
-  <version>0.3.1</version>
-</dependency>
+compile 'com.aliyun.openservices:aliyun-log-android-sdk:0.4.0'
+```
+
+或通过源码编译jar包
+
+clone工程源码之后，运行gradle命令打包：
+
+```
+
+# clone工程
+$ git clone https://github.com/aliyun/aliyun-log-android-sdk.git
+
+# 进入目录
+$ cd aliyun-log-android-sdk/aliyun-sls-android-sdk/
+
+# 执行打包脚本，要求jdk 1.7
+$ ../gradlew releaseJar
+
+# 进入打包生成目录，jar包生成在该目录下
+$ cd build/libs && ls
 ```
 
 
@@ -40,10 +53,6 @@
 以下演示了上传log文件的基本流程。更多细节用法可以参考本工程的：
 
 sample目录: [点击查看](https://github.com/aliyun/aliyun-log-android-sdk/tree/master/app)。
-
-## 完整文档
-
-SDK提供的更多功能，详见官方完整文档：[点击查看](https://help.aliyun.com/document_detail/43200.html)
 
 
 ## License
