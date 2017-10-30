@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //移动端是不安全环境，不建议把ak，sk保存在本地。建议使用STS方式。具体参见
-        //https://help.aliyun.com/document_detail/60899.html?spm=5176.doc29090.6.661.3S92j7
+        //https://help.aliyun.com/document_detail/60899.html
         String STS_AK = "******";
         String STS_SK = "******";
         String STS_TOKEN = "******";
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /*
-     *  0.3.1 以前的使用方式(不推荐，但兼容)
+     *  0.3.1 以下版本的使用方式(不推荐，但兼容)
      */
     private void sampleUploadLog(@Nullable String ip) {
         if (TextUtils.isEmpty(ip)){
