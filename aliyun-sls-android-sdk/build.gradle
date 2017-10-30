@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         minSdkVersion 16
@@ -35,7 +35,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.alibaba:fastjson:1.2.35'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.squareup.okio:okio:1.9.0'
@@ -43,8 +43,8 @@ dependencies {
 }
 
 task releaseJar(type: Copy, dependsOn: build) {
-    delete( 'build/libs')
-    from('build/intermediates/bundles/release')
+    delete('build/libs')
+    from('build/intermediates/bundles/default')
     into('build/libs')
     include('classes.jar')
     rename('classes.jar', 'aliyun-log-sdk-android-' + android.defaultConfig.versionName + '.jar')
