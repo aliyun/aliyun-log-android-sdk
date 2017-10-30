@@ -38,10 +38,8 @@ public class RetryHandler {
         String errorCode = e.getErrorCode();
         String errorMessage = e.getErrorMessage();
 
-        if (!TextUtils.isEmpty(errorCode)){
-            if (Integer.valueOf(errorCode) >= 500){
-                return RetryType.RetryTypeShouldRetry;
-            }
+        if (e.responseCode >= 500){
+            return RetryType.RetryTypeShouldRetry;
         }
 
 //        //发起请求的时间和服务器时间超出15分钟,会要求重试，不知道SLS是否有这个逻辑

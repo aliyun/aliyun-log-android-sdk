@@ -142,7 +142,7 @@ public class RequestTask<T extends Result> implements Callable<T> {
             if (SLSLog.isEnableLog()) {
                 e.printStackTrace();
             }
-            exception = new LogException("", "", e.getCause(), "");
+            exception = new LogException("", e.getMessage(), e.getCause(), "");
         }
 
         //先检查request 是否 cancel
@@ -188,16 +188,19 @@ public class RequestTask<T extends Result> implements Callable<T> {
             } else {
                 exception = new LogException("LogServerError", "Response code:"
                         + String.valueOf(responseCode) + "\nMessage: internal error", request_id);
+                exception.responseCode = responseCode;
                 byte[] body = response.body().bytes();
                 if (body != null && body.length > 0) {
                     String bodyString = new String(body, "utf-8");
                     JSONObject obj = JSON.parseObject(bodyString);
                     if (obj != null && obj.containsKey("errorCode") && obj.containsKey("errorMessage")) {
                         exception = new LogException(obj.getString("errorCode"), obj.getString("errorMessage"), request_id);
+                        exception.responseCode = responseCode;
                     } else {
                         exception = new LogException("LogServerError", "Response code:"
                                 + String.valueOf(responseCode) + "\nMessage:"
                                 + bodyString, request_id);
+                        exception.responseCode = responseCode;
                     }
                 }
             }

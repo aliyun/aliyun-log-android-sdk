@@ -12,6 +12,8 @@ public class LogException extends Exception {
 
     public Boolean canceled = false;
 
+    public int responseCode = -1111;
+
     public LogException(String code, String message, String requestId) {
         super(message);
         this.errorCode = code;
