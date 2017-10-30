@@ -14,18 +14,17 @@
 
 日志服务 Android SDK依赖于[fastjson](https://github.com/alibaba/fastjson)。
 
-通过Gradle获取依赖
+###通过Gradle获取依赖
 
 ```
 compile 'com.aliyun.openservices:aliyun-log-android-sdk:0.4.0'
 ```
 
-或通过源码编译jar包
+###或通过源码编译jar包
 
 clone工程源码之后，运行gradle命令打包：
 
 ```
-
 # clone工程
 $ git clone https://github.com/aliyun/aliyun-log-android-sdk.git
 

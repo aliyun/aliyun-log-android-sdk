@@ -15,20 +15,27 @@ This document mainly describes how to install and use the SLS Android SDK. If yo
 
 SLS Android SDK is dependent on [fastjson](https://github.com/alibaba/fastjson). 
 
-you can use it through the Maven dependency. 
+you can use it through the Gradle. 
 
-
-### Maven dependency
+### Gradle
 
 ```
-<dependency>
-  <groupId>com.aliyun.openservices</groupId>
-  <artifactId>aliyun-log-android-sdk</artifactId>
-  <version>0.3.1</version>
-</dependency>
+compile 'com.aliyun.openservices:aliyun-log-android-sdk:0.4.0'
 ```
+### or you can compile jar by source code
+```
+# clone工程
+$ git clone https://github.com/aliyun/aliyun-log-android-sdk.git
 
+# 进入目录
+$ cd aliyun-log-android-sdk/aliyun-sls-android-sdk/
 
+# run task(must jdk 1.7 above)
+$ ../gradlew releaseJar
+
+# location
+$ cd build/libs && ls
+```
 
 ### Configure permissions
 
@@ -37,8 +44,6 @@ The following are the Android permissions needed by the SLS Android SDK. Please 
 ```
 <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 ```
-
-
 
 ## Quick start
 
