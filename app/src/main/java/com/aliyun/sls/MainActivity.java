@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     public String accessKeySecret = "******";
     public String project = "******";
     public String logStore = "******";
+
     public String source_ip = "";
 
 
@@ -96,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
         /* 存入一条log */
         Log log = new Log();
-        log.PutContent("bbb", "value_3");
-        log.PutContent("aaa", "value_5");
+        log.PutContent("current time ", "" + System.currentTimeMillis() / 1000);
+        log.PutContent("content", "this is a log");
 
         logGroup.PutLog(log);
 
@@ -136,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
 
         /* 存入一条log */
         Log log = new Log();
-        log.PutContent("bbb", "value_3");
-        log.PutContent("aaa", "value_5");
+        log.PutContent("current time ", "" + System.currentTimeMillis() / 1000);
+        log.PutContent("content", "this is a log");
 
         logGroup.PutLog(log);
 
@@ -146,15 +147,20 @@ public class MainActivity extends AppCompatActivity {
             logClient.asyncPostLog(request, new CompletedCallback<PostLogRequest, PostLogResult>() {
                 @Override
                 public void onSuccess(PostLogRequest request, PostLogResult result) {
-                    Toast.makeText(MainActivity.this,"success",Toast.LENGTH_SHORT).show();
+                    Message message = Message.obtain(handler);
+                    message.what = HANDLER_MESSAGE_UPLOAD_SUCCESS;
+                    message.sendToTarget();
                 }
 
                 @Override
                 public void onFailure(PostLogRequest request, LogException exception) {
-
+                    Message message = Message.obtain(handler);
+                    message.what = HANDLER_MESSAGE_UPLOAD_FAILED;
+                    message.obj = exception.getMessage();
+                    message.sendToTarget();
                 }
             });
-        }catch (Exception e){
+        }catch (LogException e){
             e.printStackTrace();
         }
     }
