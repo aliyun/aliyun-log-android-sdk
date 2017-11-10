@@ -90,10 +90,6 @@ public class MainActivity extends AppCompatActivity {
      *  推荐使用的方式，直接调用异步接口，通过callback 获取回调信息
      */
     private void asyncUploadLog(@Nullable String ip) {
-        if (TextUtils.isEmpty(ip)){
-            Toast.makeText(MainActivity.this,"请先获取ip地址",Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         //移动端是不安全环境，不建议把ak，sk保存在本地。建议使用STS方式。具体参见
         //https://help.aliyun.com/document_detail/60899.html
@@ -103,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         StsTokenCredentialProvider credentialProvider =
                 new StsTokenCredentialProvider(STS_AK,STS_SK,STS_TOKEN);
 
+
+
         ClientConfiguration conf = new ClientConfiguration();
         conf.setConnectionTimeout(15 * 1000); // 连接超时，默认15秒
         conf.setSocketTimeout(15 * 1000); // socket超时，默认15秒
@@ -111,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         SLSLog.enableLog(); // log打印在控制台
         LOGClient logClient = new LOGClient(endpoint, credentialProvider, conf);
         /* 创建logGroup */
-        LogGroup logGroup = new LogGroup("sls test", ip);
+        LogGroup logGroup = new LogGroup("sls test", TextUtils.isEmpty(ip)? " no ip " : ip);
 
         /* 存入一条log */
         Log log = new Log();
@@ -148,14 +146,10 @@ public class MainActivity extends AppCompatActivity {
      *  0.3.1 以下版本的使用方式(不推荐，但兼容)
      */
     private void sampleUploadLog(@Nullable String ip) {
-        if (TextUtils.isEmpty(ip)){
-            Toast.makeText(MainActivity.this,"请先获取ip地址",Toast.LENGTH_SHORT).show();
-            return;
-        }
         final LOGClient logClient = new LOGClient(endpoint, accesskeyID,
                 accessKeySecret, project);
         /* 创建logGroup */
-        final LogGroup logGroup = new LogGroup("sls test", ip);
+        final LogGroup logGroup = new LogGroup("sls test", TextUtils.isEmpty(ip)? " no ip " : ip);
 
         /* 存入一条log */
         Log log = new Log();
