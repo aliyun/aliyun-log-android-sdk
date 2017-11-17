@@ -16,6 +16,7 @@ import com.aliyun.sls.android.sdk.ClientConfiguration;
 import com.aliyun.sls.android.sdk.LOGClient;
 import com.aliyun.sls.android.sdk.LogException;
 import com.aliyun.sls.android.sdk.SLSLog;
+import com.aliyun.sls.android.sdk.core.auth.PlainTextAKSKCredentialProvider;
 import com.aliyun.sls.android.sdk.core.auth.StsTokenCredentialProvider;
 import com.aliyun.sls.android.sdk.model.Log;
 import com.aliyun.sls.android.sdk.model.LogGroup;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     logText.setText((String) msg.obj);
                     return;
                 case HANDLER_MESSAGE_UPLOAD_SUCCESS:
-                    Toast.makeText(MainActivity.this,"upload success",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "upload success", Toast.LENGTH_SHORT).show();
                     return;
             }
             super.handleMessage(msg);
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         logText = (TextView) findViewById(R.id.ip);
         upload = (Button) findViewById(R.id.upload);
         try {
-            IPService.getInstance().asyncGetIp(IPService.DEFAULT_URL,handler);
+            IPService.getInstance().asyncGetIp(IPService.DEFAULT_URL, handler);
         } catch (Exception e) {
             e.printStackTrace();
             logText.setText(e.getMessage());
@@ -91,14 +92,22 @@ public class MainActivity extends AppCompatActivity {
      */
     private void asyncUploadLog(@Nullable String ip) {
 
-        //移动端是不安全环境，不建议把ak，sk保存在本地。建议使用STS方式。具体参见
-        //https://help.aliyun.com/document_detail/60899.html
+//        移动端是不安全环境，不建议直接使用阿里云主账号ak，sk的方式。建议使用STS方式。具体参见 https://help.aliyun.com/document_detail/60899.html
+//        注意：SDK 提供的 PlainTextAKSKCredentialProvider 只建议在测试环境或者用户可以保证阿里云主账号AK，SK安全的前提下使用。具体使用如下
+//
+//        引用方式
+//         import com.aliyun.sls.android.sdk.core.auth.PlainTextAKSKCredentialProvider;
+//          使用方式
+//        String AK = "******";
+//        String SK = "******";
+//        PlainTextAKSKCredentialProvider credentialProvider =
+//                new PlainTextAKSKCredentialProvider(AK,SK);
+
         String STS_AK = "******";
         String STS_SK = "******";
         String STS_TOKEN = "******";
         StsTokenCredentialProvider credentialProvider =
-                new StsTokenCredentialProvider(STS_AK,STS_SK,STS_TOKEN);
-
+                new StsTokenCredentialProvider(STS_AK, STS_SK, STS_TOKEN);
 
 
         ClientConfiguration conf = new ClientConfiguration();
@@ -109,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         SLSLog.enableLog(); // log打印在控制台
         LOGClient logClient = new LOGClient(endpoint, credentialProvider, conf);
         /* 创建logGroup */
-        LogGroup logGroup = new LogGroup("sls test", TextUtils.isEmpty(ip)? " no ip " : ip);
+        LogGroup logGroup = new LogGroup("sls test", TextUtils.isEmpty(ip) ? " no ip " : ip);
 
         /* 存入一条log */
         Log log = new Log();
@@ -118,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
 
         logGroup.PutLog(log);
 
-        try{
-            PostLogRequest request = new PostLogRequest(project,logStore,logGroup);
+        try {
+            PostLogRequest request = new PostLogRequest(project, logStore, logGroup);
             logClient.asyncPostLog(request, new CompletedCallback<PostLogRequest, PostLogResult>() {
                 @Override
                 public void onSuccess(PostLogRequest request, PostLogResult result) {
@@ -136,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                     message.sendToTarget();
                 }
             });
-        }catch (LogException e){
+        } catch (LogException e) {
             e.printStackTrace();
         }
     }
@@ -149,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         final LOGClient logClient = new LOGClient(endpoint, accesskeyID,
                 accessKeySecret, project);
         /* 创建logGroup */
-        final LogGroup logGroup = new LogGroup("sls test", TextUtils.isEmpty(ip)? " no ip " : ip);
+        final LogGroup logGroup = new LogGroup("sls test", TextUtils.isEmpty(ip) ? " no ip " : ip);
 
         /* 存入一条log */
         Log log = new Log();
@@ -161,10 +170,10 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
+                try {
                     /* 发送log 会调用网络操作，需要在一个异步线程中完成*/
                     logClient.PostLog(logGroup, logStore);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     Message message = Message.obtain(handler);
                     message.what = HANDLER_MESSAGE_UPLOAD_FAILED;
