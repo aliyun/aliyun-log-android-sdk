@@ -132,7 +132,14 @@ public class RequestTask<T extends Result> implements Callable<T> {
             StringBuilder printRsp = new StringBuilder();
             printRsp.append("response:---------------------\n");
             printRsp.append("response code : " + response.code() + " for url : " + request.url() + "\n");
-            printRsp.append("response msg : " + response.message() + "\n");
+
+            byte[] body = response.body().bytes();
+            if (body != null && body.length > 0) {
+                String bodyString = new String(body, "utf-8");
+                printRsp.append("response body : " + bodyString + "\n");
+            }else{
+                printRsp.append("response body is null \n");
+            }
             for (String key : headerMap.keySet()) {
                 printRsp.append("responseHeader [" + key + "]: ").append(headerMap.get(key).get(0) + "\n");
             }
