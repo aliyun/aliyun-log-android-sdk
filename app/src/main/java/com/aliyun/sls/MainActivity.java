@@ -94,10 +94,11 @@ public class MainActivity extends AppCompatActivity {
 
 //        移动端是不安全环境，不建议直接使用阿里云主账号ak，sk的方式。建议使用STS方式。具体参见
 //        https://help.aliyun.com/document_detail/62681.html
-//        注意：SDK 提供的 PlainTextAKSKCredentialProvider 只建议在测试环境或者用户可以保证阿里云主账号AK，SK安全的前提下使用。具体使用如下
+//        注意：SDK 提供的 PlainTextAKSKCredentialProvider 只建议在测试环境或者用户可以保证阿里云主账号AK，SK安全的前提下使用。
+//		  具体使用如下
 //
-//         import com.aliyun.sls.android.sdk.core.auth.PlainTextAKSKCredentialProvider;
 //        主账户使用方式
+//        import com.aliyun.sls.android.sdk.core.auth.PlainTextAKSKCredentialProvider;
 //        String AK = "******";
 //        String SK = "******";
 //        PlainTextAKSKCredentialProvider credentialProvider =
