@@ -2,6 +2,7 @@ package com.aliyun.sls.android.sdk;
 
 import com.aliyun.sls.android.sdk.core.parser.AbstractResponseParser;
 import com.aliyun.sls.android.sdk.result.PostLogResult;
+import com.aliyun.sls.android.sdk.result.PostCachedLogResult;
 
 import okhttp3.Response;
 
@@ -18,5 +19,12 @@ public final class ResponseParsers {
         }
     }
 
+    public static class PostCachedLogResponseParser extends AbstractResponseParser<PostCachedLogResult> {
+
+        @Override
+        public PostCachedLogResult parseData(Response response, PostCachedLogResult result) throws Exception{
+            return result;
+        }
+    }
 
 }
