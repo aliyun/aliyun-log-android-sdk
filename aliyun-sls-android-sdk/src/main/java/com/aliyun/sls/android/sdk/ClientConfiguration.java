@@ -17,6 +17,14 @@ import java.util.List;
  * The client side configuration
  */
 public class ClientConfiguration {
+
+    public enum NetworkPolicy{
+        /* wifi-only,只有wifi情况下上传 */
+        WIFI_ONLY,
+        /* 有网,只有wifi情况下上传 */
+        WWAN_OR_WIFI
+    }
+
     
     private static final int DEFAULT_MAX_RETRIES = 2;
 
@@ -27,6 +35,9 @@ public class ClientConfiguration {
     private List<String> customCnameExcludeList = new ArrayList<String>();
     private String proxyHost;
     private int proxyPort;
+
+    private Boolean cachable = false;           // 是否开启缓存日志
+    private NetworkPolicy connectType = NetworkPolicy.WIFI_ONLY;  // 缓存日志的发送策略
 
     /**
      * Constructor
@@ -165,5 +176,21 @@ public class ClientConfiguration {
 
     public void setProxyPort(int proxyPort) {
         this.proxyPort = proxyPort;
+    }
+
+    public Boolean getCachable() {
+        return cachable;
+    }
+
+    public void setCachable(Boolean cachable) {
+        this.cachable = cachable;
+    }
+
+    public NetworkPolicy getConnectType() {
+        return connectType;
+    }
+
+    public void setConnectType(NetworkPolicy connectType) {
+        this.connectType = connectType;
     }
 }

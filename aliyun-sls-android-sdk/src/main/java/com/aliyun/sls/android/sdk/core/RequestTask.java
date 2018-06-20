@@ -190,6 +190,7 @@ public class RequestTask<T extends Result> implements Callable<T> {
                         context.getCompletedCallback().onSuccess(context.getRequest(), result);
                     } catch (Exception ignore) {
                         // The callback throws the exception, ignore it
+                        SLSLog.logError(ignore.toString());
                     }
                 }
             } else {

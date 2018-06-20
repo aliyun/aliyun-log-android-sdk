@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.sdk;
 
+import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -8,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -24,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.zip.Deflater;
+import java.util.Date;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -31,6 +35,7 @@ import javax.crypto.spec.SecretKeySpec;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+
 import com.aliyun.sls.android.sdk.core.AsyncTask;
 import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
 import com.aliyun.sls.android.sdk.core.auth.CredentialProvider;
@@ -38,6 +43,8 @@ import com.aliyun.sls.android.sdk.core.RequestOperation;
 import com.aliyun.sls.android.sdk.model.LogGroup;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
 import com.aliyun.sls.android.sdk.result.PostLogResult;
+import com.aliyun.sls.android.sdk.request.PostCachedLogRequest;
+import com.aliyun.sls.android.sdk.result.PostCachedLogResult;
 import com.aliyun.sls.android.sdk.utils.Base64Kit;
 
 /**
@@ -45,17 +52,35 @@ import com.aliyun.sls.android.sdk.utils.Base64Kit;
  * edited by wangzheng on 17/10/15
  */
 public class LOGClient {
-
     private URI endpointURI;
     private RequestOperation requestOperation;
+    private CacheManager cacheManager;
+    private Boolean cachable;
+    private ClientConfiguration.NetworkPolicy policy;
+    private Context context;
+    private CompletedCallback mCompletedCallback;
 
     public LOGClient(String endpoint, CredentialProvider credentialProvider, ClientConfiguration conf) {
         try {
-            endpoint = endpoint.trim();
-            if (!endpoint.startsWith("http")) {
-                endpoint = "http://" + endpoint;
+            mHttpType = "http://";
+            if (endpoint.trim() != "") {
+                mEndPoint = endpoint;
+            } else {
+                throw new NullPointerException("endpoint is null");
             }
-            this.endpointURI = new URI(endpoint);
+
+            if (mEndPoint.startsWith("http://")) {
+                mEndPoint = mEndPoint.substring(7);
+            } else if (mEndPoint.startsWith("https://")) {
+                mEndPoint = mEndPoint.substring(8);
+                mHttpType = "https://";
+            }
+
+            while (mEndPoint.endsWith("/")) {
+                mEndPoint = mEndPoint.substring(0, mEndPoint.length() - 1);
+            }
+
+            this.endpointURI = new URI(mHttpType + mEndPoint);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Endpoint must be a string like 'http://cn-****.log.aliyuncs.com'," +
                     "or your cname like 'http://image.cnamedomain.com'!");
@@ -65,12 +90,64 @@ public class LOGClient {
             throw new IllegalArgumentException("CredentialProvider can't be null.");
         }
 
+        if (conf != null) {
+            this.cachable = conf.getCachable();
+            this.policy = conf.getConnectType();
+        }
+
         requestOperation = new RequestOperation(endpointURI, credentialProvider, (conf == null ? ClientConfiguration.getDefaultConf() : conf));
+        cacheManager = new CacheManager(this);
     }
 
     public AsyncTask<PostLogResult> asyncPostLog(PostLogRequest request, CompletedCallback<PostLogRequest, PostLogResult> completedCallback)
             throws LogException {
+        final boolean bCachable = this.cachable;
+
+        final String itemEndPoint = this.mEndPoint;
+
+//        mCompletedCallback = completedCallback;
+
+//        CompletedCallback<PostLogRequest, PostLogResult> callback = new CompletedCallback<PostLogRequest, PostLogResult>() {
+//            @Override
+//            public void onSuccess(PostLogRequest request, PostLogResult result) {
+//                if (mCompletedCallback != null) {
+//                    try {
+//                        mCompletedCallback.onSuccess(request, result);
+//                    } catch (Exception ignore) {
+//                        // The callback throws the exception, ignore it
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(PostLogRequest request, LogException exception) {
+//                if (bCachable) {
+//                    LogEntity item = new LogEntity();
+//                    item.setProject(request.mProject);
+//                    item.setStore(request.mLogStoreName);
+//                    item.setEndPoint(itemEndPoint);
+//                    item.setJsonString(request.mLogGroup.LogGroupToJsonString());
+//                    item.setTimestamp(new Long(new Date().getTime()));
+//
+//                    SLSDatabaseManager.getInstance().insertRecordIntoDB(item);
+//                }
+//
+//                if (mCompletedCallback != null) {
+//                    try {
+//                        mCompletedCallback.onFailure(request, exception);
+//                    } catch (Exception ignore) {
+//                        // The callback throws the exception, ignore it
+//                    }
+//                }
+//            }
+//        };
+
         return requestOperation.postLog(request, completedCallback);
+    }
+
+    public AsyncTask<PostCachedLogResult> asyncPostCachedLog(PostCachedLogRequest request, final CompletedCallback<PostCachedLogRequest, PostCachedLogResult> completedCallback)
+            throws LogException {
+        return requestOperation.postCachedLog(request, completedCallback);
     }
 
 
@@ -326,5 +403,22 @@ public class LOGClient {
         }
     }
 
+    public ClientConfiguration.NetworkPolicy getPolicy() {
+        return policy;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        Log.d("SLS SDK","LOGClient finalize");
+    }
     //=================================================
 }

@@ -15,6 +15,8 @@ public final class Constants {
 
     public static final String COMPRESSTYPE_DEFLATE = "deflate";
 
+    public static final String DB_NAME = "slslog";
+
 
 
     public static final int DEFAULT_RETRY_COUNT = 2;
