@@ -1,6 +1,11 @@
 package com.aliyun.sls.android.sdk.core;
 
 import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
+import com.aliyun.sls.android.sdk.request.PostLogRequest;
+import com.aliyun.sls.android.sdk.result.PostLogResult;
+
+import java.lang.ref.WeakReference;
+import java.util.WeakHashMap;
 
 import okhttp3.OkHttpClient;
 
@@ -13,7 +18,9 @@ public class ExecutionContext<T extends Request> {
     private OkHttpClient client;
     private CancellationHandler cancellationHandler = new CancellationHandler();
 
-    private CompletedCallback completedCallback;
+//    private CompletedCallback completedCallback;
+
+    private WeakReference<CompletedCallback> completedCallback;
 
     public ExecutionContext(OkHttpClient client, T request) {
         setClient(client);
@@ -41,10 +48,11 @@ public class ExecutionContext<T extends Request> {
     }
 
     public CompletedCallback getCompletedCallback() {
-        return completedCallback;
+        return completedCallback.get();
     }
 
     public void setCompletedCallback(CompletedCallback completedCallback) {
-        this.completedCallback = completedCallback;
+        this.completedCallback = new WeakReference<CompletedCallback>(completedCallback);
+//        this.completedCallback = completedCallback;
     }
 }

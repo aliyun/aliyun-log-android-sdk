@@ -48,27 +48,25 @@ public class CacheManager {
             if(mWeakCacheManager.get() == null){
                 return;
             }else{
-                if(mWeakCacheManager.get() instanceof CacheManager){
-                    ConnectivityManager cm =
-                            (ConnectivityManager)mWeakCacheManager.get().mClient.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-                    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-                    boolean isConnected = activeNetwork != null &&
-                            activeNetwork.isConnectedOrConnecting();
-                    if (!isConnected) {
-                        return;
-                    }
+                ConnectivityManager cm =
+                        (ConnectivityManager)mWeakCacheManager.get().mClient.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
+                if (!isConnected) {
+                    return;
+                }
 
-                    // 有网络连接的情况下如何决定是否上传日志(1.WIFI_ONLY只在wifi环境上传; 2.有网就传)
-                    Boolean shouldPost = false;
-                    if (mWeakCacheManager.get().mClient.getPolicy() == ClientConfiguration.NetworkPolicy.WIFI_ONLY && activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-                        shouldPost = true;
-                    } else if (mWeakCacheManager.get().mClient.getPolicy() == ClientConfiguration.NetworkPolicy.WWAN_OR_WIFI) {
-                        shouldPost = true;
-                    }
+                // 有网络连接的情况下如何决定是否上传日志(1.WIFI_ONLY只在wifi环境上传; 2.有网就传)
+                Boolean shouldPost = false;
+                if (mWeakCacheManager.get().mClient.getPolicy() == ClientConfiguration.NetworkPolicy.WIFI_ONLY && activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                    shouldPost = true;
+                } else if (mWeakCacheManager.get().mClient.getPolicy() == ClientConfiguration.NetworkPolicy.WWAN_OR_WIFI) {
+                    shouldPost = true;
+                }
 
-                    if (shouldPost) {
-                        mWeakCacheManager.get().fetchDataFromDBAndPost();
-                    }
+                if (shouldPost) {
+                    mWeakCacheManager.get().fetchDataFromDBAndPost();
                 }
             }
 

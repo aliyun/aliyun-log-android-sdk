@@ -41,17 +41,18 @@ public class MainActivity extends AppCompatActivity {
      * 填入必要的参数
      */
     public String endpoint = "http://cn-hangzhou.sls.aliyuncs.com";
-    public String accesskeyID = "************";
-    public String accessKeySecret = "**************";
-    public String project = "****************";
-    public String logStore = "**************";
+    public String accesskeyID = "LTAIdJcQW6Uap6cL";
+    public String accessKeySecret = "ssnJED1Ro4inSpE2NF71bGZD6IEbN1";
+    public String project = "zhuoqinsls001";
+    public String logStore = "zhuoqinsls001-logstore001";
     public String source_ip = "";
-
-//    public LOGClient logClient;
+    //client的生命周期和app保持一致
+    public LOGClient logClient;
 
 
     TextView logText;
     Button upload;
+    Button gc;
 
     private Handler handler = new Handler() {
         // 处理子线程给我们发送的消息。
@@ -92,6 +93,16 @@ public class MainActivity extends AppCompatActivity {
                 asyncUploadLog(source_ip);
             }
         });
+
+        gc = (Button) findViewById(R.id.gc);
+        gc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logClient = null;
+                System.gc();
+            }
+        });
+
         SLSLog.enableLog();
     }
 
@@ -127,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         conf.setCachable(true);
         conf.setConnectType(ClientConfiguration.NetworkPolicy.WIFI_ONLY);
         SLSLog.enableLog(); // log打印在控制台
-        LOGClient logClient = new LOGClient(endpoint, credentialProvider, conf);
+        logClient = new LOGClient(endpoint, credentialProvider, conf);
         logClient.setContext(getApplicationContext());
         /* 创建logGroup */
         LogGroup logGroup = new LogGroup("sls test", TextUtils.isEmpty(ip) ? " no ip " : ip);
@@ -147,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                     Message message = Message.obtain(handler);
                     message.what = HANDLER_MESSAGE_UPLOAD_SUCCESS;
                     message.sendToTarget();
-                    System.gc();
+//                    System.gc();
                 }
 
                 @Override
@@ -156,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                     message.what = HANDLER_MESSAGE_UPLOAD_FAILED;
                     message.obj = exception.getMessage();
                     message.sendToTarget();
-                    System.gc();
+//                    System.gc();
                 }
             });
         } catch (LogException e) {
