@@ -3,6 +3,20 @@ package com.aliyun.sls.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
+import com.aliyun.sls.android.sdk.core.AsyncTask;
+import com.aliyun.sls.android.sdk.core.RequestOperation;
+import com.aliyun.sls.android.sdk.core.auth.CredentialProvider;
+import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
+import com.aliyun.sls.android.sdk.model.LogGroup;
+import com.aliyun.sls.android.sdk.request.PostCachedLogRequest;
+import com.aliyun.sls.android.sdk.request.PostLogRequest;
+import com.aliyun.sls.android.sdk.result.PostCachedLogResult;
+import com.aliyun.sls.android.sdk.result.PostLogResult;
+import com.aliyun.sls.android.sdk.utils.Base64Kit;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -10,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -22,30 +35,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.WeakHashMap;
 import java.util.zip.Deflater;
-import java.util.Date;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
-
-import com.aliyun.sls.android.sdk.core.AsyncTask;
-import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
-import com.aliyun.sls.android.sdk.core.auth.CredentialProvider;
-import com.aliyun.sls.android.sdk.core.RequestOperation;
-import com.aliyun.sls.android.sdk.model.LogGroup;
-import com.aliyun.sls.android.sdk.request.PostLogRequest;
-import com.aliyun.sls.android.sdk.result.PostLogResult;
-import com.aliyun.sls.android.sdk.request.PostCachedLogRequest;
-import com.aliyun.sls.android.sdk.result.PostCachedLogResult;
-import com.aliyun.sls.android.sdk.utils.Base64Kit;
 
 /**
  * Created by wangjwchn on 16/8/2.
@@ -58,7 +57,8 @@ public class LOGClient {
     private Boolean cachable;
     private ClientConfiguration.NetworkPolicy policy;
     private Context context;
-    private CompletedCallback mCompletedCallback;
+    private WeakHashMap<PostLogRequest, CompletedCallback<PostLogRequest, PostLogResult>> mCompletedCallbacks = new WeakHashMap<PostLogRequest, CompletedCallback<PostLogRequest, PostLogResult>>();
+    private CompletedCallback<PostLogRequest, PostLogResult> callbackImp;
 
     public LOGClient(String endpoint, CredentialProvider credentialProvider, ClientConfiguration conf) {
         try {
@@ -97,52 +97,52 @@ public class LOGClient {
 
         requestOperation = new RequestOperation(endpointURI, credentialProvider, (conf == null ? ClientConfiguration.getDefaultConf() : conf));
         cacheManager = new CacheManager(this);
+
+        callbackImp = new CompletedCallback<PostLogRequest, PostLogResult>() {
+            @Override
+            public void onSuccess(PostLogRequest request, PostLogResult result) {
+                CompletedCallback<PostLogRequest, PostLogResult> callback = mCompletedCallbacks.get(request);
+                if (callback != null) {
+                    try {
+                        callback.onSuccess(request, result);
+                    } catch (Exception ignore) {
+                        // The callback throws the exception, ignore it
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(PostLogRequest request, LogException exception) {
+
+                if (cachable) {
+                    LogEntity item = new LogEntity();
+                    item.setProject(request.mProject);
+                    item.setStore(request.mLogStoreName);
+                    item.setEndPoint(mEndPoint);
+                    item.setJsonString(request.mLogGroup.LogGroupToJsonString());
+                    item.setTimestamp(new Long(new Date().getTime()));
+                    SLSDatabaseManager.getInstance().insertRecordIntoDB(item);
+                }
+
+                CompletedCallback<PostLogRequest, PostLogResult> callback = mCompletedCallbacks.get(request);
+                if (callback != null) {
+                    try {
+                        callback.onFailure(request, exception);
+                    } catch (Exception ignore) {
+                        // The callback throws the exception, ignore it
+                    }
+                }
+            }
+        };
+
     }
 
     public AsyncTask<PostLogResult> asyncPostLog(PostLogRequest request, CompletedCallback<PostLogRequest, PostLogResult> completedCallback)
             throws LogException {
-        final boolean bCachable = this.cachable;
 
-        final String itemEndPoint = this.mEndPoint;
+        mCompletedCallbacks.put(request, completedCallback);
 
-//        mCompletedCallback = completedCallback;
-
-//        CompletedCallback<PostLogRequest, PostLogResult> callback = new CompletedCallback<PostLogRequest, PostLogResult>() {
-//            @Override
-//            public void onSuccess(PostLogRequest request, PostLogResult result) {
-//                if (mCompletedCallback != null) {
-//                    try {
-//                        mCompletedCallback.onSuccess(request, result);
-//                    } catch (Exception ignore) {
-//                        // The callback throws the exception, ignore it
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(PostLogRequest request, LogException exception) {
-//                if (bCachable) {
-//                    LogEntity item = new LogEntity();
-//                    item.setProject(request.mProject);
-//                    item.setStore(request.mLogStoreName);
-//                    item.setEndPoint(itemEndPoint);
-//                    item.setJsonString(request.mLogGroup.LogGroupToJsonString());
-//                    item.setTimestamp(new Long(new Date().getTime()));
-//
-//                    SLSDatabaseManager.getInstance().insertRecordIntoDB(item);
-//                }
-//
-//                if (mCompletedCallback != null) {
-//                    try {
-//                        mCompletedCallback.onFailure(request, exception);
-//                    } catch (Exception ignore) {
-//                        // The callback throws the exception, ignore it
-//                    }
-//                }
-//            }
-//        };
-
-        return requestOperation.postLog(request, completedCallback);
+        return requestOperation.postLog(request, callbackImp);
     }
 
     public AsyncTask<PostCachedLogResult> asyncPostCachedLog(PostCachedLogRequest request, final CompletedCallback<PostCachedLogRequest, PostCachedLogResult> completedCallback)
@@ -192,7 +192,6 @@ public class LOGClient {
 
         mAccessToken = "";
     }
-
 
 
     public void SetToken(String token) {
@@ -418,7 +417,7 @@ public class LOGClient {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        Log.d("SLS SDK","LOGClient finalize");
+        Log.d("SLS SDK", "LOGClient finalize");
     }
     //=================================================
 }
