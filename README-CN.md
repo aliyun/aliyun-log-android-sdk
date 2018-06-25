@@ -17,7 +17,7 @@
 ###通过Gradle获取依赖
 
 ```
-compile 'com.aliyun.openservices:aliyun-log-android-sdk:0.4.0'
+compile 'com.aliyun.openservices:aliyun-log-android-sdk:2.0.0'
 ```
 
 ###或通过源码编译jar包
@@ -83,8 +83,7 @@ public class MyApplication extends Application {
         
         SLSLog.enableLog(); // log打印在控制台
         
-        LOGClient logClient = new LOGClient(endpoint, credentialProvider, conf);    // 初始化client
-        logClient.setContext(getApplicationContext());  // 设置context
+        LOGClient logClient = new LOGClient(getApplicationContext(), endpoint, credentialProvider, conf);    // 初始化client
 
 ```
 
