@@ -20,7 +20,7 @@ you can use it through the Gradle.
 ### Gradle
 
 ```
-compile 'com.aliyun.openservices:aliyun-log-android-sdk:0.4.0'
+compile 'com.aliyun.openservices:aliyun-log-android-sdk:2.0.0'
 ```
 ### or you can compile jar by source code
 ```

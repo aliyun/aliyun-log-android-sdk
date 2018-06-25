@@ -5,7 +5,7 @@ package com.aliyun.sls.android.sdk;
  */
 public final class Constants {
 
-    public static final String SDK_VERSION = "0.4.0";
+    public static final String SDK_VERSION = "2.0.0";
 
     public static final String API_VERSION = "0.6.0";
 
