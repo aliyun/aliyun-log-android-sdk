@@ -25,7 +25,6 @@ public class CacheManager {
 
     public CacheManager(LOGClient mClient) {
         this.mClient = mClient;
-        setupTimer();
     }
 
     public void setupTimer() {

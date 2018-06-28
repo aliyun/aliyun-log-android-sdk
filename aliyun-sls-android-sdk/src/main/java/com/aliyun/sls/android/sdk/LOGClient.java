@@ -104,9 +104,11 @@ public class LOGClient {
         }
 
         requestOperation = new RequestOperation(endpointURI, credentialProvider, (conf == null ? ClientConfiguration.getDefaultConf() : conf));
-        cacheManager = new CacheManager(this);
         this.context = context;
         SLSDatabaseManager.getInstance().setupDB(context);
+
+        cacheManager = new CacheManager(this);
+        cacheManager.setupTimer();
 
         callbackImp = new CompletedCallback<PostLogRequest, PostLogResult>() {
             @Override
