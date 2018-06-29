@@ -25,6 +25,12 @@ import com.aliyun.sls.android.sdk.utils.IPService;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
 import com.aliyun.sls.android.sdk.result.PostLogResult;
 
+import com.aliyun.sls.android.sdk.SLSDatabaseManager;
+import com.aliyun.sls.android.sdk.LogEntity;
+
+import java.util.Date;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,16 +40,17 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 填入必要的参数
      */
-    public String endpoint = "******";
-    public String accesskeyID = "******";
-    public String accessKeySecret = "******";
-    public String project = "******";
-    public String logStore = "******";
+    public String endpoint = "http://cn-hangzhou.sls.aliyuncs.com";
+    public String project = "**********";
+    public String logStore = "*********";
     public String source_ip = "";
+    //client的生命周期和app保持一致
+    public LOGClient logClient;
 
 
     TextView logText;
     Button upload;
+    Button gc;
 
     private Handler handler = new Handler() {
         // 处理子线程给我们发送的消息。
@@ -85,30 +92,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        gc = (Button) findViewById(R.id.gc);
+        gc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logClient = null;
+                System.gc();
+            }
+        });
+
+        setupSLSClient();
+        SLSLog.enableLog();
     }
 
-    /*
-     *  推荐使用的方式，直接调用异步接口，通过callback 获取回调信息
-     */
-    private void asyncUploadLog(@Nullable String ip) {
-
-//        移动端是不安全环境，不建议直接使用阿里云主账号ak，sk的方式。建议使用STS方式。具体参见
+    private void setupSLSClient() {
+        //        移动端是不安全环境，不建议直接使用阿里云主账号ak，sk的方式。建议使用STS方式。具体参见
 //        https://help.aliyun.com/document_detail/62681.html
 //        注意：SDK 提供的 PlainTextAKSKCredentialProvider 只建议在测试环境或者用户可以保证阿里云主账号AK，SK安全的前提下使用。
 //		  具体使用如下
-//
+
 //        主账户使用方式
-//        import com.aliyun.sls.android.sdk.core.auth.PlainTextAKSKCredentialProvider;
-//        String AK = "******";
-//        String SK = "******";
-//        PlainTextAKSKCredentialProvider credentialProvider =
-//                new PlainTextAKSKCredentialProvider(AK,SK)
+
+        String AK = "********";
+        String SK = "********";
+        PlainTextAKSKCredentialProvider credentialProvider =
+                new PlainTextAKSKCredentialProvider(AK, SK);
 //        STS使用方式
-        String STS_AK = "******";
-        String STS_SK = "******";
-        String STS_TOKEN = "******";
-        StsTokenCredentialProvider credentialProvider =
-                new StsTokenCredentialProvider(STS_AK, STS_SK, STS_TOKEN);
+//        String STS_AK = "******";
+//        String STS_SK = "******";
+//        String STS_TOKEN = "******";
+//        StsTokenCredentialProvider credentialProvider =
+//                new StsTokenCredentialProvider(STS_AK, STS_SK, STS_TOKEN);
 
 
         ClientConfiguration conf = new ClientConfiguration();
@@ -116,8 +130,18 @@ public class MainActivity extends AppCompatActivity {
         conf.setSocketTimeout(15 * 1000); // socket超时，默认15秒
         conf.setMaxConcurrentRequest(5); // 最大并发请求书，默认5个
         conf.setMaxErrorRetry(2); // 失败后最大重试次数，默认2次
+        conf.setCachable(true);
+        conf.setConnectType(ClientConfiguration.NetworkPolicy.WWAN_OR_WIFI);
         SLSLog.enableLog(); // log打印在控制台
-        LOGClient logClient = new LOGClient(endpoint, credentialProvider, conf);
+
+        logClient = new LOGClient(getApplicationContext(), endpoint, credentialProvider, conf);
+    }
+
+    /*
+     *  推荐使用的方式，直接调用异步接口，通过callback 获取回调信息
+     */
+    private void asyncUploadLog(@Nullable String ip) {
+
         /* 创建logGroup */
         LogGroup logGroup = new LogGroup("sls test", TextUtils.isEmpty(ip) ? " no ip " : ip);
 
@@ -136,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
                     Message message = Message.obtain(handler);
                     message.what = HANDLER_MESSAGE_UPLOAD_SUCCESS;
                     message.sendToTarget();
+//                    System.gc();
                 }
 
                 @Override
@@ -144,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
                     message.what = HANDLER_MESSAGE_UPLOAD_FAILED;
                     message.obj = exception.getMessage();
                     message.sendToTarget();
+//                    System.gc();
                 }
             });
         } catch (LogException e) {
@@ -151,43 +177,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void insertLogToDB(View v) {
+        LogEntity entity = new LogEntity();
+        entity.setEndPoint("cn-hangzhou.sls.aliyuncs.com");
+        entity.setJsonString("{\"__topic__\":\"sls test\",\"__logs__\":[{\"content\":\"this is a log\",\"__time__\":1529466139,\"current time \":\"1529466139\"}],\"__source__\":\"42.120.74.108\"}");
+        entity.setStore(logStore);
+        entity.setProject(project);
+        Date date = new Date();
+        entity.setTimestamp(new Long(date.getTime()));
 
-    /*
-     *  0.3.1 以下版本的使用方式(不推荐，但兼容)
-     */
-    private void sampleUploadLog(@Nullable String ip) {
-        final LOGClient logClient = new LOGClient(endpoint, accesskeyID,
-                accessKeySecret, project);
-        /* 创建logGroup */
-        final LogGroup logGroup = new LogGroup("sls test", TextUtils.isEmpty(ip) ? " no ip " : ip);
-
-        /* 存入一条log */
-        Log log = new Log();
-        log.PutContent("current time ", "" + System.currentTimeMillis() / 1000);
-        log.PutContent("content", "this is a log");
-
-        logGroup.PutLog(log);
+        SLSDatabaseManager.getInstance().insertRecordIntoDB(entity);
 
         new Thread(new Runnable() {
+
             @Override
             public void run() {
                 try {
                     /* 发送log 会调用网络操作，需要在一个异步线程中完成*/
-                    logClient.PostLog(logGroup, logStore);
+                    List<LogEntity> list = SLSDatabaseManager.getInstance().queryRecordFromDB();
+                    for (LogEntity logEntity: list) {
+                        String msg = "logEntity:{\nendPoint: " + logEntity.getEndPoint() + ",\nlogStore: " + logEntity.getStore() + ",\nProject: " + logEntity.getProject() + "}";
+                        SLSLog.logInfo(msg);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Message message = Message.obtain(handler);
-                    message.what = HANDLER_MESSAGE_UPLOAD_FAILED;
-                    message.obj = e.getMessage();
-                    message.sendToTarget();
                     return;
                 }
-                Message message = Message.obtain(handler);
-                message.what = HANDLER_MESSAGE_UPLOAD_SUCCESS;
-                message.sendToTarget();
             }
         }).start();
     }
-
-
 }

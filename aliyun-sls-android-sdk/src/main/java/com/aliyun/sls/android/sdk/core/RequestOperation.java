@@ -18,6 +18,8 @@ import com.aliyun.sls.android.sdk.utils.HttpHeaders;
 import com.aliyun.sls.android.sdk.utils.Utils;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
 import com.aliyun.sls.android.sdk.result.PostLogResult;
+import com.aliyun.sls.android.sdk.request.PostCachedLogRequest;
+import com.aliyun.sls.android.sdk.result.PostCachedLogResult;
 import com.aliyun.sls.android.sdk.utils.VersionInfoUtils;
 
 import java.net.InetSocketAddress;
@@ -175,6 +177,94 @@ public class RequestOperation {
 
     }
 
+    private void buildCachedUrl(PostCachedLogRequest request, RequestMessage requestMessage) throws
+            LogException {
+        if (request == null || requestMessage == null) {
+            LogException exception = new LogException("", "postCachedLogRequest or requestMessage when buildUrl is not null", null, "");
+            throw exception;
+        }
+        String logStoreName = request.mLogStoreName;
+        String project = request.mProject;
+        String scheme = endpoint.getScheme();
+        String host = project + "." + endpoint.getHost();
+        String url = scheme + "://" + host + "/logstores/" + logStoreName + "/shards/lb";
+        requestMessage.url = url;
+        requestMessage.method = HttpMethod.POST;
+    }
+
+    private void buildCachedHeaders(PostCachedLogRequest request, RequestMessage requestMessage) throws
+            LogException {
+        if (request == null || requestMessage == null) {
+            LogException exception = new LogException("", "postCachedLogRequest or requestMessage when buildheaders is not null", null, "");
+            throw exception;
+        }
+
+        String logStoreName = request.mLogStoreName;
+        String project = request.mProject;
+        String contentType = request.logContentType;
+        String host = project + "." + endpoint.getHost();
+
+        Map<String, String> headers = requestMessage.headers;
+        headers.put(CommonHeaders.COMMON_HEADER_APIVERSION, Constants.API_VERSION);
+        headers.put(CommonHeaders.COMMON_HEADER_SIGNATURE_METHOD, Constants.SIGNATURE_METHOD);
+        headers.put(CommonHeaders.COMMON_HEADER_COMPRESSTYPE, Constants.COMPRESSTYPE_DEFLATE);
+        headers.put(HttpHeaders.CONTENT_TYPE, contentType);
+        headers.put(HttpHeaders.DATE, Utils.GetMGTTime());
+        headers.put(HttpHeaders.HOST, host);
+
+
+        try {
+            byte[] httpPostBody = request.mJsonString.getBytes("UTF-8");
+            byte[] httpPostBodyZipped = Utils.GzipFrom(httpPostBody);
+            requestMessage.setUploadData(httpPostBodyZipped);
+            headers.put(HttpHeaders.CONTENT_MD5, Utils.ParseToMd5U32(httpPostBodyZipped));
+            headers.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(httpPostBodyZipped.length));
+            headers.put(CommonHeaders.COMMON_HEADER_BODYRAWSIZE, String.valueOf(httpPostBody.length));
+        } catch (Exception e) {
+            LogException exception = new LogException("", "postLogRequest or requestMessage is not null", null, "");
+            throw exception;
+        }
+
+        StringBuilder signStringBuf = new StringBuilder("POST" + "\n").
+                append(headers.get(HttpHeaders.CONTENT_MD5) + "\n").
+                append(headers.get(HttpHeaders.CONTENT_TYPE) + "\n").
+                append(headers.get(HttpHeaders.DATE) + "\n");
+
+        FederationToken federationToken = null;
+        if (credentialProvider instanceof StsTokenCredentialProvider) {
+            federationToken = ((StsTokenCredentialProvider) credentialProvider).getFederationToken();
+        }
+
+        String token = federationToken == null ? "" : federationToken.getSecurityToken();
+        if (token != null && token != "") {
+            headers.put(CommonHeaders.COMMON_HEADER_SECURITY_TOKEN, token);
+            signStringBuf.append(CommonHeaders.COMMON_HEADER_SECURITY_TOKEN + ":" + token + "\n");
+        }
+        signStringBuf.append(CommonHeaders.COMMON_HEADER_APIVERSION + ":" + Constants.API_VERSION + "\n").
+                append(CommonHeaders.COMMON_HEADER_BODYRAWSIZE + ":" + headers.get(CommonHeaders.COMMON_HEADER_BODYRAWSIZE) + "\n").
+                append(CommonHeaders.COMMON_HEADER_COMPRESSTYPE + ":" + Constants.COMPRESSTYPE_DEFLATE + "\n").
+                append(CommonHeaders.COMMON_HEADER_SIGNATURE_METHOD + ":" + Constants.SIGNATURE_METHOD + "\n").
+                append("/logstores/" + logStoreName + "/shards/lb");
+        String signString = signStringBuf.toString();
+
+
+        String signature = "---initValue---";
+        if (credentialProvider instanceof StsTokenCredentialProvider) {
+            signature = Utils.sign(federationToken.getTempAK(), federationToken.getTempSK(), signString);
+        } else if (credentialProvider instanceof PlainTextAKSKCredentialProvider) {
+            signature = Utils.sign(((PlainTextAKSKCredentialProvider) credentialProvider).getAccessKeyId(),
+                    ((PlainTextAKSKCredentialProvider) credentialProvider).getAccessKeySecret(), signString);
+        }
+
+        SLSLog.logDebug("signed content: " + signString + "   \n ---------   signature: " + signature, false);
+
+
+        headers.put(CommonHeaders.AUTHORIZATION, signature);
+
+        headers.put(HttpHeaders.USER_AGENT, VersionInfoUtils.getUserAgent());
+
+    }
+
     public AsyncTask<PostLogResult> postLog(PostLogRequest postLogRequest, CompletedCallback<PostLogRequest, PostLogResult> completedCallback) throws
             LogException {
 
@@ -195,6 +285,29 @@ public class RequestOperation {
         }
 
         Callable<PostLogResult> callable = new RequestTask<PostLogResult>(requestMessage, parser, executionContext, maxRetryCount);
+
+        return AsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
+    }
+
+    public AsyncTask<PostCachedLogResult> postCachedLog(PostCachedLogRequest request, CompletedCallback<PostCachedLogRequest, PostCachedLogResult> completedCallback) throws
+            LogException {
+        RequestMessage requestMessage = new RequestMessage();
+
+        try {
+            buildCachedUrl(request, requestMessage);
+            buildCachedHeaders(request, requestMessage);
+        } catch (LogException e) {
+            throw e;
+        }
+
+        ResponseParser<PostCachedLogResult> parser = new ResponseParsers.PostCachedLogResponseParser();
+
+        ExecutionContext<PostCachedLogRequest> executionContext = new ExecutionContext<PostCachedLogRequest>(getInnerClient(), request);
+        if (completedCallback != null) {
+            executionContext.setCompletedCallback(completedCallback);
+        }
+
+        Callable<PostCachedLogResult> callable = new RequestTask<PostCachedLogResult>(requestMessage, parser, executionContext, maxRetryCount);
 
         return AsyncTask.wrapRequestTask(executorService.submit(callable), executionContext);
     }

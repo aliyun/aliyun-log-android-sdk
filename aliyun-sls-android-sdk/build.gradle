@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'org.greenrobot.greendao' // apply plugin
 
 android {
     compileSdkVersion 25
@@ -8,7 +9,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 40
-        versionName "0.4.0"
+        versionName "2.0.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -39,6 +40,7 @@ dependencies {
     compile 'com.alibaba:fastjson:1.2.35'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.squareup.okio:okio:1.9.0'
+    compile 'org.greenrobot:greendao:3.2.2' // add library
     testCompile 'junit:junit:4.12'
 }
 
