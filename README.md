@@ -20,14 +20,14 @@ you can use it through the Gradle.
 ### Gradle
 
 ```
-compile 'com.aliyun.openservices:aliyun-log-android-sdk:0.4.0'
+compile 'com.aliyun.openservices:aliyun-log-android-sdk:2.0.0'
 ```
 ### or you can compile jar by source code
 ```
-# clone工程
+# clone
 $ git clone https://github.com/aliyun/aliyun-log-android-sdk.git
 
-# 进入目录
+# access the directory
 $ cd aliyun-log-android-sdk/aliyun-sls-android-sdk/
 
 # run task(must jdk 1.7 above)

@@ -65,4 +65,6 @@ fastlane/screenshots
 fastlane/test_output
 
 .idea
+.gradle
+/local.properties
 *.iml
