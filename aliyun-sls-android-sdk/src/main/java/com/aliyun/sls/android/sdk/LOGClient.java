@@ -3,48 +3,22 @@ package com.aliyun.sls.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
+
 import com.aliyun.sls.android.sdk.core.AsyncTask;
 import com.aliyun.sls.android.sdk.core.RequestOperation;
 import com.aliyun.sls.android.sdk.core.auth.CredentialProvider;
 import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
-import com.aliyun.sls.android.sdk.model.LogGroup;
+
 import com.aliyun.sls.android.sdk.request.PostCachedLogRequest;
 import com.aliyun.sls.android.sdk.request.PostLogRequest;
 import com.aliyun.sls.android.sdk.result.PostCachedLogResult;
 import com.aliyun.sls.android.sdk.result.PostLogResult;
-import com.aliyun.sls.android.sdk.utils.Base64Kit;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
+
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
 import java.util.WeakHashMap;
-import java.util.zip.Deflater;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Created by wangjwchn on 16/8/2.
@@ -53,7 +27,6 @@ import javax.crypto.spec.SecretKeySpec;
 public class LOGClient {
 
     private String mEndPoint;
-    private String mAccessToken;
     private String mHttpType;
     private URI endpointURI;
     private RequestOperation requestOperation;
@@ -160,11 +133,6 @@ public class LOGClient {
     public AsyncTask<PostCachedLogResult> asyncPostCachedLog(PostCachedLogRequest request, final CompletedCallback<PostCachedLogRequest, PostCachedLogResult> completedCallback)
             throws LogException {
         return requestOperation.postCachedLog(request, completedCallback);
-    }
-
-
-    public void SetToken(String token) {
-        mAccessToken = token;
     }
 
     public String GetEndPoint() {
