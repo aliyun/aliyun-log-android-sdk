@@ -7,7 +7,7 @@ import android.util.Log;
  */
 public class SLSLog {
 
-    private static final String TAG = "OSS-Android-SDK";
+    private static final String TAG = "SLS-Android-SDK";
     private static boolean enableLog = false;
 
     /**
