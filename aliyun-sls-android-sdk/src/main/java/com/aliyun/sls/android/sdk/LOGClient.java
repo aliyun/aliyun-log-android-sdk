@@ -30,7 +30,7 @@ public class LOGClient {
     private String mHttpType;
     private URI endpointURI;
     private RequestOperation requestOperation;
-//    private CacheManager cacheManager;
+    private CacheManager cacheManager;
     private Boolean cachable;
     private ClientConfiguration.NetworkPolicy policy;
     private Context context;
@@ -81,7 +81,8 @@ public class LOGClient {
         SLSDatabaseManager.getInstance().setupDB(context);
 
         if (this.cachable){
-            (new CacheManager(this)).setupTimer();
+            cacheManager = new CacheManager(this);
+            cacheManager.setupTimer();
         }
 
         callbackImp = new CompletedCallback<PostLogRequest, PostLogResult>() {
