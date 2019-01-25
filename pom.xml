@@ -7,15 +7,15 @@
     <name>Sls SDK for Java API Version 0.6.0</name>
     <licenses>
         <license>
-            <name></name>
-            <url></url>
+            <name/>
+            <url/>
             <distribution>repo</distribution>
             <comments>Copyright (C) Alibaba Cloud Computing. All rights reserved.</comments>
         </license>
     </licenses>
     <scm>
-        <url></url>
-        <connection></connection>
+        <url/>
+        <connection/>
     </scm>
     <developers>
         <developer>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.1.55.android</version>
+            <version>1.2.25</version>
         </dependency>
     </dependencies>
 
