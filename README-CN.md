@@ -14,13 +14,7 @@
 
 日志服务 Android SDK依赖于[fastjson](https://github.com/alibaba/fastjson),[greenDAO](https://github.com/greenrobot/greenDAO)。
 
-###通过Gradle获取依赖
-
-```
-compile 'com.aliyun.openservices:aliyun-log-android-sdk:2.0.0'
-```
-
-###或通过源码编译jar包
+###通过源码编译jar包
 
 clone工程源码之后，运行gradle命令打包：
 
