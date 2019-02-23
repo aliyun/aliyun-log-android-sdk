@@ -28,5 +28,10 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.aliyun.dpa:oss-android-sdk:2.4.2'
     testCompile 'junit:junit:4.12'
-    compile project(':aliyun-sls-android-sdk')
+    //    compile project(':aliyun-sls-android-sdk')
+    compile 'com.alibaba:fastjson:1.2.35'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.squareup.okio:okio:1.9.0'
+    compile 'org.greenrobot:greendao:3.2.2'
+    compile files('libs/aliyun-log-sdk-android-2.1.0.jar')
 }
