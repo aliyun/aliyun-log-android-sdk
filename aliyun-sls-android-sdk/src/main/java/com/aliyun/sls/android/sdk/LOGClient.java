@@ -31,7 +31,7 @@ public class LOGClient {
     private URI endpointURI;
     private RequestOperation requestOperation;
     private CacheManager cacheManager;
-    private Boolean cachable;
+    private Boolean cachable = false;
     private ClientConfiguration.NetworkPolicy policy;
     private Context context;
     private WeakHashMap<PostLogRequest, CompletedCallback<PostLogRequest, PostLogResult>> mCompletedCallbacks = new WeakHashMap<PostLogRequest, CompletedCallback<PostLogRequest, PostLogResult>>();
@@ -78,9 +78,9 @@ public class LOGClient {
 
         requestOperation = new RequestOperation(endpointURI, credentialProvider, (conf == null ? ClientConfiguration.getDefaultConf() : conf));
         this.context = context;
-        SLSDatabaseManager.getInstance().setupDB(context);
 
         if (this.cachable){
+            SLSDatabaseManager.getInstance().setupDB(context);
             cacheManager = new CacheManager(this);
             cacheManager.setupTimer();
         }
