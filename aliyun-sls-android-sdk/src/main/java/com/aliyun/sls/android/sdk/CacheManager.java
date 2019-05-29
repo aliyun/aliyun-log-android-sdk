@@ -44,11 +44,12 @@ public class CacheManager {
 
         @Override
         public void run() {
-            if(mWeakCacheManager.get() == null){
+            CacheManager cacheManager = mWeakCacheManager.get();
+            if(cacheManager == null){
                 return;
             }else{
                 ConnectivityManager cm =
-                        (ConnectivityManager)mWeakCacheManager.get().mClient.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                        (ConnectivityManager)cacheManager.mClient.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
                 boolean isConnected = activeNetwork != null &&
                         activeNetwork.isConnectedOrConnecting();
@@ -58,14 +59,14 @@ public class CacheManager {
 
                 // 有网络连接的情况下如何决定是否上传日志(1.WIFI_ONLY只在wifi环境上传; 2.有网就传)
                 Boolean shouldPost = false;
-                if (mWeakCacheManager.get().mClient.getPolicy() == ClientConfiguration.NetworkPolicy.WIFI_ONLY && activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                if (cacheManager.mClient.getPolicy() == ClientConfiguration.NetworkPolicy.WIFI_ONLY && activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
                     shouldPost = true;
-                } else if (mWeakCacheManager.get().mClient.getPolicy() == ClientConfiguration.NetworkPolicy.WWAN_OR_WIFI) {
+                } else if (cacheManager.mClient.getPolicy() == ClientConfiguration.NetworkPolicy.WWAN_OR_WIFI) {
                     shouldPost = true;
                 }
 
                 if (shouldPost) {
-                    mWeakCacheManager.get().fetchDataFromDBAndPost();
+                    cacheManager.fetchDataFromDBAndPost();
                 }
             }
 

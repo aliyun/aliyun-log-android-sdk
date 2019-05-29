@@ -17,7 +17,6 @@ import com.aliyun.sls.android.sdk.LOGClient;
 import com.aliyun.sls.android.sdk.LogException;
 import com.aliyun.sls.android.sdk.SLSLog;
 import com.aliyun.sls.android.sdk.core.auth.PlainTextAKSKCredentialProvider;
-import com.aliyun.sls.android.sdk.core.auth.StsTokenCredentialProvider;
 import com.aliyun.sls.android.sdk.model.Log;
 import com.aliyun.sls.android.sdk.model.LogGroup;
 import com.aliyun.sls.android.sdk.core.callback.CompletedCallback;
@@ -44,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     public String project = "**********";
     public String logStore = "*********";
     public String source_ip = "";
+    public boolean isAsyncGetIp = false;
     //client的生命周期和app保持一致
     public LOGClient logClient;
 
@@ -79,11 +79,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         logText = (TextView) findViewById(R.id.ip);
         upload = (Button) findViewById(R.id.upload);
-        try {
-            IPService.getInstance().asyncGetIp(IPService.DEFAULT_URL, handler);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logText.setText(e.getMessage());
+        if(isAsyncGetIp){
+            try {
+                IPService.getInstance().asyncGetIp(IPService.DEFAULT_URL, handler);
+            } catch (Exception e) {
+                e.printStackTrace();
+                logText.setText(e.getMessage());
+            }
         }
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
     private void asyncUploadLog(@Nullable String ip) {
 
         /* 创建logGroup */
-        LogGroup logGroup = new LogGroup("sls test", TextUtils.isEmpty(ip) ? " no ip " : ip);
+        LogGroup logGroup = new LogGroup("sls test", ip);
 
         /* 存入一条log */
         Log log = new Log();
