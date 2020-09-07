@@ -60,8 +60,10 @@ public class LogGroup {
         }
         json_log_group.put("__logs__", log_arrays);
         Map<String, Object> map = mTag.GetContent();
-        JSONObject json_log = new JSONObject(map);
-        json_log_group.put("__tags__", json_log);
+        if (!map.isEmpty()){
+            JSONObject json_log = new JSONObject(map);
+            json_log_group.put("__tags__", json_log);
+        }
         String s = json_log_group.toJSONString();
         return s;
     }
