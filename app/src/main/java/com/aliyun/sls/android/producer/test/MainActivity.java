@@ -55,9 +55,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, false);
+            config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
             // 指定sts token 创建config，过期之前调用resetSecurityToken重置token
-            //config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken, true);
+            //config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
             createClient();
         } catch (LogProducerException e) {
             e.printStackTrace();
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
     void send1() {
         try {
-            LogProducerConfig config1 = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, true);
+            LogProducerConfig config1 = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
             config1.setTopic("test_topic1");
             LogProducerClient client1 = new LogProducerClient(config1, new LogProducerCallback() {
                 @Override
