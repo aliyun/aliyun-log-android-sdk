@@ -27,7 +27,7 @@ public class LogProducerClient {
     }
 
     public LogProducerResult addLog(Log log, int flush) {
-        if(client == 0) {
+        if (client == 0 || log == null) {
             return LogProducerResult.LOG_PRODUCER_INVALID;
         }
         Map<String, String> contents = log.getContent();
@@ -42,12 +42,13 @@ public class LogProducerClient {
         int i = 0;
         for (Map.Entry<String, String> entry : contents.entrySet()) {
             String key = entry.getKey();
+            key = key == null ? "" : key;
             keyArray[i] = key;
             keyCountArray[i] = key.getBytes().length;
 
             String value = entry.getValue();
+            value = value == null ? "" : value;
             valueArray[i] = value;
-
             valueCountArray[i] = value.getBytes().length;
 
             i++;
