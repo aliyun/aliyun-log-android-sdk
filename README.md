@@ -1,54 +1,129 @@
-﻿# Alibaba Cloud SLS SDK for Android
+# log service android producer
 
-## [README of Chinese](https://github.com/aliyun/aliyun-log-android-sdk/blob/master/README-CN.md)
+## 功能特点
 
-## Introduction
+* 异步
+    * 异步写入，客户端线程无阻塞
+* 聚合&压缩 上传
+    * 支持按超时时间、日志数、日志size聚合数据发送
+    * 支持lz4压缩
+* 多客户端
+	* 可同时配置多个客户端，每个客户端可独立配置采集优先级、缓存上限、目的project/logstore、聚合参数等
+* 缓存
+    * 支持缓存上限可设置
+    * 超过上限后日志写入失败
+* 自定义标识
+    * 支持设置自定义tag、topic
+* 断点续传功能
+    * 每次发送前会把日志保存到本地的binlog文件，只有发送成功才会删除，保证日志上传At Least Once（配置多个客户端时，不应设置相同持久化文件）
 
-This document mainly describes how to install and use the SLS Android SDK. If you have not yet activated or do not know about the SLS service, log on to the [SLS Product Homepage](https://www.aliyun.com/product/sls/) for more help.
+![image.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/099B6EC1-7305-4C18-A1CF-BA2CCD1FBDBC.png)
 
-## Environment requirements
+## 性能测试
 
-- Android ***2.3*** or above
-- You must have registered an Alibaba Cloud account with the SLS activated.
+* 开启断点续传
 
-## Installation
+| 发送 条/每秒 | cpu占用 |  内存占用(MB) | 上传速(MB/min) |
+| --- | --- | --- | --- |
+| 1 | <1% | 49 | 0.046 |
+| 10 | 2% | 53 | 0.442 |
+| 100 | 8% | 57 | 4.393 |
+| 200 | 10% | 70 | 7.90 |
 
-SLS Android SDK is dependent on [fastjson](https://github.com/alibaba/fastjson). 
+* 不开启断点续传
 
-### or you can compile jar by source code
+| 发送 条/每秒 | cpu占用 |  内存占用(MB) | 上传速(MB/min) |
+| --- | --- | --- | --- |
+| 1 | <1% | 49 | 0.046 |
+| 10 | 2% | 58 | 0.442 |
+| 100 | 10% | 60 | 4.393 |
+| 200 | 15% | 70 | 7.90 |
+
+## 配置说明
+
+### Android权限
+
+上传日志需要
 ```
-# clone
-$ git clone https://github.com/aliyun/aliyun-log-android-sdk.git
-
-# access the directory
-$ cd aliyun-log-android-sdk/aliyun-sls-android-sdk/
-
-# run task(must jdk 1.7 above)
-$ ../gradlew releaseJar
-
-# location
-$ cd build/libs && ls
+<uses-permission android:name="android.permission.INTERNET" />
 ```
 
-### Configure permissions
-
-The following are the Android permissions needed by the SLS Android SDK. Please make sure these permissions are already set in your `AndroidManifest.xml` file. Otherwise, the SDK will not work normally.
-
+开启断点续传功能需要
 ```
-<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 ```
 
-## Quick start
-
-The basic processes for uploading log is demonstrated below. For details, you can refer to the following directories of this project:
-
-the sample directory: [click to view details](https://github.com/aliyun/aliyun-log-android-sdk/tree/master/app).
+### 创建config
 
 
-## License
+https://help.aliyun.com/document_detail/29064.html
 
-* Apache License 2.0.
+```
+String endpoint = "project's_endpoint";
+String project = "project_name";
+String logstore = "logstore_name";
+String accesskeyid = "your_accesskey_id";
+String accesskeysecret = "your_accesskey_secret";
+LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
+// 指定sts token 创建config，过期之前调用resetSecurityToken重置token
+// LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
+```
 
-## Contact us
+### 配置config
+```
+// 设置主题
+config.setTopic("test_topic");
+// 设置tag信息，此tag会附加在每条日志上
+config.addTag("test", "test_topic");
+// 每个缓存的日志包的大小上限，取值为1~5242880，单位为字节。默认为1024 * 1024
+config.setPacketLogBytes(1024*1024);
+// 每个缓存的日志包中包含日志数量的最大值，取值为1~4096，默认为1024
+config.setPacketLogCount(1024);
+// 被缓存日志的发送超时时间，如果缓存超时，则会被立即发送，单位为毫秒，默认为3000
+config.setPacketTimeout(3000);
+// 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败
+// 默认为64 * 1024 * 1024
+config.setMaxBufferLimit(64*1024*1024);
+// 发送线程数，默认为1
+config.setSendThreadCount(1);
 
-* [Alibaba Cloud SLS official documentation center](https://www.aliyun.com/product/sls/).
+// 1 开启断点续传功能， 0 关闭
+// 每次发送前会把日志保存到本地的binlog文件，只有发送成功才会删除，保证日志上传At Least Once
+config.setPersistent(1);
+// 持久化的文件名，需要保证文件所在的文件夹已创建。配置多个客户端时，不应设置相同文件
+config.setPersistentFilePath("/sdcard/log.dat");
+// 是否每次AddLog强制刷新，高可靠性场景建议打开
+config.setPersistentForceFlush(1);
+// 持久化文件滚动个数，建议设置成10。
+config.setPersistentMaxFileCount(10);
+// 每个持久化文件的大小，建议设置成1-10M
+config.setPersistentMaxFileSize(1024 * 1024);
+// 本地最多缓存的日志数，不建议超过1M，通常设置为65536即可
+config.setPersistentMaxLogCount(65536);
+```
+
+### 设置回调函数，创建client
+```
+// 回调函数不填，默认无回调
+LogProducerClient client = new LogProducerClient(config, new LogProducerCallback() {
+    @Override
+    public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
+        System.out.printf("%s %s %s %s %s%n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
+    }
+});
+```
+
+### 写数据
+```
+Log log = new Log();
+log.putContent("k1", "v1");
+log.putContent("k2", "v2");
+// addLog第二个参数flush，是否立即发送，1代表立即发送，不设置时默认为0
+LogProducerResult res = client.addLog(log, 0);
+```
+
+## Gradle配置
+```
+
+```
