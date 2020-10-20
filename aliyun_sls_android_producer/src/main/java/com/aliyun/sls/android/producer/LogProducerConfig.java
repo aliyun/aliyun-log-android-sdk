@@ -9,8 +9,8 @@ public class LogProducerConfig {
 
     private long config;
 
-    private LogProducerConfig(String endpoint, String project, String logstore, boolean isDebugEnabled) throws LogProducerException {
-        config = create_log_producer_config(isDebugEnabled);
+    private LogProducerConfig(String endpoint, String project, String logstore) throws LogProducerException {
+        config = create_log_producer_config();
         if (config == 0) {
             throw new LogProducerException("Can not create log producer config");
         }
@@ -25,21 +25,13 @@ public class LogProducerConfig {
     }
 
     public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID, String accessKeySecret) throws LogProducerException {
-        this(endpoint, project, logstore, accessKeyID, accessKeySecret, false);
-    }
-
-    public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID, String accessKeySecret, boolean isDebugEnabled) throws LogProducerException {
-        this(endpoint, project, logstore, isDebugEnabled);
+        this(endpoint, project, logstore);
         log_producer_config_set_access_id(config, accessKeyID);
         log_producer_config_set_access_key(config, accessKeySecret);
     }
 
     public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID, String accessKeySecret, String securityToken) throws LogProducerException {
-        this(endpoint, project, logstore, accessKeyID, accessKeySecret, securityToken, false);
-    }
-
-    public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID, String accessKeySecret, String securityToken, boolean isDebugEnabled) throws LogProducerException {
-        this(endpoint, project, logstore, isDebugEnabled);
+        this(endpoint, project, logstore);
         this.resetSecurityToken(accessKeyID, accessKeySecret, securityToken);
     }
 
@@ -99,11 +91,17 @@ public class LogProducerConfig {
         log_producer_config_reset_security_token(config, accessKeyID, accessKeySecret, securityToken);
     }
 
+    public void logProducerDebug() {
+        log_producer_debug();
+    }
+
     long getConfig() {
         return config;
     }
 
-    private static native long create_log_producer_config(boolean isDebugEnabled);
+    private static native long create_log_producer_config();
+
+    private static native void log_producer_debug();
 
     private static native void log_producer_config_set_endpoint(long config, String endpoint);
 

@@ -14,14 +14,21 @@ extern "C" {
 /*
  * Class:     com_aliyun_sls_android_producer_LogProducerConfig
  * Method:    create_log_producer_config
- * Signature: ()Ljava/lang/Object;
+ * Signature: ()V
  */
 JNIEXPORT jlong JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_create_1log_1producer_1config
-  (JNIEnv *env, jclass obj, jboolean is_debug_enabled){
-    if (is_debug_enabled) {
-        aos_log_set_level(AOS_LOG_DEBUG);
-    }
+  (JNIEnv *env, jclass obj){
     return create_log_producer_config();
+  }
+
+/*
+ * Class:     com_aliyun_sls_android_producer_LogProducerConfig
+ * Method:    log_producer_debug
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1debug
+  (JNIEnv *env, jclass obj){
+    aos_log_set_level(AOS_LOG_DEBUG);
   }
 
 /*
