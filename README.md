@@ -125,5 +125,5 @@ LogProducerResult res = client.addLog(log, 0);
 
 ## Gradle配置
 ```
-
+implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.2.0'
 ```
