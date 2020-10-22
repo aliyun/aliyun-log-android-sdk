@@ -41,6 +41,17 @@
 
 ## 配置说明
 
+### Gradle配置
+```
+implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.2.0'
+```
+
+### 混淆配置
+```
+-keep class com.aliyun.sls.android.producer.* { *; }
+-keep interface com.aliyun.sls.android.producer.* { *; }
+```
+
 ### Android权限
 
 上传日志需要
@@ -121,9 +132,4 @@ log.putContent("k1", "v1");
 log.putContent("k2", "v2");
 // addLog第二个参数flush，是否立即发送，1代表立即发送，不设置时默认为0
 LogProducerResult res = client.addLog(log, 0);
-```
-
-## Gradle配置
-```
-implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.2.0'
 ```
