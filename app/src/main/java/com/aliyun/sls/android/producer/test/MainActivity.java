@@ -3,6 +3,7 @@ package com.aliyun.sls.android.producer.test;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         // 每次发送前会把日志保存到本地的binlog文件，只有发送成功才会删除，保证日志上传At Least Once
         config.setPersistent(1);
         // 持久化的文件名，需要保证文件所在的文件夹已创建。配置多个客户端时，不应设置相同文件
-        config.setPersistentFilePath("/sdcard/log.dat");
+        config.setPersistentFilePath(Environment.getExternalStorageDirectory().getPath() + "/log.dat");
         // 是否每次AddLog强制刷新，高可靠性场景建议打开
         config.setPersistentForceFlush(1);
         // 持久化文件滚动个数，建议设置成10。
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         x = x + 1;
         if (client != null) {
             LogProducerResult res = client.addLog(log, 1);
-            System.out.printf("%s %s%n",res,res.isLogProducerResultOk());
+            System.out.printf("%s %s%n", res, res.isLogProducerResultOk());
         }
     }
 
@@ -158,17 +159,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void send(int logCountPerSecond){
-        while (true){
+    void send(int logCountPerSecond) {
+        while (true) {
             long time1 = System.currentTimeMillis();
-            for(int i=0;i<logCountPerSecond;i++){
+            for (int i = 0; i < logCountPerSecond; i++) {
                 Log log = oneLog();
                 client.addLog(log);
             }
             long time2 = System.currentTimeMillis();
-            if (time2-time1<1000) {
+            if (time2 - time1 < 1000) {
                 try {
-                    Thread.sleep(1000-(time2-time1));
+                    Thread.sleep(1000 - (time2 - time1));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -176,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void crash(){
-        double a = 1/0;
+    void crash() {
+        double a = 1 / 0;
     }
 
     Log oneLog() {
