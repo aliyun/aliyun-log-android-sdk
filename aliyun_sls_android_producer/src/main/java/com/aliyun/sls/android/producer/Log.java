@@ -1,10 +1,10 @@
 package com.aliyun.sls.android.producer;
 
-import java.util.HashMap;
+import android.util.ArrayMap;
 import java.util.Map;
 
 public class Log {
-    private Map<String, String> content = new HashMap<>();
+    private Map<String, String> content = new ArrayMap<>();
 
     public void putContent(String key, String value) {
         content.put(key, value);

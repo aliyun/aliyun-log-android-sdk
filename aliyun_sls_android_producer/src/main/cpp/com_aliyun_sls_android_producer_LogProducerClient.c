@@ -76,25 +76,25 @@ JNIEXPORT jlong JNICALL Java_com_aliyun_sls_android_producer_LogProducerClient_g
  * Signature: (Ljava/lang/Object;I[Ljava/lang/String;[I[Ljava/lang/String;[I)V
  */
 JNIEXPORT jint JNICALL Java_com_aliyun_sls_android_producer_LogProducerClient_log_1producer_1client_1add_1log_1with_1len
-  (JNIEnv *env, jclass obj, jlong config, jint pair_count, jobjectArray keys, jintArray key_lens, jobjectArray values, jintArray value_lens, jint flush){
+  (JNIEnv *env, jclass obj, jlong config, jint pair_count, jobjectArray keys, jobjectArray values, jint flush){
     jstring jstr;
     int i;
     jsize len_keys = (*env)->GetArrayLength(env, keys);
     char **c_keys = (char **) malloc(len_keys*sizeof(char *));
+    int32_t *c_key_lens = (int32_t *) malloc(len_keys*sizeof(int32_t));
     for (i=0 ; i<len_keys; i++) {
         jstr = (*env)->GetObjectArrayElement(env, keys, i);
         c_keys[i] = (char *)(*env)->GetStringUTFChars(env, jstr, 0);
-
+        c_key_lens[i] = strlen(c_keys[i]);
     }
     jsize len_values = (*env)->GetArrayLength(env, values);
     char **c_values = (char **) malloc(len_values*sizeof(char *));
+    int32_t *c_value_lens = (int32_t *) malloc(len_values*sizeof(int32_t));
     for (i=0 ; i<len_values; i++) {
         jstr = (*env)->GetObjectArrayElement(env, values, i);
         c_values[i] = (char *)(*env)->GetStringUTFChars(env, jstr, 0);
-
+        c_value_lens[i] = strlen(c_values[i]);
     }
-    const jint *c_key_lens = (*env)->GetIntArrayElements(env, key_lens, NULL);
-    const jint *c_value_lens = (*env)->GetIntArrayElements(env, value_lens, NULL);
 
     int res = log_producer_client_add_log_with_len_int32((log_producer_client *)config, pair_count, c_keys, c_key_lens, c_values, c_value_lens, flush);
 

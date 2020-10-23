@@ -36,24 +36,19 @@ public class LogProducerClient {
         String[] keyArray = new String[pairCount];
         String[] valueArray = new String[pairCount];
 
-        int[] keyCountArray = new int[pairCount];
-        int[] valueCountArray = new int[pairCount];
-
         int i = 0;
         for (Map.Entry<String, String> entry : contents.entrySet()) {
             String key = entry.getKey();
             key = key == null ? "" : key;
             keyArray[i] = key;
-            keyCountArray[i] = key.getBytes().length;
 
             String value = entry.getValue();
             value = value == null ? "" : value;
             valueArray[i] = value;
-            valueCountArray[i] = value.getBytes().length;
 
             i++;
         }
-        int res = log_producer_client_add_log_with_len(client, pairCount, keyArray, keyCountArray, valueArray, valueCountArray, flush);
+        int res = log_producer_client_add_log_with_len(client, pairCount, keyArray, valueArray, flush);
         return LogProducerResult.fromInt(res);
     }
 
@@ -71,7 +66,7 @@ public class LogProducerClient {
 
     private static native long get_log_producer_client(long producer);
 
-    private static native int log_producer_client_add_log_with_len(long config, int pairCount, String[] keys, int[] keyLens, String[] values, int[] valueLens, int flush);
+    private static native int log_producer_client_add_log_with_len(long config, int pairCount, String[] keys, String[] values, int flush);
 
     private static native void destroy_log_producer(long producer);
 

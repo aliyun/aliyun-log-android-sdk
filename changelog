@@ -9,14 +9,14 @@ All rights reserved.
 http://www.aliyun.com
 
 环境要求：
-- Android版本2.3(API 9)以上。
+- Android版本4.4(API 19)以上。
 - 必须注册有Aliyun.com用户账户，并开通相应的服务（LOG）。
 
 
 更新日志:
 
-2020/10/20
-- 发布 2.2.0 版本
+2020/10/23
+- 发布 2.3.0 版本
 
 使用c sdk重写，支持异步，多客户端，断点续传。
 
