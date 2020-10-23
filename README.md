@@ -41,6 +41,10 @@
 
 ## 配置说明
 
+### 环境要求
+- Android版本4.4(API 19)及以上。
+- 必须注册有Aliyun.com用户账户，并开通相应的服务（LOG）。
+
 ### Gradle配置
 ```
 implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.23.0'
