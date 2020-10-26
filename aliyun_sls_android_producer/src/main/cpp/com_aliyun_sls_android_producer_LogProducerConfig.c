@@ -40,7 +40,8 @@ JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_lo
   (JNIEnv *env, jclass obj, jlong config, jstring endpoint){
     const char *c_endpoint = (*env)->GetStringUTFChars(env, endpoint, NULL);
     log_producer_config_set_endpoint((log_producer_config *)config, c_endpoint);
-  }
+    (*env)->ReleaseStringUTFChars(env, endpoint, c_endpoint);
+}
 
 /*
  * Class:     com_aliyun_sls_android_producer_LogProducerConfig
@@ -51,6 +52,7 @@ JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_lo
   (JNIEnv *env, jclass obj, jlong config, jstring project){
     const char *c_project = (*env)->GetStringUTFChars(env, project, NULL);
     log_producer_config_set_project((log_producer_config *)config, c_project);
+    (*env)->ReleaseStringUTFChars(env, project, c_project);
   }
 
 /*
@@ -62,6 +64,7 @@ JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_lo
   (JNIEnv *env, jclass obj, jlong config, jstring logstore){
     const char *c_logstore = (*env)->GetStringUTFChars(env, logstore, NULL);
     log_producer_config_set_logstore((log_producer_config *)config, c_logstore);
+    (*env)->ReleaseStringUTFChars(env, logstore, c_logstore);
   }
 
 /*
@@ -73,6 +76,7 @@ JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_lo
   (JNIEnv *env, jclass obj, jlong config, jstring accessKey_id){
     const char *c_accessKey_id = (*env)->GetStringUTFChars(env, accessKey_id, NULL);
     log_producer_config_set_access_id((log_producer_config *)config, c_accessKey_id);
+    (*env)->ReleaseStringUTFChars(env, accessKey_id, c_accessKey_id);
   }
 
 /*
@@ -84,6 +88,7 @@ JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_lo
   (JNIEnv *env, jclass obj, jlong config, jstring access_key_secret){
     const char *c_access_key_secret = (*env)->GetStringUTFChars(env, access_key_secret, NULL);
     log_producer_config_set_access_key((log_producer_config *)config, c_access_key_secret);
+    (*env)->ReleaseStringUTFChars(env, access_key_secret, c_access_key_secret);
   }
 
 /*
@@ -97,6 +102,9 @@ JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_lo
     const char *c_access_key_secret = (*env)->GetStringUTFChars(env, access_key_secret, NULL);
     const char *c_security_token = (*env)->GetStringUTFChars(env, security_token, NULL);
     log_producer_config_reset_security_token((log_producer_config *)config, c_accessKey_id, c_access_key_secret, c_security_token);
+    (*env)->ReleaseStringUTFChars(env, accessKey_id, c_accessKey_id);
+    (*env)->ReleaseStringUTFChars(env, access_key_secret, c_access_key_secret);
+    (*env)->ReleaseStringUTFChars(env, security_token, c_security_token);
 }
 
 /*
@@ -108,6 +116,7 @@ JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_lo
   (JNIEnv *env, jclass obj, jlong config, jstring topic){
     const char *c_topic = (*env)->GetStringUTFChars(env, topic, NULL);
     log_producer_config_set_topic((log_producer_config *)config, c_topic);
+    (*env)->ReleaseStringUTFChars(env, topic, c_topic);
   }
 
 /*
@@ -120,6 +129,8 @@ JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_lo
     const char *c_key = (*env)->GetStringUTFChars(env, key, NULL);
     const char *c_value = (*env)->GetStringUTFChars(env, value, NULL);
     log_producer_config_add_tag((log_producer_config *)config, c_key, c_value);
+    (*env)->ReleaseStringUTFChars(env, key, c_key);
+    (*env)->ReleaseStringUTFChars(env, value, c_value);
   }
 
 /*
@@ -191,6 +202,7 @@ JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_lo
         (JNIEnv *env, jclass obj, jlong config, jstring path){
     const char *c_path = (*env)->GetStringUTFChars(env, path, NULL);
     log_producer_config_set_persistent_file_path((log_producer_config *)config, c_path);
+    (*env)->ReleaseStringUTFChars(env, path, c_path);
 }
 
 /*
