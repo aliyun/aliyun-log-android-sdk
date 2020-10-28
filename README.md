@@ -1,5 +1,8 @@
 # log service android producer
 
+基于[aliyun-log-c-sdk](https://github.com/aliyun/aliyun-log-c-sdk/tree/persistent)
+，提供了在Android平台上将日志采集到日志服务的接口。
+
 ## 功能特点
 
 * 异步
@@ -16,6 +19,8 @@
     * 支持设置自定义tag、topic
 * 断点续传功能
     * 每次发送前会把日志保存到本地的binlog文件，只有发送成功才会删除，保证日志上传At Least Once（配置多个客户端时，不应设置相同持久化文件）
+* 上下文
+    * 采集上来的日志，支持查看某条日志的上下文
 
 ![image.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/099B6EC1-7305-4C18-A1CF-BA2CCD1FBDBC.png)
 
@@ -46,6 +51,7 @@
 - 必须注册有Aliyun.com用户账户，并开通相应的服务（LOG）。
 
 ### Gradle配置
+    jcenter()
 ```
 implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.3.0'
 ```
