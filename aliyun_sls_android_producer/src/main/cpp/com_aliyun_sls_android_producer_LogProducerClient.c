@@ -77,7 +77,6 @@ JNIEXPORT jlong JNICALL Java_com_aliyun_sls_android_producer_LogProducerClient_g
  */
 JNIEXPORT jint JNICALL Java_com_aliyun_sls_android_producer_LogProducerClient_log_1producer_1client_1add_1log_1with_1len
   (JNIEnv *env, jclass obj, jlong config, jint pair_count, jobjectArray keys, jobjectArray values, jint flush){
-    jstring jstr;
     int i;
     jsize len_keys = (*env)->GetArrayLength(env, keys);
     jstring jstr_keys[len_keys];
