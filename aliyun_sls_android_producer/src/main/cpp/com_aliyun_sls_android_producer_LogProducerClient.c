@@ -106,7 +106,9 @@ JNIEXPORT jint JNICALL Java_com_aliyun_sls_android_producer_LogProducerClient_lo
         (*env)->ReleaseStringUTFChars(env, jstr_values[i], c_values[i]);
     }
     free(c_keys);
+    free(c_key_lens);
     free(c_values);
+    free(c_value_lens);
     return res;
   }
 
