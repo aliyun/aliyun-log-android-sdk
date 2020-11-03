@@ -1,6 +1,6 @@
 package com.aliyun.sls.android.producer;
 
-import android.util.ArrayMap;
+import android.support.v4.util.ArrayMap;
 import java.util.Map;
 
 public class Log {
