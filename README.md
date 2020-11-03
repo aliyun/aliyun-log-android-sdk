@@ -47,7 +47,7 @@
 ## 配置说明
 
 ### 环境要求
-- Android版本4.4(API 19)及以上。
+- Android版本4.0(API 14)及以上。
 - 必须注册有Aliyun.com用户账户，并开通相应的服务（LOG）。
 
 ### Gradle配置
