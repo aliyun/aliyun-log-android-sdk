@@ -111,7 +111,7 @@ config.setSendThreadCount(1);
 
 // 1 开启断点续传功能， 0 关闭
 // 每次发送前会把日志保存到本地的binlog文件，只有发送成功才会删除，保证日志上传At Least Once
-config.setPersistent(1);
+config.setPersistent(0);
 // 持久化的文件名，需要保证文件所在的文件夹已创建。配置多个客户端时，不应设置相同文件
 config.setPersistentFilePath("/sdcard/log.dat");
 // 是否每次AddLog强制刷新，高可靠性场景建议打开
