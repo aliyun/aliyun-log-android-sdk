@@ -51,8 +51,8 @@
 - 必须注册有Aliyun.com用户账户，并开通相应的服务（LOG）。
 
 ### Gradle配置
-    jcenter()
 ```
+jcenter()
 implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.4.1'
 ```
 
@@ -69,11 +69,7 @@ implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.4.1'
 <uses-permission android:name="android.permission.INTERNET" />
 ```
 
-开启断点续传功能需要
-```
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-```
+开启断点续传功能需要有持久化文件的读写权限
 
 ### 创建config
 
