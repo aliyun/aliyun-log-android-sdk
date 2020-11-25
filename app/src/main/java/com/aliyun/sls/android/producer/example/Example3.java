@@ -45,19 +45,6 @@ public class Example3 extends AppCompatActivity {
             }
         });
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            int REQUEST_CODE_PERMISSION_STORAGE = 100;
-            String[] permissions = {
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            };
-            for (String str : permissions) {
-                if (this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
-                    this.requestPermissions(permissions, REQUEST_CODE_PERMISSION_STORAGE);
-                }
-            }
-        }
-
         try {
             config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
             client = new LogProducerClient(config, new LogProducerCallback() {

@@ -45,19 +45,6 @@ public class Example2 extends AppCompatActivity {
             }
         });
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            int REQUEST_CODE_PERMISSION_STORAGE = 100;
-            String[] permissions = {
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            };
-            for (String str : permissions) {
-                if (this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
-                    this.requestPermissions(permissions, REQUEST_CODE_PERMISSION_STORAGE);
-                }
-            }
-        }
-
         try {
             config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
             // 1 开启断点续传功能， 0 关闭
