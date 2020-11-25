@@ -51,7 +51,7 @@ public class Example2 extends AppCompatActivity {
             // 每次发送前会把日志保存到本地的binlog文件，只有发送成功才会删除，保证日志上传At Least Once
             config.setPersistent(1);
             // 持久化的文件名，需要保证文件所在的文件夹已创建。配置多个客户端时，不应设置相同文件
-            config.setPersistentFilePath(getExternalFilesDir("sls") + "/log.dat");
+            config.setPersistentFilePath(getFilesDir() + "/log.dat");
             // 是否每次AddLog强制刷新，高可靠性场景建议打开
             config.setPersistentForceFlush(1);
             // 持久化文件滚动个数，建议设置成10。
