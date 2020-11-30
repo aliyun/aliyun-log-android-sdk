@@ -126,7 +126,14 @@ config.setPersistentMaxLogCount(65536);
 LogProducerClient client = new LogProducerClient(config, new LogProducerCallback() {
     @Override
     public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
-        System.out.printf("%s %s %s %s %s%n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
+        // 回调
+        // resultCode       返回结果代码
+        // reqId            请求id
+        // errorMessage     错误信息，没有为null
+        // logBytes         日志大小
+        // compressedBytes  压缩后日志大小
+        android.util.Log.d("LogProducerCallback",String.format("%s %s %s %s %s",
+                                LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
     }
 });
 ```

@@ -74,7 +74,7 @@ public class Example2 extends AppCompatActivity {
         x = x + 1;
         if (client != null) {
             LogProducerResult res = client.addLog(log);
-            System.out.printf("%s %s%n", res, res.isLogProducerResultOk());
+            android.util.Log.d("LogProducerResult",String.format("%s %s", res, res.isLogProducerResultOk()));
         }
     }
 

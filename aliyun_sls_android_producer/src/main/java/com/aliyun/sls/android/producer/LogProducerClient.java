@@ -56,12 +56,6 @@ public class LogProducerClient {
         destroy_log_producer(producer);
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        destroyLogProducer();
-        super.finalize();
-    }
-
     private static native long create_log_producer(long config, LogProducerCallback callback);
 
     private static native long get_log_producer_client(long producer);
