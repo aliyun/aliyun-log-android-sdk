@@ -53,7 +53,7 @@
 ### Gradle配置
 ```
 jcenter()
-implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.4.1'
+implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.4.2'
 ```
 
 ### 混淆配置
