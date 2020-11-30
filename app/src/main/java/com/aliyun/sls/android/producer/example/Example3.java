@@ -56,7 +56,8 @@ public class Example3 extends AppCompatActivity {
                     // errorMessage     错误信息，没有为null
                     // logBytes         日志大小
                     // compressedBytes  压缩后日志大小
-                    System.out.printf("%s %s %s %s %s%n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
+                    android.util.Log.d("LogProducerCallback",String.format("%s %s %s %s %s",
+                            LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
                 }
             });
         } catch (LogProducerException e) {
@@ -71,7 +72,7 @@ public class Example3 extends AppCompatActivity {
         x = x + 1;
         if (client != null) {
             LogProducerResult res = client.addLog(log);
-            System.out.printf("%s %s%n", res, res.isLogProducerResultOk());
+            android.util.Log.d("LogProducerResult",String.format("%s %s", res, res.isLogProducerResultOk()));
         }
     }
 
