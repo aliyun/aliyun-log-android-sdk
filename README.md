@@ -53,7 +53,7 @@
 ### Gradle配置
 ```
 jcenter()
-implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.4.2'
+implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.5.0'
 ```
 
 ### 混淆配置
@@ -77,6 +77,7 @@ implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.4.2'
 https://help.aliyun.com/document_detail/29064.html
 
 ```
+// endpoint前需要加 https://
 String endpoint = "project's_endpoint";
 String project = "project_name";
 String logstore = "logstore_name";

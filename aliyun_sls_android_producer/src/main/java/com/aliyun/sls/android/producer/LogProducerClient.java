@@ -64,5 +64,4 @@ public class LogProducerClient {
 
     private static native void destroy_log_producer(long producer);
 
-    private static native void log_producer_env_destroy();
 }
