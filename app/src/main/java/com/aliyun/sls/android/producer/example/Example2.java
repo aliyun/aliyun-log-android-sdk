@@ -1,10 +1,6 @@
 package com.aliyun.sls.android.producer.example;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -74,7 +70,7 @@ public class Example2 extends AppCompatActivity {
         x = x + 1;
         if (client != null) {
             LogProducerResult res = client.addLog(log);
-            android.util.Log.d("LogProducerResult",String.format("%s %s", res, res.isLogProducerResultOk()));
+            android.util.Log.d("LogProducerResult", String.format("%s %s", res, res.isLogProducerResultOk()));
         }
     }
 

@@ -27,7 +27,7 @@ android {
 
 dependencies {
     implementation project(':aliyun_sls_android_producer')
-//    implementation(name:'aliyun_sls_android_producer-release', ext:'aar')
+//    implementation(name:'aliyun-log-android-sdk-release', ext:'aar')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:+'
     implementation 'com.android.support.constraint:constraint-layout:2.0.2'

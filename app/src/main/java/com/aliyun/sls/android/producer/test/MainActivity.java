@@ -1,9 +1,5 @@
 package com.aliyun.sls.android.producer.test;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,13 +14,11 @@ import com.aliyun.sls.android.producer.LogProducerResult;
 
 public class MainActivity extends AppCompatActivity {
 
-    String endpoint = "http://cn-hangzhou.log.aliyuncs.com";
+    String endpoint = "https://cn-hangzhou.log.aliyuncs.com";
     String project = "k8s-log-c783b4a12f29b44efa31f655a586bb243";
     String logstore = "666";
     String accesskeyid = "";
     String accesskeysecret = "";
-    String securityToken = "";
-    LogProducerConfig config;
     LogProducerClient client;
 
     int x = 0;
@@ -41,11 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 send();
             }
         });
-
         try {
-            config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
-            // 指定sts token 创建config，过期之前调用resetSecurityToken重置token
-            //config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
             createClient();
         } catch (LogProducerException e) {
             e.printStackTrace();
@@ -58,27 +48,18 @@ public class MainActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        send(200);
+                        send(1024);
                     }
                 }).start();
-
             }
         });
-
-        Button crash = findViewById(R.id.crash);
-        crash.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                crash();
-            }
-        });
-
-        MyCrashHandler crashHandler = MyCrashHandler.instance();
-        crashHandler.init(getApplicationContext(), client);
     }
 
 
     void createClient() throws LogProducerException {
+        // 指定sts token 创建config，过期之前调用resetSecurityToken重置token
+        //config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
+        LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
         // 设置主题
         config.setTopic("test_topic");
         // 设置tag信息，此tag会附加在每条日志上
@@ -119,30 +100,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void send() {
-        send1();
         Log log = oneLog();
         log.putContent("index", String.valueOf(x));
         x = x + 1;
         if (client != null) {
-            LogProducerResult res = client.addLog(log, 1);
+            LogProducerResult res = client.addLog(log, 0);
             System.out.printf("%s %s%n", res, res.isLogProducerResultOk());
-        }
-    }
-
-    void send1() {
-        try {
-            LogProducerConfig config1 = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
-            config1.setTopic("test_topic1");
-            LogProducerClient client1 = new LogProducerClient(config1, new LogProducerCallback() {
-                @Override
-                public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
-                    System.out.printf("%s %s %s %s %s%n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
-                }
-            });
-            Log log = oneLog();
-            client1.addLog(log, 1);
-        } catch (LogProducerException e) {
-            e.printStackTrace();
         }
     }
 
@@ -164,10 +127,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void crash() {
-        double a = 1 / 0;
-    }
-
     Log oneLog() {
         Log log = new Log();
         log.putContent("content_key_1", "1abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
@@ -185,6 +144,5 @@ public class MainActivity extends AppCompatActivity {
         log.putContent("null", null);
         return log;
     }
-
 
 }
