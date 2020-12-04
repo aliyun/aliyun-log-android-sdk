@@ -44,6 +44,24 @@
 | 100 | 10% | 60 | 4.393 |
 | 200 | 15% | 70 | 7.90 |
 
+## SDK包体积
+
+* aar包大小
+
+![aar包大小.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.4.png)
+
+* 未引用SDK包大小
+
+![未引用SDK包大小.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.2.png)
+
+* 引用SDK包大小
+
+![引用SDK包大小.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.1.png)
+
+* 包大小对比
+
+![包大小对比.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.3.png)
+
 ## 配置说明
 
 ### 环境要求
