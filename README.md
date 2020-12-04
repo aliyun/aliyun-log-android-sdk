@@ -52,7 +52,7 @@
 
 * 引用SDK包前后体积对比
 
-![引用SDK包前后体积对比.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.3.png)
+![引用SDK包前后体积对比.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.2.png)
 
 ## 配置说明
 
