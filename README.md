@@ -46,21 +46,13 @@
 
 ## SDK包体积
 
-* aar包大小
+* aar包体积
 
-![aar包大小.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.4.png)
+![aar包体积.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.4.png)
 
-* 未引用SDK包大小
+* 引用SDK包前后体积对比
 
-![未引用SDK包大小.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.2.png)
-
-* 引用SDK包大小
-
-![引用SDK包大小.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.1.png)
-
-* 包大小对比
-
-![包大小对比.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.3.png)
+![引用SDK包前后体积对比.png](https://test-lichao.oss-cn-hangzhou.aliyuncs.com/pic/2020.12.4.3.png)
 
 ## 配置说明
 
