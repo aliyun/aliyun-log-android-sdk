@@ -39,10 +39,6 @@ public class LogProducerHttpTool {
                 response.append(inputLine);
             }
             in.close();
-
-            //打印结果
-            System.out.println(response.toString());
-
             return httpConn.getResponseCode();
         } catch (Exception ex) {
             ex.printStackTrace();
