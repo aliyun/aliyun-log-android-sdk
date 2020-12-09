@@ -139,12 +139,12 @@ public class LogProducerConfig {
         return config;
     }
 
-    public void isValid() {
-        log_producer_config_is_valid(config);
+    public int isValid() {
+        return log_producer_config_is_valid(config);
     }
 
-    public void isEnabled() {
-        log_producer_persistent_config_is_enabled(config);
+    public int isEnabled() {
+        return log_producer_persistent_config_is_enabled(config);
     }
 
     private static native long create_log_producer_config();
