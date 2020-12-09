@@ -15,7 +15,7 @@ public class LogProducerHttpTool {
 
             httpConn.setDoOutput(true);
             httpConn.setRequestMethod("POST");
-            httpConn.setRequestProperty("User-agent", "sls-android-sdk_v2.5.2");
+            httpConn.setRequestProperty("User-agent", "sls-android-sdk_v2.5.3");
 
             if (header != null) {
                 int pairs = header.length / 2;
