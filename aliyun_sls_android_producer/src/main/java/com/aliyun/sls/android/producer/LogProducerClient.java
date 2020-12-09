@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class LogProducerClient {
 
-    private long producer;
-    private long client;
+    private final long producer;
+    private final long client;
 
     public LogProducerClient(LogProducerConfig logProducerConfig) throws LogProducerException {
         this(logProducerConfig, null);
