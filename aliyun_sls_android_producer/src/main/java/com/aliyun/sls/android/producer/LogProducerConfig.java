@@ -7,7 +7,7 @@ public class LogProducerConfig {
         System.loadLibrary("sls_producer");
     }
 
-    private long config;
+    private final long config;
 
     private LogProducerConfig(String endpoint, String project, String logstore) throws LogProducerException {
         config = create_log_producer_config();

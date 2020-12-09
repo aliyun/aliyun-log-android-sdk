@@ -16,7 +16,7 @@ public enum LogProducerResult {
     LOG_PRODUCER_PERSISTENT_ERROR(99);
 
 
-    private int code;
+    private final int code;
 
     LogProducerResult(int code) {
         this.code = code;
