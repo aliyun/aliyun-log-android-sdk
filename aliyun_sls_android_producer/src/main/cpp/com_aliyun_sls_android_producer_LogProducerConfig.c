@@ -266,6 +266,81 @@ Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1se
     log_producer_config_set_persistent_max_log_count((log_producer_config *) config, num);
 }
 
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1using_1http(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    log_producer_config_set_using_http((log_producer_config *) config, num);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1net_1interface(
+        JNIEnv *env, jclass clazz, jlong config, jstring net_interface) {
+    const char *c_net_interface = (*env)->GetStringUTFChars(env, net_interface, NULL);
+    log_producer_config_set_net_interface((log_producer_config *) config, c_net_interface);
+    (*env)->ReleaseStringUTFChars(env, net_interface, c_net_interface);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1connect_1timeout_1sec(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    log_producer_config_set_connect_timeout_sec((log_producer_config *) config, num);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1send_1timeout_1sec(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    log_producer_config_set_send_timeout_sec((log_producer_config *) config, num);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1destroy_1flusher_1wait_1sec(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    log_producer_config_set_destroy_flusher_wait_sec((log_producer_config *) config, num);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1destroy_1sender_1wait_1sec(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    log_producer_config_set_destroy_sender_wait_sec((log_producer_config *) config, num);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1compress_1type(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    log_producer_config_set_compress_type((log_producer_config *) config, num);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1ntp_1time_1offset(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    log_producer_config_set_ntp_time_offset((log_producer_config *) config, num);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1max_1log_1delay_1time(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    log_producer_config_set_max_log_delay_time((log_producer_config *) config, num);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1drop_1delay_1log(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    log_producer_config_set_drop_delay_log((log_producer_config *) config, num);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1is_1valid(JNIEnv *env,
+                                                                                        jclass clazz,
+                                                                                        jlong config) {
+    return log_producer_config_is_valid((log_producer_config *) config);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1persistent_1config_1is_1enabled(
+        JNIEnv *env, jclass clazz, jlong config) {
+    return log_producer_persistent_config_is_enabled((log_producer_config *) config);
+}
+
 #ifdef __cplusplus
 }
 #endif
