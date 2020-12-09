@@ -23,7 +23,7 @@ int os_http_post(const char *url,
     JNIEnv *env;
     g_VM->AttachCurrentThread(&env, NULL);
     if (g_VM->AttachCurrentThread(&env, NULL) != JNI_OK) {
-        return 412;
+        return 400;
     }
     jstring jurl = env->NewStringUTF(url);
 

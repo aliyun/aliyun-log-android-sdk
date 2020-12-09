@@ -87,3 +87,4 @@ lint/tmp/
 # Android Profiling
 *.hprof
 /aliyun_sls_android_producer/.externalNativeBuild/ndkBuild/
+/.idea/

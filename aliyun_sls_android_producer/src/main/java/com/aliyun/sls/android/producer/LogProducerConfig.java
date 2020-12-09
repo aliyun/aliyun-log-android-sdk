@@ -87,6 +87,46 @@ public class LogProducerConfig {
         log_producer_config_set_persistent_max_log_count(config, num);
     }
 
+    public void setUsingHttp(int num) {
+        log_producer_config_set_using_http(config, num);
+    }
+
+    public void setNetInterface(String netInterface) {
+        log_producer_config_set_net_interface(config, netInterface);
+    }
+
+    public void setConnectTimeoutSec(int num) {
+        log_producer_config_set_connect_timeout_sec(config, num);
+    }
+
+    public void setSendTimeoutSec(int num) {
+        log_producer_config_set_send_timeout_sec(config, num);
+    }
+
+    public void setDestroyFlusherWaitSec(int num) {
+        log_producer_config_set_destroy_flusher_wait_sec(config, num);
+    }
+
+    public void setDestroySenderWaitSec(int num) {
+        log_producer_config_set_destroy_sender_wait_sec(config, num);
+    }
+
+    public void setCompressType(int num) {
+        log_producer_config_set_compress_type(config, num);
+    }
+
+    public void setNtpTimeOffset(int num) {
+        log_producer_config_set_ntp_time_offset(config, num);
+    }
+
+    public void setMaxLogDelayTime(int num) {
+        log_producer_config_set_max_log_delay_time(config, num);
+    }
+
+    public void setDropDelayLog(int num) {
+        log_producer_config_set_drop_delay_log(config, num);
+    }
+
     public void resetSecurityToken(String accessKeyID, String accessKeySecret, String securityToken) {
         log_producer_config_reset_security_token(config, accessKeyID, accessKeySecret, securityToken);
     }
@@ -97,6 +137,14 @@ public class LogProducerConfig {
 
     long getConfig() {
         return config;
+    }
+
+    public void isValid() {
+        log_producer_config_is_valid(config);
+    }
+
+    public void isEnabled() {
+        log_producer_persistent_config_is_enabled(config);
     }
 
     private static native long create_log_producer_config();
@@ -141,5 +189,28 @@ public class LogProducerConfig {
 
     private static native void log_producer_config_set_persistent_max_log_count(long config, int num);
 
+    private static native void log_producer_config_set_using_http(long config, int num);
+
+    private static native void log_producer_config_set_net_interface(long config, String net_interface);
+
+    private static native void log_producer_config_set_connect_timeout_sec(long config, int num);
+
+    private static native void log_producer_config_set_send_timeout_sec(long config, int num);
+
+    private static native void log_producer_config_set_destroy_flusher_wait_sec(long config, int num);
+
+    private static native void log_producer_config_set_destroy_sender_wait_sec(long config, int num);
+
+    private static native void log_producer_config_set_compress_type(long config, int num);
+
+    private static native void log_producer_config_set_ntp_time_offset(long config, int num);
+
+    private static native void log_producer_config_set_max_log_delay_time(long config, int num);
+
+    private static native void log_producer_config_set_drop_delay_log(long config, int num);
+
+    private static native int log_producer_config_is_valid(long config);
+
+    private static native int log_producer_persistent_config_is_enabled(long config);
 
 }

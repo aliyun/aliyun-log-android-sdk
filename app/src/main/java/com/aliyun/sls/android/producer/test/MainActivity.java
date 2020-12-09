@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        send(1024);
+                        send(2048);
                     }
                 }).start();
             }
@@ -89,6 +89,27 @@ public class MainActivity extends AppCompatActivity {
         config.setPersistentMaxFileSize(1024 * 1024);
         // 本地最多缓存的日志数，不建议超过1M，通常设置为65536即可
         config.setPersistentMaxLogCount(65536);
+
+        //网络连接超时时间，整数，单位秒，默认为10
+        config.setConnectTimeoutSec(10);
+        //日志发送超时时间，整数，单位秒，默认为15
+        config.setSendTimeoutSec(10);
+        //flusher线程销毁最大等待时间，整数，单位秒，默认为1
+        config.setDestroyFlusherWaitSec(2);
+        //sender线程池销毁最大等待时间，整数，单位秒，默认为1
+        config.setDestroySenderWaitSec(2);
+        //数据上传时的压缩类型，默认为LZ4压缩，0 不压缩，1 LZ4压缩，默认为1
+        config.setCompressType(1);
+        //设备时间与标准时间之差，值为标准时间-设备时间，一般此种情况用户客户端设备时间不同步的场景
+        //整数，单位秒，默认为0；比如当前设备时间为1607064208, 标准时间为1607064308，则值设置为 1607064308 - 1607064208 = 10
+        config.setNtpTimeOffset(3);
+        //日志时间与本机时间之差，超过该大小后会根据 `drop_delay_log` 选项进行处理。
+        //一般此种情况只会在设置persistent的情况下出现，即设备下线后，超过几天/数月启动，发送退出前未发出的日志
+        //整数，单位秒，默认为7*24*3600，即7天
+        config.setMaxLogDelayTime(7*24*3600);
+        //对于超过 `max_log_delay_time` 日志的处理策略
+        //0 不丢弃，把日志时间修改为当前时间; 1 丢弃，默认为 1 （丢弃）
+        config.setDropDelayLog(0);
 
         client = new LogProducerClient(config, new LogProducerCallback() {
             @Override
@@ -139,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         log.putContent("content_key_8", "8abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("content_key_9", "9abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("random", String.valueOf(Math.random()));
-        log.putContent("content", "中文");
+        log.putContent("content", "中文️");
         log.putContent(null, "null");
         log.putContent("null", null);
         return log;
