@@ -63,7 +63,7 @@
 ### Gradle配置
 ```
 jcenter()
-implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.5.2'
+implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.5.3'
 ```
 
 ### 混淆配置
@@ -136,7 +136,7 @@ config.setPersistentMaxLogCount(65536);
 | 参数                      | 说明                                | 取值                                    |
 | -------------------------| ------------------------------------| ---------------------------------------|
 | connect_timeout_sec      | 网络连接超时时间                      | 整数，单位秒，默认为10                    |
-| send_timeout_sec         |日志发送超时时间                       |整数，单位秒，默认为15                     |
+| send_timeout_sec         | 日志发送超时时间                      |整数，单位秒，默认为15                     |
 | destroy_flusher_wait_sec | flusher线程销毁最大等待时间            | 整数，单位秒，默认为1                     |
 | destroy_sender_wait_sec  | sender线程池销毁最大等待时间           | 整数，单位秒，默认为1                     |
 | compress_type            | 数据上传时的压缩类型，默认为LZ4压缩      | 0 不压缩，1 LZ4压缩， 默认为1             |
