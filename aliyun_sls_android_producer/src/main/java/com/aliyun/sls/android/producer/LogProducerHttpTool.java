@@ -1,12 +1,17 @@
 package com.aliyun.sls.android.producer;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class LogProducerHttpTool {
+
+    private static final String VERSION = "sls-android-sdk_v2.5.4";
 
     static public int android_http_post(String urlString, String[] header, byte[] body) {
         try {
@@ -15,7 +20,7 @@ public class LogProducerHttpTool {
 
             httpConn.setDoOutput(true);
             httpConn.setRequestMethod("POST");
-            httpConn.setRequestProperty("User-agent", "sls-android-sdk_v2.5.3");
+            httpConn.setRequestProperty("User-agent", VERSION);
 
             if (header != null) {
                 int pairs = header.length / 2;
@@ -30,9 +35,15 @@ public class LogProducerHttpTool {
             out.write(body);
             out.flush();
             out.close();
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(httpConn.getInputStream()));
+            int responseCode = httpConn.getResponseCode();
+            InputStream inputStream;
+            if(responseCode == 200){
+                inputStream = httpConn.getInputStream();
+            }else {
+                inputStream = httpConn.getErrorStream();
+            }
+            InputStreamReader r = new InputStreamReader(inputStream);
+            BufferedReader in = new BufferedReader(r);
             String inputLine;
             StringBuffer response = new StringBuffer();
 
@@ -40,7 +51,10 @@ public class LogProducerHttpTool {
                 response.append(inputLine);
             }
             in.close();
-            return httpConn.getResponseCode();
+            if(responseCode != 200){
+                Log.e(VERSION, response.toString());
+            }
+            return responseCode;
         } catch (Exception ex) {
             ex.printStackTrace();
             return 400;
