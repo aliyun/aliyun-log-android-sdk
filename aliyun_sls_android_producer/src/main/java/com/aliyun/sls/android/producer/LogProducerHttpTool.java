@@ -36,24 +36,15 @@ public class LogProducerHttpTool {
             out.flush();
             out.close();
             int responseCode = httpConn.getResponseCode();
-            InputStream inputStream;
-            if(responseCode == 200){
-                inputStream = httpConn.getInputStream();
-            }else {
-                inputStream = httpConn.getErrorStream();
-            }
-            InputStreamReader r = new InputStreamReader(inputStream);
-            BufferedReader in = new BufferedReader(r);
+            if (responseCode == 200) return 200;
+            BufferedReader in = new BufferedReader(new InputStreamReader(httpConn.getErrorStream()));
             String inputLine;
             StringBuffer response = new StringBuffer();
-
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
             in.close();
-            if(responseCode != 200){
-                Log.e(VERSION, response.toString());
-            }
+            Log.e(VERSION, response.toString());
             return responseCode;
         } catch (Exception ex) {
             ex.printStackTrace();
