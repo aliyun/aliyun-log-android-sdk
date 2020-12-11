@@ -4,14 +4,14 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 public class LogProducerHttpTool {
 
-    private static final String VERSION = "sls-android-sdk_v2.5.4";
+    private static final String VERSION = "sls-android-sdk_v2.5.5";
 
     static public int android_http_post(String urlString, String[] header, byte[] body) {
         try {
@@ -30,13 +30,12 @@ public class LogProducerHttpTool {
                     httpConn.setRequestProperty(key, val);
                 }
             }
-
             DataOutputStream out = new DataOutputStream(httpConn.getOutputStream());
             out.write(body);
             out.flush();
             out.close();
             int responseCode = httpConn.getResponseCode();
-            if (responseCode == 200) return 200;
+            if (responseCode / 100 == 2) return responseCode;
             BufferedReader in = new BufferedReader(new InputStreamReader(httpConn.getErrorStream()));
             String inputLine;
             StringBuffer response = new StringBuffer();
@@ -46,6 +45,8 @@ public class LogProducerHttpTool {
             in.close();
             Log.e(VERSION, response.toString());
             return responseCode;
+        } catch (UnknownHostException ex) {
+            return -1;
         } catch (Exception ex) {
             ex.printStackTrace();
             return 400;

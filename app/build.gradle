@@ -26,6 +26,7 @@ android {
 //}
 
 dependencies {
+//    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.5.4'
     implementation project(':aliyun_sls_android_producer')
 //    implementation(name:'aliyun-log-android-sdk-release', ext:'aar')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
