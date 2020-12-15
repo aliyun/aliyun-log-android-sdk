@@ -42,10 +42,10 @@ public class LogProducerHttpTool {
                 response.append(inputLine);
             }
             in.close();
-            Log.e(VERSION, response.toString());
+            Log.w(VERSION, response.toString());
             return responseCode;
         } catch (Exception ex) {
-            Log.e(VERSION, "exception", ex);
+            Log.w(VERSION, "exception", ex);
             return -1;
         }
     }
