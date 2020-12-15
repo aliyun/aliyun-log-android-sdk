@@ -7,11 +7,10 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.UnknownHostException;
 
 public class LogProducerHttpTool {
 
-    private static final String VERSION = "sls-android-sdk_v2.5.5";
+    private static final String VERSION = "sls-android-sdk_v2.5.6";
 
     static public int android_http_post(String urlString, String[] header, byte[] body) {
         try {
@@ -45,11 +44,9 @@ public class LogProducerHttpTool {
             in.close();
             Log.e(VERSION, response.toString());
             return responseCode;
-        } catch (UnknownHostException ex) {
-            return -1;
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return 400;
+            Log.e(VERSION, "exception", ex);
+            return -1;
         }
     }
 }
