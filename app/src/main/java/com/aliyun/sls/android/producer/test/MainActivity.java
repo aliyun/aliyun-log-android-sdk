@@ -15,8 +15,8 @@ import com.aliyun.sls.android.producer.LogProducerResult;
 public class MainActivity extends AppCompatActivity {
 
     String endpoint = "https://cn-hangzhou.log.aliyuncs.com";
-    String project = "k8s-log-c783b4a12f29b44efa31f655a586bb243";
-    String logstore = "666";
+    String project = "k8s-log-cdc990939f2f547e883a4cb9236e85872";
+    String logstore = "002";
     String accesskeyid = "";
     String accesskeysecret = "";
     LogProducerClient client;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     void createClient() throws LogProducerException {
         // 指定sts token 创建config，过期之前调用resetSecurityToken重置token
-        //config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
+        //LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
         LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
         // 设置主题
         config.setTopic("test_topic");
