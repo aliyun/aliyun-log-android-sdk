@@ -67,7 +67,7 @@ Java_com_aliyun_sls_android_producer_LogProducerClient_create_1log_1producer
 JNIEXPORT jlong JNICALL
 Java_com_aliyun_sls_android_producer_LogProducerClient_get_1log_1producer_1client
         (JNIEnv *env, jclass obj, jlong producer) {
-    return get_log_producer_client((log_producer *) producer, NULL);
+    return (jlong) get_log_producer_client((log_producer *) producer, NULL);
 }
 
 /*

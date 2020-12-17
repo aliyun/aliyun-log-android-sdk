@@ -18,7 +18,7 @@ extern "C" {
 JNIEXPORT jlong JNICALL
 Java_com_aliyun_sls_android_producer_LogProducerConfig_create_1log_1producer_1config
         (JNIEnv *env, jclass obj) {
-    return create_log_producer_config();
+    return (jlong) create_log_producer_config();
 }
 
 /*
@@ -329,9 +329,8 @@ Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1se
 }
 
 JNIEXPORT jint JNICALL
-Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1is_1valid(JNIEnv *env,
-                                                                                        jclass clazz,
-                                                                                        jlong config) {
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1is_1valid(
+        JNIEnv *env, jclass clazz, jlong config) {
     return log_producer_config_is_valid((log_producer_config *) config);
 }
 
@@ -339,6 +338,12 @@ JNIEXPORT jint JNICALL
 Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1persistent_1config_1is_1enabled(
         JNIEnv *env, jclass clazz, jlong config) {
     return log_producer_persistent_config_is_enabled((log_producer_config *) config);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1drop_1unauthorized_1log(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    return log_producer_config_set_drop_unauthorized_log((log_producer_config *) config, num);
 }
 
 #ifdef __cplusplus
