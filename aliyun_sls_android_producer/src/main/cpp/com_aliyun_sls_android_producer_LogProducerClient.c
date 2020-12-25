@@ -77,7 +77,7 @@ Java_com_aliyun_sls_android_producer_LogProducerClient_get_1log_1producer_1clien
  */
 JNIEXPORT jint JNICALL
 Java_com_aliyun_sls_android_producer_LogProducerClient_log_1producer_1client_1add_1log_1with_1len
-        (JNIEnv *env, jclass obj, jlong config, jint pair_count, jobjectArray keys,
+        (JNIEnv *env, jclass obj, jlong config, jlong log_time, jint pair_count, jobjectArray keys,
          jobjectArray values, jint flush) {
     int i;
     jsize len_keys = (*env)->GetArrayLength(env, keys);
@@ -99,7 +99,7 @@ Java_com_aliyun_sls_android_producer_LogProducerClient_log_1producer_1client_1ad
         c_value_lens[i] = strlen(c_values[i]);
     }
 
-    int res = log_producer_client_add_log_with_len_int32((log_producer_client *) config, pair_count,
+    int res = log_producer_client_add_log_with_len_time_int32((log_producer_client *) config, log_time, pair_count,
                                                          c_keys, c_key_lens, c_values, c_value_lens,
                                                          flush);
 

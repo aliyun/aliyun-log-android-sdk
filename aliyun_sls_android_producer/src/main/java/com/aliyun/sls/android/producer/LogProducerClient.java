@@ -48,7 +48,8 @@ public class LogProducerClient {
 
             i++;
         }
-        int res = log_producer_client_add_log_with_len(client, pairCount, keyArray, valueArray, flush);
+        long logTime = log.getLogTime();
+        int res = log_producer_client_add_log_with_len(client, logTime, pairCount, keyArray, valueArray, flush);
         return LogProducerResult.fromInt(res);
     }
 
@@ -60,7 +61,7 @@ public class LogProducerClient {
 
     private static native long get_log_producer_client(long producer);
 
-    private static native int log_producer_client_add_log_with_len(long config, int pairCount, String[] keys, String[] values, int flush);
+    private static native int log_producer_client_add_log_with_len(long config, long log_time, int pairCount, String[] keys, String[] values, int flush);
 
     private static native void destroy_log_producer(long producer);
 
