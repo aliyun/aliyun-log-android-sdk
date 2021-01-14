@@ -10,7 +10,7 @@ import java.net.URL;
 
 public class LogProducerHttpTool {
 
-    private static final String VERSION = "sls-android-sdk_v2.5.8";
+    private static final String VERSION = "sls-android-sdk_v2.5.9";
 
     static public int android_http_post(String urlString, String[] header, byte[] body) {
         try {
