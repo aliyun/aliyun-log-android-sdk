@@ -63,7 +63,7 @@
 ### Gradle配置
 ```
 jcenter()
-implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.5.9'
+implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.5.10'
 ```
 
 ### 混淆配置
