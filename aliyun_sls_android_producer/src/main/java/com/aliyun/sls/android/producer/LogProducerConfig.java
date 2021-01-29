@@ -131,6 +131,10 @@ public class LogProducerConfig {
         log_producer_config_set_drop_unauthorized_log(config, num);
     }
 
+    public void setGetTimeUnixFunc(LogProducerTimeUnixFunc func) {
+        log_producer_config_set_get_time_unix_func(func);
+    }
+
     public void resetSecurityToken(String accessKeyID, String accessKeySecret, String securityToken) {
         log_producer_config_reset_security_token(config, accessKeyID, accessKeySecret, securityToken);
     }
@@ -212,6 +216,8 @@ public class LogProducerConfig {
     private static native void log_producer_config_set_max_log_delay_time(long config, int num);
 
     private static native void log_producer_config_set_drop_delay_log(long config, int num);
+
+    private static native void log_producer_config_set_get_time_unix_func(LogProducerTimeUnixFunc func);
 
     private static native void log_producer_config_set_drop_unauthorized_log(long config, int num);
 

@@ -2,6 +2,7 @@
 #include <jni.h>
 #include <libs/include/inner_log.h>
 #include <libs/include/log_producer_config.h>
+#include <libs/include/log_http_interface.h>
 
 /* Header for class com_aliyun_sls_android_producer_LogProducerConfig */
 
@@ -326,6 +327,44 @@ JNIEXPORT void JNICALL
 Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1drop_1delay_1log(
         JNIEnv *env, jclass clazz, jlong config, jint num) {
     log_producer_config_set_drop_delay_log((log_producer_config *) config, num);
+}
+
+JavaVM *g_VM;
+jobject g_time_func;
+
+unsigned int set_get_time_unix_func(){
+    JNIEnv *env = NULL;
+    if ((*g_VM)->AttachCurrentThread(g_VM, &env, NULL) != JNI_OK) {
+        return time(NULL);
+    }
+    //通过全局变量g_obj 获取到要回调的类
+    jclass java_class = (*env)->GetObjectClass(env, g_time_func);
+    if (java_class == 0) {
+        (*g_VM)->DetachCurrentThread(g_VM);
+        return time(NULL);
+    }
+    //获取要回调的方法ID
+    jmethodID java_callback_id = (*env)->GetMethodID(env, java_class,
+                                                     "getTimeUnix",
+                                                     "()J");
+    if (java_callback_id == NULL) {
+        return time(NULL);
+    }
+    //执行回调
+    jlong time_unix = (*env)->CallLongMethod(env, g_time_func, java_callback_id);
+    //释放当前线程
+    (*g_VM)->DetachCurrentThread(g_VM);
+    env = NULL;
+    return time_unix;
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1get_1time_1unix_1func(
+        JNIEnv *env, jclass clazz, jobject func) {
+    if (func != NULL) {
+        g_time_func = (*env)->NewGlobalRef(env, func);
+        log_set_get_time_unix_func(set_get_time_unix_func);
+    }
 }
 
 JNIEXPORT jint JNICALL
