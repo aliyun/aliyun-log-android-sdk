@@ -11,6 +11,7 @@ import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
+import com.aliyun.sls.android.producer.LogProducerTimeUnixFunc;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     String accesskeyid = "";
     String accesskeysecret = "";
     LogProducerClient client;
+    LogProducerConfig config;
+
 
     int x = 0;
 
@@ -58,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
     void createClient() throws LogProducerException {
         // 指定sts token 创建config，过期之前调用resetSecurityToken重置token
-        //LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
-        LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
+//        LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
+        config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
         // 设置主题
         config.setTopic("test_topic");
         // 设置tag信息，此tag会附加在每条日志上
@@ -113,6 +116,13 @@ public class MainActivity extends AppCompatActivity {
         //是否丢弃鉴权失败的日志，0 不丢弃，1丢弃
         //默认为 0，即不丢弃
         config.setDropUnauthorizedLog(0);
+        //注册 获取服务器时间 的函数
+//        config.setGetTimeUnixFunc(new LogProducerTimeUnixFunc() {
+//            @Override
+//            public long getTimeUnix() {
+//                return System.currentTimeMillis()/1000;
+//            }
+//        });
 
         client = new LogProducerClient(config, new LogProducerCallback() {
             @Override
