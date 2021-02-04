@@ -22,6 +22,15 @@ public class LogProducerConfig {
         setPacketLogCount(1024);
         setPacketLogBytes(1024 * 1024);
         setSendThreadCount(1);
+
+        setGetTimeUnixFunc(new LogProducerTimeUnixFunc() {
+            @Override
+            public long getTimeUnix() {
+                long deltaTime = LogProducerHttpTool.localServerDeltaTime.get();
+                long sysTime = System.currentTimeMillis() / 1000;
+                return sysTime + deltaTime;
+            }
+        });
     }
 
     public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID, String accessKeySecret) throws LogProducerException {
