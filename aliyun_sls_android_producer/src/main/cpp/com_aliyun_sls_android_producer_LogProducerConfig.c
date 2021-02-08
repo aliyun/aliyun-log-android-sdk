@@ -329,10 +329,14 @@ Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1se
     log_producer_config_set_drop_delay_log((log_producer_config *) config, num);
 }
 
-JavaVM *g_VM;
+extern JavaVM *g_VM;
 jobject g_time_func;
 
-unsigned int set_get_time_unix_func(){
+unsigned int set_get_time_unix_func() {
+    if (NULL == g_VM) {
+        return time(NULL);
+    }
+
     JNIEnv *env = NULL;
     if ((*g_VM)->AttachCurrentThread(g_VM, &env, NULL) != JNI_OK) {
         return time(NULL);
