@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     void createClient() throws LogProducerException {
         // 指定sts token 创建config，过期之前调用resetSecurityToken重置token
 //        LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
-        config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret);
+        config = new LogProducerConfig(this, endpoint, project, logstore, accesskeyid, accesskeysecret);
         // 设置主题
         config.setTopic("test_topic");
         // 设置tag信息，此tag会附加在每条日志上
