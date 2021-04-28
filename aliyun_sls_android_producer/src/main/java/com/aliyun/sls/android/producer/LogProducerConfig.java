@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.producer;
 
+import android.content.Context;
+import com.aliyun.sls.android.producer.utils.SoLoader;
 
 public class LogProducerConfig {
 
@@ -9,7 +11,15 @@ public class LogProducerConfig {
 
     private final long config;
 
-    private LogProducerConfig(String endpoint, String project, String logstore) throws LogProducerException {
+    private static boolean hasSoLoaded = false;
+
+    private LogProducerConfig(Context context, String endpoint, String project, String logstore)
+        throws LogProducerException {
+        if (!hasSoLoaded) {
+            SoLoader.instance().loadLibrary(context, "sls_producer");
+            hasSoLoaded = true;
+        }
+
         config = create_log_producer_config();
         if (config == 0) {
             throw new LogProducerException("Can not create log producer config");
@@ -33,14 +43,28 @@ public class LogProducerConfig {
         });
     }
 
-    public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID, String accessKeySecret) throws LogProducerException {
-        this(endpoint, project, logstore);
+    @Deprecated
+    public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID,
+        String accessKeySecret) throws LogProducerException {
+        this((Context)null, endpoint, project, logstore, accessKeyID, accessKeySecret);
+    }
+
+    public LogProducerConfig(Context context, String endpoint, String project, String logstore, String accessKeyID,
+        String accessKeySecret) throws LogProducerException {
+        this(context, endpoint, project, logstore);
         log_producer_config_set_access_id(config, accessKeyID);
         log_producer_config_set_access_key(config, accessKeySecret);
     }
 
-    public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID, String accessKeySecret, String securityToken) throws LogProducerException {
-        this(endpoint, project, logstore);
+    @Deprecated
+    public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID,
+        String accessKeySecret, String securityToken) throws LogProducerException {
+        this(null, endpoint, project, logstore, accessKeyID, accessKeySecret, securityToken);
+    }
+
+    public LogProducerConfig(Context context, String endpoint, String project, String logstore, String accessKeyID,
+        String accessKeySecret, String securityToken) throws LogProducerException {
+        this(context, endpoint, project, logstore);
         this.resetSecurityToken(accessKeyID, accessKeySecret, securityToken);
     }
 
