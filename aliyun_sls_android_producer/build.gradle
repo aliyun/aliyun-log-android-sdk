@@ -38,4 +38,4 @@ task makeJar(type: Copy) {
 makeJar.dependsOn(build)
 
 //====以下是将android library上传到jcenter的脚本
-apply from: "jCenterUpload.gradle"
+apply from: "mavenCentralUpload.gradle"
