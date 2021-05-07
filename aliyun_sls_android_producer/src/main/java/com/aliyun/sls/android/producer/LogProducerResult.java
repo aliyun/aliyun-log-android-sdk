@@ -1,7 +1,7 @@
 package com.aliyun.sls.android.producer;
 
 public enum LogProducerResult {
-
+    LOG_PRODUCER_UNKNOWN(-1),
     LOG_PRODUCER_OK(0),
     LOG_PRODUCER_INVALID(1),
     LOG_PRODUCER_WRITE_ERROR(2),
@@ -28,7 +28,8 @@ public enum LogProducerResult {
                 return timeSpanType;
             }
         }
-        return null;
+
+        return LOG_PRODUCER_UNKNOWN;
     }
 
     public boolean isLogProducerResultOk() {

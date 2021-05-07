@@ -2,8 +2,11 @@ package com.aliyun.sls.android.producer;
 
 import java.util.Map;
 
+import com.aliyun.sls.android.producer.profiler.SLSProfiler;
+
 public class LogProducerClient {
 
+    private final LogProducerConfig logProducerConfig;
     private final long producer;
     private final long client;
 
@@ -11,8 +14,25 @@ public class LogProducerClient {
         this(logProducerConfig, null);
     }
 
-    public LogProducerClient(LogProducerConfig logProducerConfig, LogProducerCallback callback) throws LogProducerException {
-        producer = create_log_producer(logProducerConfig.getConfig(), callback);
+    public LogProducerClient(LogProducerConfig logProducerConfig, final LogProducerCallback callback) throws LogProducerException {
+        this.logProducerConfig = logProducerConfig;
+
+        if (logProducerConfig.isEnableProfiler()) {
+            producer = create_log_producer(logProducerConfig.getConfig(), new LogProducerCallback() {
+                @Override
+                public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
+                    final LogProducerResult result = LogProducerResult.fromInt(resultCode);
+                    SLSProfiler.getInstance().reportSendLog(result.isLogProducerResultOk(), result);
+
+                    if (null != callback) {
+                        callback.onCall(resultCode, reqId, errorMessage, logBytes, compressedBytes);
+                    }
+                }
+            });
+        } else {
+            producer = create_log_producer(logProducerConfig.getConfig(), callback);
+        }
+
         if (producer == 0) {
             throw new LogProducerException("Can not create log producer");
         }
@@ -50,7 +70,13 @@ public class LogProducerClient {
         }
         long logTime = log.getLogTime();
         int res = log_producer_client_add_log_with_len(client, logTime, pairCount, keyArray, valueArray, flush);
-        return LogProducerResult.fromInt(res);
+        final LogProducerResult result = LogProducerResult.fromInt(res);
+
+        if (logProducerConfig.isEnableProfiler()) {
+            SLSProfiler.getInstance().reportAddLog(result.isLogProducerResultOk(), result);
+        }
+
+        return result;
     }
 
     public void destroyLogProducer() {

@@ -1,17 +1,16 @@
 package com.aliyun.sls.android.producer.test;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
-import com.aliyun.sls.android.producer.LogProducerTimeUnixFunc;
+import com.aliyun.sls.android.producer.profiler.SLSProfiler;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         });
         try {
             createClient();
+            setupProfiler();
         } catch (LogProducerException e) {
             e.printStackTrace();
         }
@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         // 指定sts token 创建config，过期之前调用resetSecurityToken重置token
 //        LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
         config = new LogProducerConfig(this, endpoint, project, logstore, accesskeyid, accesskeysecret);
+        // 是否开启 profiler
+        config.setEnableProfiler(true);
         // 设置主题
         config.setTopic("test_topic");
         // 设置tag信息，此tag会附加在每条日志上
@@ -127,10 +129,19 @@ public class MainActivity extends AppCompatActivity {
         client = new LogProducerClient(config, new LogProducerCallback() {
             @Override
             public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
-                System.out.printf("%s %s %s %s %s%n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
+                // @formatter:off
+                System.out.printf("onCall. %s %s %s %s %s%n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
             }
         });
 //        client = new LogProducerClient(config);
+    }
+
+    private void setupProfiler() throws LogProducerException{
+        // 配置 profiler，全局唯一，只能配置一个
+        // 1. endpoint、project 建议和其他的保持一致
+        // logstore 可以和其他的保持一致，也可以使用单独的 logstore
+        config = new LogProducerConfig(this, endpoint, project, "dev-android-profiler", accesskeyid, accesskeysecret);
+        SLSProfiler.getInstance().init(this, config);
     }
 
     void send() {
@@ -139,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         x = x + 1;
         if (client != null) {
             LogProducerResult res = client.addLog(log, 0);
-            System.out.printf("%s %s%n", res, res.isLogProducerResultOk());
+            System.out.printf("send. res: %s, success: %s%n", res, res.isLogProducerResultOk());
         }
     }
 

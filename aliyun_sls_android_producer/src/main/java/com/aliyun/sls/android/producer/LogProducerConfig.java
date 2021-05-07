@@ -5,13 +5,11 @@ import com.aliyun.sls.android.producer.utils.SoLoader;
 
 public class LogProducerConfig {
 
-    static {
-        System.loadLibrary("sls_producer");
-    }
-
     private final long config;
 
     private static boolean hasSoLoaded = false;
+
+    private boolean enableProfiler = false;
 
     private LogProducerConfig(Context context, String endpoint, String project, String logstore)
         throws LogProducerException {
@@ -66,6 +64,14 @@ public class LogProducerConfig {
         String accessKeySecret, String securityToken) throws LogProducerException {
         this(context, endpoint, project, logstore);
         this.resetSecurityToken(accessKeyID, accessKeySecret, securityToken);
+    }
+
+    public boolean isEnableProfiler() {
+        return enableProfiler;
+    }
+
+    public void setEnableProfiler(boolean enableProfiler) {
+        this.enableProfiler = enableProfiler;
     }
 
     public void setTopic(String topic) {
