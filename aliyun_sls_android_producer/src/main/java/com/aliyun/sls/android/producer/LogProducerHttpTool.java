@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class LogProducerHttpTool {
 
-    private static final String VERSION = "sls-android-sdk_v2.5.14";
+    private static final String VERSION = "sls-android-sdk_v2.5.14_profiler";
 
     protected static AtomicLong localServerDeltaTime = new AtomicLong(0);
 
