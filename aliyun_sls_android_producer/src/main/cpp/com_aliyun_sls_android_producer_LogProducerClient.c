@@ -127,6 +127,54 @@ Java_com_aliyun_sls_android_producer_LogProducerClient_destroy_1log_1producer
     destroy_log_producer((log_producer *) producer);
 }
 
+/*
+ * Class: com_aliyun_sls_android_producer_LogProducerClient
+ * Method: log_producer_client_add_log_with_len_time_int32
+ */
+JNIEXPORT jint JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerClient_log_1producer_1client_1add_1log_1with_1len_1time_1int32(
+        JNIEnv *env, jclass clazz, jlong config, jlong log_time, jint pair_count, jobjectArray keys,
+        jobjectArray values) {
+    jsize len_keys = (*env)->GetArrayLength(env, keys);
+    jobjectArray key_array[len_keys];
+    char **c_keys = (char **) malloc(len_keys * sizeof(char *));
+    int32_t *c_key_lens = (int32_t *) malloc(len_keys * sizeof(int32_t));
+    int i;
+    for (i = 0; i < len_keys; i++) {
+        key_array[i] = (*env)->GetObjectArrayElement(env, keys, i);
+        jsize cols = (*env)->GetArrayLength(env, key_array[i]);
+        c_keys[i] = (char *) (*env)->GetByteArrayElements(env, key_array[i], 0);
+        c_key_lens[i] = cols;
+    }
+
+    jsize len_values = (*env)->GetArrayLength(env, values);
+    jobjectArray value_array[len_values];
+    char **c_values = (char **) malloc(len_values * sizeof(char *));
+    int32_t *c_value_lens = (int32_t *) malloc(len_values * sizeof(int32_t));
+    for (i = 0; i < len_values; i++) {
+        value_array[i] = (*env)->GetObjectArrayElement(env, values, i);
+        jsize cols = (*env)->GetArrayLength(env, value_array[i]);
+        c_values[i] = (char *) (*env)->GetByteArrayElements(env, value_array[i], 0);
+        c_value_lens[i] = cols;
+    }
+
+    int res = log_producer_client_add_log_with_len_time_int32((log_producer_client *) config, log_time, pair_count,
+                                                              c_keys, c_key_lens, c_values, c_value_lens,
+                                                              0);
+
+    for (i = 0; i < len_keys; i++) {
+        (*env)->ReleaseByteArrayElements(env, key_array[i], (jbyte *)c_keys[i], JNI_COMMIT);
+    }
+    for (i = 0; i < len_values; i++) {
+        (*env)->ReleaseByteArrayElements(env, value_array[i], (jbyte *)c_values[i], JNI_COMMIT);
+    }
+    free(c_keys);
+    free(c_key_lens);
+    free(c_values);
+    free(c_value_lens);
+    return res;
+}
+
 #ifdef __cplusplus
 }
 #endif
