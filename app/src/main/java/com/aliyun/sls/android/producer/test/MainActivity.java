@@ -1,7 +1,7 @@
 package com.aliyun.sls.android.producer.test;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
@@ -11,7 +11,8 @@ import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
-import com.aliyun.sls.android.producer.LogProducerTimeUnixFunc;
+
+import java.io.UnsupportedEncodingException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         //日志时间与本机时间之差，超过该大小后会根据 `drop_delay_log` 选项进行处理。
         //一般此种情况只会在设置persistent的情况下出现，即设备下线后，超过几天/数月启动，发送退出前未发出的日志
         //整数，单位秒，默认为7*24*3600，即7天
-        config.setMaxLogDelayTime(7*24*3600);
+        config.setMaxLogDelayTime(7 * 24 * 3600);
         //对于超过 `max_log_delay_time` 日志的处理策略
         //0 不丢弃，把日志时间修改为当前时间; 1 丢弃，默认为 1 （丢弃）
         config.setDropDelayLog(0);
@@ -140,6 +141,22 @@ public class MainActivity extends AppCompatActivity {
         if (client != null) {
             LogProducerResult res = client.addLog(log, 0);
             System.out.printf("%s %s%n", res, res.isLogProducerResultOk());
+        }
+    }
+
+    /**
+     * send data with bytes.
+     */
+    void sendRaw() {
+        try {
+            byte[][] keys = {"sw".getBytes("utf-8"), "中文 key".getBytes("utf-8")};
+            byte[] v1 = {10, 36, 52, 98, 54, 51, 53, 54, 54, 52, 45, 53, 56, 53, 55, 45, 52, 98, 55, 53, 45, 97, 50, 53, 54, 45, 54, 99, 54, 51, 54, 49, 54, 102, 53, 97, 51, 48, 18, 36, 52, 55, 53, 55, 51, 55, 55, 57, 45, 55, 56, 51, 48, 45, 52, 54, 53, 97, 45, 56, 102, 51, 57, 45, 51, 56, 55, 51, 55, 48, 51, 50, 52, 99, 51, 52, 26, 92, 8, 1, 24, -92, -94, -11, -90, -87, 47, 32, -92, -94, -11, -90, -87, 47, 50, 22, 47, 112, 105, 110, 103, 32, 82, 101, 115, 112, 111, 110, 115, 101, 67, 97, 108, 108, 98, 97, 99, 107, 64, 2, 72, 4, 80, -78, 70, 98, 13, 10, 7, 99, 108, 105, 95, 115, 101, 113, 18, 2, 49, 53, 98, 13, 10, 8, 101, 114, 114, 95, 99, 111, 100, 101, 18, 1, 48, 98, 13, 10, 3, 117, 105, 100, 18, 6, 55, 48, 54, 50, 53, 57, 26, -72, 1, 16, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 24, -93, -94, -11, -90, -87, 47, 32, -86, -94, -11, -90, -87, 47, 42, 121, 18, 36, 52, 98, 54, 51, 53, 54, 54, 52, 45, 53, 56, 53, 55, 45, 52, 98, 55, 53, 45, 97, 50, 53, 54, 45, 54, 99, 54, 51, 54, 49, 54, 102, 53, 97, 51, 48, 26, 36, 53, 51, 54, 52, 52, 97, 54, 55, 45, 52, 49, 53, 53, 45, 52, 48, 52, 51, 45, 57, 54, 51, 55, 45, 55, 54, 53, 97, 52, 54, 55, 48, 51, 51, 54, 49, 42, 11, 105, 109, 95, 115, 100, 107, 95, 99, 111, 114, 101, 50, 11, 83, 101, 110, 100, 82, 101, 113, 117, 101, 115, 116, 58, 10, 47, 112, 105, 110, 103, 32, 83, 101, 110, 100, 66, 5, 47, 112, 105, 110, 103, 50, 14, 47, 112, 105, 110, 103, 32, 82, 101, 115, 112, 111, 110, 115, 101, 72, 4, 80, -78, 70, 98, 13, 10, 3, 117, 105, 100, 18, 6, 55, 48, 54, 50, 53, 57, 34, 11, 105, 109, 95, 115, 100, 107, 95, 99, 111, 114, 101, 42, 22, 73, 110, 118, 111, 107, 101, 82, 101, 115, 112, 111, 110, 115, 101, 67, 97, 108, 108, 98, 97, 99, 107};
+            String v2 = new String(v1);
+            int len = v2.length();
+            byte[][] values = {/*"value".getBytes("utf-8")*/v1, "中文 value".getBytes("utf-8")};
+            client.addLogRaw(keys, values);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
     }
 
