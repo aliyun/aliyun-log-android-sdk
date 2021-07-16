@@ -5,12 +5,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import com.aliyun.sls.android.SLSAdapter;
+import com.aliyun.sls.android.SLSConfig;
+import com.aliyun.sls.android.plugin.crashreporter.SLSCrashReporterPlugin;
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
+import com.aliyun.sls.android.producer.utils.ThreadUtils;
 
 import java.io.UnsupportedEncodingException;
 
@@ -32,6 +36,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SLSConfig config = new SLSConfig(this);
+        config.endpoint = endpoint;
+        config.pluginAppId = "sls-7011bc6fb3af0244d8";
+        config.pluginLogproject = project;
+        config.accessKeyId = accesskeyid;
+        config.accessKeySecret = accesskeysecret;
+        config.debuggable = true;
+        config.addCustom("testKey", "testValue");
+        config.addCustom(null, null);
+
+        SLSAdapter slsAdapter = SLSAdapter.getInstance();
+        slsAdapter.addPlugin(new SLSCrashReporterPlugin());
+        slsAdapter.init(config);
+
         Button send = findViewById(R.id.send);
         send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         });
         try {
             final LogProducerConfig config1 = createClient("test1");
+            config1.setEnableTrack(true);
             final LogProducerConfig config2 = createClient("test2");
             client = new LogProducerClient(config1, new LogProducerCallback() {
                 @Override
@@ -49,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                     System.out.printf("1: %s %s %s %s %s%n\n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
                 }
             });
-            new Thread(new Runnable() {
+            ThreadUtils.exec(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -64,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-            }).start();
+            });
         } catch (LogProducerException e) {
             e.printStackTrace();
         }
@@ -79,6 +98,13 @@ public class MainActivity extends AppCompatActivity {
                         send(2048);
                     }
                 }).start();
+            }
+        });
+
+        findViewById(R.id.crash).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mockCrash();
             }
         });
     }
@@ -151,6 +177,11 @@ public class MainActivity extends AppCompatActivity {
 
         return config;
 //        client = new LogProducerClient(config);
+    }
+
+    void mockCrash() {
+        String test = null;
+        test.length();
     }
 
     void send() {

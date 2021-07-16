@@ -10,12 +10,12 @@ import android.text.TextUtils;
  * @author gordon
  * @date 2021/04/19
  */
-public class TCUtils {
+public class AppUtils {
     private static String packageName;
     private static String appVersion;
     private static String appName;
 
-    private TCUtils() {
+    private AppUtils() {
         //no instance
     }
 
