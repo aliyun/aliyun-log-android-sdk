@@ -222,7 +222,7 @@ public class SoLoader {
     }
 
     private String[] getSupportABIs() {
-        if (Build.VERSION.SDK_INT >= 21 && Build.SUPPORTED_ABIS.length > 0) {
+        if (VERSION.SDK_INT >= 21 && Build.SUPPORTED_ABIS.length > 0) {
             return Build.SUPPORTED_ABIS;
         } else if (!TextUtils.isEmpty(Build.CPU_ABI2)) {
             return new String[] {Build.CPU_ABI, Build.CPU_ABI2};
