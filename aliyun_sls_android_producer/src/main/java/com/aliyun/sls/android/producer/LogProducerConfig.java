@@ -1,71 +1,191 @@
 package com.aliyun.sls.android.producer;
 
 import android.content.Context;
+import android.text.TextUtils;
 import com.aliyun.sls.android.producer.utils.SoLoader;
+import com.aliyun.sls.android.producer.utils.TimeUtils;
 
 public class LogProducerConfig {
 
-    static {
-        System.loadLibrary("sls_producer");
+    private static boolean hasSoLoaded = false;
+    private final long config;
+    private final Context context;
+    private String endpoint;
+    private String project;
+    private String logstore;
+
+    @Deprecated
+    // @formatter:off
+    public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyId, String accessKeySecret) throws LogProducerException {
+        this(endpoint, project, logstore, accessKeyId, accessKeySecret, null);
     }
 
-    private final long config;
+    @Deprecated
+    // @formatter:off
+    public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyId, String accessKeySecret, String securityToken) throws LogProducerException {
+        this(null, endpoint, project, logstore, accessKeyId, accessKeySecret, securityToken);
+    }
 
-    private static boolean hasSoLoaded = false;
+    // @formatter:off
+    public LogProducerConfig(Context context, String endpoint, String project, String logstore) throws LogProducerException {
+        this(context, endpoint, project, logstore, null, null);
+    }
 
-    private LogProducerConfig(Context context, String endpoint, String project, String logstore)
-        throws LogProducerException {
+    // @formatter:off
+    public LogProducerConfig(Context context, String endpoint, String project, String logstore, String accessKeyId, String accessKeySecret) throws LogProducerException {
+        this(context, endpoint, project, logstore, accessKeyId, accessKeySecret, null);
+    }
+
+    // @formatter:off
+    public LogProducerConfig(Context context, String endpoint, String project, String logstore, String accessKeyId, String accessKeySecret, String securityToken) throws LogProducerException {
         if (!hasSoLoaded) {
             SoLoader.instance().loadLibrary(context, "sls_producer");
             hasSoLoaded = true;
         }
 
+        this.context = context;
         config = create_log_producer_config();
         if (config == 0) {
             throw new LogProducerException("Can not create log producer config");
         }
-        log_producer_config_set_endpoint(config, endpoint);
-        log_producer_config_set_project(config, project);
-        log_producer_config_set_logstore(config, logstore);
 
+        // default configuration
+        setSource("Android");
         setPacketTimeout(3000);
         setPacketLogCount(1024);
         setPacketLogBytes(1024 * 1024);
         setSendThreadCount(1);
-
+        setDropUnauthorizedLog(0);
+        setDropDelayLog(0);
         setGetTimeUnixFunc(new LogProducerTimeUnixFunc() {
             @Override
             public long getTimeUnix() {
-                long deltaTime = LogProducerHttpTool.localServerDeltaTime.get();
-                long sysTime = System.currentTimeMillis() / 1000;
-                return sysTime + deltaTime;
+                return TimeUtils.getTimeInMillis();
             }
         });
+
+        // user configuration
+        setEndpoint(endpoint);
+        setProject(project);
+        setLogstore(logstore);
+        setAccessKeyId(accessKeyId);
+        setAccessKeySecret(accessKeySecret);
+
+        if (!TextUtils.isEmpty(securityToken)) {
+            resetSecurityToken(accessKeyId, accessKeySecret, securityToken);
+        }
     }
 
-    @Deprecated
-    public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID,
-        String accessKeySecret) throws LogProducerException {
-        this((Context)null, endpoint, project, logstore, accessKeyID, accessKeySecret);
+    private static native long create_log_producer_config();
+
+    private static native void log_producer_debug();
+
+    private static native void log_producer_config_set_endpoint(long config, String endpoint);
+
+    private static native void log_producer_config_set_project(long config, String project);
+
+    private static native void log_producer_config_set_logstore(long config, String logstore);
+
+    private static native void log_producer_config_set_access_id(long config, String accessKeyID);
+
+    private static native void log_producer_config_set_access_key(long config, String accessKeySecret);
+
+    private static native void log_producer_config_reset_security_token(long config, String accessKeyID,String accessKeySecret, String securityToken);
+
+    private static native void log_producer_config_set_topic(long config, String topic);
+
+    private static native void log_producer_config_add_tag(long config, String key, String value);
+
+    private static native void log_producer_config_set_packet_log_bytes(long config, int num);
+
+    private static native void log_producer_config_set_packet_log_count(long config, int num);
+
+    private static native void log_producer_config_set_packet_timeout(long config, int num);
+
+    private static native void log_producer_config_set_max_buffer_limit(long config, int num);
+
+    private static native void log_producer_config_set_send_thread_count(long config, int num);
+
+    private static native void log_producer_config_set_persistent(long config, int num);
+
+    private static native void log_producer_config_set_persistent_file_path(long config, String path);
+
+    private static native void log_producer_config_set_persistent_force_flush(long config, int num);
+
+    private static native void log_producer_config_set_persistent_max_file_count(long config, int num);
+
+    private static native void log_producer_config_set_persistent_max_file_size(long config, int num);
+
+    private static native void log_producer_config_set_persistent_max_log_count(long config, int num);
+
+    private static native void log_producer_config_set_using_http(long config, int num);
+
+    private static native void log_producer_config_set_net_interface(long config, String net_interface);
+
+    private static native void log_producer_config_set_connect_timeout_sec(long config, int num);
+
+    private static native void log_producer_config_set_send_timeout_sec(long config, int num);
+
+    private static native void log_producer_config_set_destroy_flusher_wait_sec(long config, int num);
+
+    private static native void log_producer_config_set_destroy_sender_wait_sec(long config, int num);
+
+    private static native void log_producer_config_set_compress_type(long config, int num);
+
+    private static native void log_producer_config_set_ntp_time_offset(long config, int num);
+
+    private static native void log_producer_config_set_max_log_delay_time(long config, int num);
+
+    private static native void log_producer_config_set_drop_delay_log(long config, int num);
+
+    private static native void log_producer_config_set_get_time_unix_func(LogProducerTimeUnixFunc func);
+
+    private static native void log_producer_config_set_drop_unauthorized_log(long config, int num);
+
+    private static native void log_producer_config_set_source(long config, String source);
+
+    private static native int log_producer_config_is_valid(long config);
+
+    private static native int log_producer_persistent_config_is_enabled(long config);
+
+    public Context getContext() {
+        return context;
     }
 
-    public LogProducerConfig(Context context, String endpoint, String project, String logstore, String accessKeyID,
-        String accessKeySecret) throws LogProducerException {
-        this(context, endpoint, project, logstore);
-        log_producer_config_set_access_id(config, accessKeyID);
-        log_producer_config_set_access_key(config, accessKeySecret);
+    public void setEndpoint(String endpoint) {
+        if (TextUtils.isEmpty(endpoint)) {
+            endpoint = "please_set_endpoint";
+        }
+        this.endpoint = endpoint;
+        log_producer_config_set_endpoint(config, endpoint);
     }
 
-    @Deprecated
-    public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyID,
-        String accessKeySecret, String securityToken) throws LogProducerException {
-        this(null, endpoint, project, logstore, accessKeyID, accessKeySecret, securityToken);
+    public String getEndpoint() {
+        return endpoint;
     }
 
-    public LogProducerConfig(Context context, String endpoint, String project, String logstore, String accessKeyID,
-        String accessKeySecret, String securityToken) throws LogProducerException {
-        this(context, endpoint, project, logstore);
-        this.resetSecurityToken(accessKeyID, accessKeySecret, securityToken);
+    public void setProject(String project) {
+        if (TextUtils.isEmpty(project)) {
+            project = "please_set_project";
+        }
+        this.project = project;
+        log_producer_config_set_project(config, project);
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setLogstore(String logstore) {
+        if (TextUtils.isEmpty(logstore)) {
+            logstore = "please_set_logstore";
+        }
+        this.logstore = logstore;
+        log_producer_config_set_logstore(config, logstore);
+    }
+
+    public String getLogstore() {
+        return logstore;
     }
 
     public void setTopic(String topic) {
@@ -74,6 +194,14 @@ public class LogProducerConfig {
 
     public void addTag(String key, String value) {
         log_producer_config_add_tag(config, key, value);
+    }
+
+    public void setAccessKeyId(String accessId) {
+        log_producer_config_set_access_id(config, accessId);
+    }
+
+    public void setAccessKeySecret(String accessKeySecret) {
+        log_producer_config_set_access_key(config, accessKeySecret);
     }
 
     public void setPacketLogBytes(int num) {
@@ -168,6 +296,10 @@ public class LogProducerConfig {
         log_producer_config_set_get_time_unix_func(func);
     }
 
+    public void setSource(String source) {
+        log_producer_config_set_source(config, source);
+    }
+
     public void resetSecurityToken(String accessKeyID, String accessKeySecret, String securityToken) {
         log_producer_config_reset_security_token(config, accessKeyID, accessKeySecret, securityToken);
     }
@@ -187,75 +319,5 @@ public class LogProducerConfig {
     public int isEnabled() {
         return log_producer_persistent_config_is_enabled(config);
     }
-
-    private static native long create_log_producer_config();
-
-    private static native void log_producer_debug();
-
-    private static native void log_producer_config_set_endpoint(long config, String endpoint);
-
-    private static native void log_producer_config_set_project(long config, String project);
-
-    private static native void log_producer_config_set_logstore(long config, String logstore);
-
-    private static native void log_producer_config_set_access_id(long config, String accessKeyID);
-
-    private static native void log_producer_config_set_access_key(long config, String accessKeySecret);
-
-    private static native void log_producer_config_reset_security_token(long config, String accessKeyID, String accessKeySecret, String securityToken);
-
-    private static native void log_producer_config_set_topic(long config, String topic);
-
-    private static native void log_producer_config_add_tag(long config, String key, String value);
-
-    private static native void log_producer_config_set_packet_log_bytes(long config, int num);
-
-    private static native void log_producer_config_set_packet_log_count(long config, int num);
-
-    private static native void log_producer_config_set_packet_timeout(long config, int num);
-
-    private static native void log_producer_config_set_max_buffer_limit(long config, int num);
-
-    private static native void log_producer_config_set_send_thread_count(long config, int num);
-
-    private static native void log_producer_config_set_persistent(long config, int num);
-
-    private static native void log_producer_config_set_persistent_file_path(long config, String path);
-
-    private static native void log_producer_config_set_persistent_force_flush(long config, int num);
-
-    private static native void log_producer_config_set_persistent_max_file_count(long config, int num);
-
-    private static native void log_producer_config_set_persistent_max_file_size(long config, int num);
-
-    private static native void log_producer_config_set_persistent_max_log_count(long config, int num);
-
-    private static native void log_producer_config_set_using_http(long config, int num);
-
-    private static native void log_producer_config_set_net_interface(long config, String net_interface);
-
-    private static native void log_producer_config_set_connect_timeout_sec(long config, int num);
-
-    private static native void log_producer_config_set_send_timeout_sec(long config, int num);
-
-    private static native void log_producer_config_set_destroy_flusher_wait_sec(long config, int num);
-
-    private static native void log_producer_config_set_destroy_sender_wait_sec(long config, int num);
-
-    private static native void log_producer_config_set_compress_type(long config, int num);
-
-    private static native void log_producer_config_set_ntp_time_offset(long config, int num);
-
-    private static native void log_producer_config_set_max_log_delay_time(long config, int num);
-
-    private static native void log_producer_config_set_drop_delay_log(long config, int num);
-
-    private static native void log_producer_config_set_get_time_unix_func(LogProducerTimeUnixFunc func);
-
-    private static native void log_producer_config_set_drop_unauthorized_log(long config, int num);
-
-    private static native int log_producer_config_is_valid(long config);
-
-    private static native int log_producer_persistent_config_is_enabled(long config);
 
 }

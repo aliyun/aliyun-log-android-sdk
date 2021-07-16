@@ -3,6 +3,8 @@ package com.aliyun.sls.android.producer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.aliyun.sls.android.producer.utils.TimeUtils;
+
 public class Log {
 
     private long logTime;
@@ -10,7 +12,7 @@ public class Log {
     private Map<String, String> content = new HashMap<>();
 
     public Log() {
-        this.logTime = System.currentTimeMillis() / 1000;
+        this.logTime = TimeUtils.getTimeInMillis();
     }
 
     public void putContent(String key, String value) {
