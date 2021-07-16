@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import android.content.Context;
-import com.aliyun.sls.android.scheme.TCUtils;
+import com.aliyun.sls.android.scheme.AppUtils;
 
 /**
  * @author gordon
@@ -38,8 +38,8 @@ public final class SLSConfig {
 
     public SLSConfig(Context context) {
         this.context = context;
-        this.appVersion = TCUtils.getAppVersion(context);
-        this.appName = TCUtils.getAppName(context);
+        this.appVersion = AppUtils.getAppVersion(context);
+        this.appName = AppUtils.getAppName(context);
     }
 
     public void addCustom(String key, String value) {

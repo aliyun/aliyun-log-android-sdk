@@ -197,8 +197,8 @@ public class Scheme {
         date.setTime(Long.valueOf(scheme.local_timestamp_fixed));
         scheme.local_time_fixed = dateFormat.format(date);
 
-        scheme.app_name = returnDashIfNull(TCUtils.getAppName(context));
-        scheme.app_version = returnDashIfNull(TCUtils.getAppVersion(context));
+        scheme.app_name = returnDashIfNull(AppUtils.getAppName(context));
+        scheme.app_version = returnDashIfNull(AppUtils.getAppVersion(context));
         scheme.utdid = returnDashIfNull(DeviceUtils.getUtdid(context));
         scheme.imei = returnDashIfNull(DeviceUtils.getImei(context));
         scheme.imsi = returnDashIfNull(DeviceUtils.getImsi(context));

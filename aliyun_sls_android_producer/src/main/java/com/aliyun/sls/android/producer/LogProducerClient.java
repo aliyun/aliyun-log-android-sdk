@@ -2,7 +2,9 @@ package com.aliyun.sls.android.producer;
 
 import java.util.Map;
 
+import android.content.Context;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
+import com.aliyun.sls.android.scheme.Scheme;
 
 public class LogProducerClient {
 
@@ -10,8 +12,11 @@ public class LogProducerClient {
         void onBeforeLogAdded(Log log);
     }
 
+    private final LogProducerConfig config;
     private final long producer;
     private final long client;
+
+    @Deprecated
     private IAddLogInterceptor addLogInterceptor;
 
     public LogProducerClient(LogProducerConfig logProducerConfig) throws LogProducerException {
@@ -20,6 +25,7 @@ public class LogProducerClient {
 
     public LogProducerClient(LogProducerConfig logProducerConfig, LogProducerCallback callback)
         throws LogProducerException {
+        this.config = logProducerConfig;
         producer = create_log_producer(logProducerConfig.getConfig(), callback);
         if (producer == 0) {
             throw new LogProducerException("Can not create log producer");
@@ -41,9 +47,18 @@ public class LogProducerClient {
             return LogProducerResult.LOG_PRODUCER_INVALID;
         }
 
-        if (null != addLogInterceptor) {
-            addLogInterceptor.onBeforeLogAdded(log);
-            //TimeUtils.fixTime(log);
+        if (config.isEnableTrack()) {
+            final Context context = config.getContext();
+            if (null != context) {
+                Scheme scheme = Scheme.createDefaultScheme(config.getContext());
+                for (Map.Entry<String, String> entry : scheme.toMap().entrySet()) {
+                    log.putContent(entry.getKey(), entry.getValue());
+                }
+            }
+        } else {
+            if (null != addLogInterceptor) {
+                addLogInterceptor.onBeforeLogAdded(log);
+            }
         }
 
         Map<String, String> contents = log.getContent();
@@ -69,6 +84,7 @@ public class LogProducerClient {
         return LogProducerResult.fromInt(res);
     }
 
+    @Deprecated
     public void setAddLogInterceptor(IAddLogInterceptor addLogInterceptor) {
         this.addLogInterceptor = addLogInterceptor;
     }

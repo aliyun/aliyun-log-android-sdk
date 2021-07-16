@@ -14,8 +14,8 @@ public class StatCache {
 
     public static void init(Context context) {
         app.packageName = context.getPackageName();
-        app.appName = TCUtils.getAppName(context);
-        app.appVersion = TCUtils.getAppVersion(context);
+        app.appName = AppUtils.getAppName(context);
+        app.appVersion = AppUtils.getAppVersion(context);
 
         device.utdid = DeviceUtils.getUtdid(context);
         device.imei = DeviceUtils.getImei(context);
