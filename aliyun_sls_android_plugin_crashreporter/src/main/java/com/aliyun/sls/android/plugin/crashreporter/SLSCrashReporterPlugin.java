@@ -18,6 +18,7 @@ import com.aliyun.sls.android.scheme.Scheme;
 import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.ICrashClient;
 import org.json.JSONObject;
+import static com.aliyun.sls.android.plugin.crashreporter.BuildConfig.VERSION_NAME;
 
 /**
  * @author gordon
@@ -48,7 +49,7 @@ public class SLSCrashReporterPlugin extends AbstractPlugin implements ICrashClie
 
     @Override
     public String version() {
-        return "1.0.12";
+        return VERSION_NAME;
     }
 
     @Override
