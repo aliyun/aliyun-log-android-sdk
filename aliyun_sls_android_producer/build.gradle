@@ -7,7 +7,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "2.5.14.1"
     }
     buildTypes {
         release {
@@ -28,14 +28,11 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 }
 
-task makeJar(type: Copy) {
-    delete('build/libs')
-    from('build/outputs/aar')
-    into('build/libs')
-    include('aliyun_sls_android_producer-release.aar')
+ext {
+    moduleVersion = android.defaultConfig.versionName
+    moduleName = 'aliyun-log-android-sdk'
 }
 
-makeJar.dependsOn(build)
-
 //====以下是将android library上传到jcenter的脚本
-apply from: "mavenCentralUpload.gradle"
+//apply from: "mavenCentralUpload.gradle"
+apply from: "${project.rootProject.file('maven-publish.gradle')}"
