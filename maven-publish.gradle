@@ -100,7 +100,7 @@ publishing {
                         println(configuration)
                         configuration.dependencies.each {
                             println(it)
-                            if (it.name == "unspecified") {
+                            if (it.name == "unspecified" || it.version == 'unspecified') {
                                 // 忽略无法识别的
                                 return
                             }
