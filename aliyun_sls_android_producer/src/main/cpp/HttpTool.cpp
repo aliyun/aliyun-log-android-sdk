@@ -3,12 +3,10 @@
 
 extern "C" {
 #include <jni.h>
-#include <android/looper.h>
 
 static jclass cls_foo = NULL;
 static jmethodID mid_http_post = NULL;
-JavaVM *g_VM;
-ALooper *main_thread_looper;
+static JavaVM *g_VM;
 
 int os_http_post(const char *url,
                  char **header_array,
@@ -69,7 +67,6 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return -1;
     }
     g_VM = vm;
-    main_thread_looper = ALooper_forThread();
 
     jclass cls = env->FindClass("com/aliyun/sls/android/producer/LogProducerHttpTool");
     cls_foo = (jclass) env->NewGlobalRef(cls);
