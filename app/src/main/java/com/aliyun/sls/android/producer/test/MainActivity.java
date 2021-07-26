@@ -5,16 +5,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import com.aliyun.sls.android.SLSAdapter;
-import com.aliyun.sls.android.SLSConfig;
-import com.aliyun.sls.android.plugin.crashreporter.SLSCrashReporterPlugin;
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
-import com.aliyun.sls.android.producer.utils.ThreadUtils;
 
 import java.io.UnsupportedEncodingException;
 
@@ -26,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     String accesskeyid = "";
     String accesskeysecret = "";
     LogProducerClient client;
-    LogProducerClient client2;
+    LogProducerConfig config;
 
 
     int x = 0;
@@ -36,20 +32,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SLSConfig config = new SLSConfig(this);
-        config.endpoint = endpoint;
-        config.pluginAppId = "sls-7011bc6fb3af0244d8";
-        config.pluginLogproject = project;
-        config.accessKeyId = accesskeyid;
-        config.accessKeySecret = accesskeysecret;
-        config.debuggable = true;
-        config.addCustom("testKey", "testValue");
-        config.addCustom(null, null);
-
-        SLSAdapter slsAdapter = SLSAdapter.getInstance();
-        slsAdapter.addPlugin(new SLSCrashReporterPlugin());
-        slsAdapter.init(config);
-
         Button send = findViewById(R.id.send);
         send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,32 +40,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         try {
-            final LogProducerConfig config1 = createClient("test1");
-            config1.setEnableTrack(true);
-            final LogProducerConfig config2 = createClient("test2");
-            client = new LogProducerClient(config1, new LogProducerCallback() {
-                @Override
-                public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
-                    System.out.printf("1: thread: %s\n", Thread.currentThread());
-                    System.out.printf("1: %s %s %s %s %s%n\n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
-                }
-            });
-            ThreadUtils.exec(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        client2 = new LogProducerClient(config2, new LogProducerCallback() {
-                            @Override
-                            public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
-                                System.out.printf("2: thread: %s\n", Thread.currentThread());
-                                System.out.printf("2: %s %s %s %s %s%n\n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
-                            }
-                        });
-                    } catch (LogProducerException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            createClient();
         } catch (LogProducerException e) {
             e.printStackTrace();
         }
@@ -100,20 +57,13 @@ public class MainActivity extends AppCompatActivity {
                 }).start();
             }
         });
-
-        findViewById(R.id.crash).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mockCrash();
-            }
-        });
     }
 
 
-    LogProducerConfig createClient(String path) throws LogProducerException {
+    void createClient() throws LogProducerException {
         // 指定sts token 创建config，过期之前调用resetSecurityToken重置token
 //        LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
-        LogProducerConfig config = new LogProducerConfig(this, endpoint, project, logstore, accesskeyid, accesskeysecret);
+        config = new LogProducerConfig(this, endpoint, project, logstore, accesskeyid, accesskeysecret);
         // 设置主题
         config.setTopic("test_topic");
         // 设置tag信息，此tag会附加在每条日志上
@@ -134,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         // 每次发送前会把日志保存到本地的binlog文件，只有发送成功才会删除，保证日志上传At Least Once
         config.setPersistent(0);
         // 持久化的文件名，需要保证文件所在的文件夹已创建。配置多个客户端时，不应设置相同文件
-        config.setPersistentFilePath(getFilesDir() + String.format("%s_log.dat", path));
+        config.setPersistentFilePath(getFilesDir() + "/log.dat");
         // 是否每次AddLog强制刷新，高可靠性场景建议打开
         config.setPersistentForceFlush(1);
         // 持久化文件滚动个数，建议设置成10。
@@ -175,27 +125,21 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        return config;
+        client = new LogProducerClient(config, new LogProducerCallback() {
+            @Override
+            public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
+                System.out.printf("%s %s %s %s %s%n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
+            }
+        });
 //        client = new LogProducerClient(config);
     }
 
-    void mockCrash() {
-        String test = null;
-        test.length();
-    }
-
     void send() {
-        System.out.printf("%s %n", Thread.currentThread());
         Log log = oneLog();
         log.putContent("index", String.valueOf(x));
         x = x + 1;
         if (client != null) {
             LogProducerResult res = client.addLog(log, 0);
-            System.out.printf("%s %s%n", res, res.isLogProducerResultOk());
-        }
-
-        if (client2 != null) {
-            LogProducerResult res = client2.addLog(log, 0);
             System.out.printf("%s %s%n", res, res.isLogProducerResultOk());
         }
     }
