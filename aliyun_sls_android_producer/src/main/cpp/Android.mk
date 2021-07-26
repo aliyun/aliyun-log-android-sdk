@@ -11,5 +11,5 @@ LOCAL_C_INCLUDES :=
 LOCAL_MODULE := sls_producer
 LOCAL_SRC_FILES :=  HttpTool.cpp com_aliyun_sls_android_producer_LogProducerClient.c com_aliyun_sls_android_producer_LogProducerConfig.c
 LOCAL_STATIC_LIBRARIES := libaliyun_log_c_sdk
-LOCAL_LDLIBS := -lz -llog -landroid
+LOCAL_LDLIBS := -lz -llog
 include $(BUILD_SHARED_LIBRARY)
