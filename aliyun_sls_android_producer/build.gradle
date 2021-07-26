@@ -7,7 +7,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "2.6.0"
+        versionName "bricks_1.0.1"
     }
     buildTypes {
         release {
