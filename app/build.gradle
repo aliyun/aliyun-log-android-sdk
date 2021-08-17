@@ -4,7 +4,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
     defaultConfig {
-        applicationId "com.aliyun.sls.android.producer.test"
+        applicationId "com.aliyun.sls.android.producer.example"
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 }
 
 //repositories {
@@ -26,9 +30,10 @@ android {
 //}
 
 dependencies {
-    implementation project(':aliyun_sls_android_producer')
-//    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.5.14'
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:+'
-    implementation 'com.android.support.constraint:constraint-layout:2.0.2'
+    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.4'
+//    implementation project(':aliyun_sls_android_producer')
+    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:bricks_1.0.1'
+
+    implementation 'com.aliyun.openservices:alysls-android-crashreporter:1.1.1'
 }

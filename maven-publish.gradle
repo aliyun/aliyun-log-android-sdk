@@ -1,7 +1,6 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
@@ -19,8 +18,6 @@ if(projectPropertiesFile.exists()){
 // read properties
 def projectName = properties.getProperty("project.name")
 def projectGroupId = properties.getProperty("project.groupId")
-def projectArtifactId = properties.getProperty("project.artifactId")
-def projectVersionName = properties.getProperty("project.version")
 def projectSiteUrl = properties.getProperty("project.siteUrl")
 def projectGitUrl = properties.getProperty("project.gitUrl")
 
@@ -31,7 +28,12 @@ def developerEmail = properties.getProperty("sonatype.developer.email")
 def sonatypeUser = properties.getProperty("sonatype.user")
 def sonatypePswd = properties.getProperty("sonatype.pswd")
 
+def projectArtifactId = moduleName
+def projectVersionName = moduleVersion
 project.archivesBaseName = projectArtifactId
+
+println "publish -->> moduleName: " + moduleName
+println "publish -->> moduleVersion: " + moduleVersion
 
 task androidSourcesJar(type: Jar) {
     archiveClassifier.set("sources")
@@ -39,6 +41,15 @@ task androidSourcesJar(type: Jar) {
     exclude "**/R.class"
     exclude "**/BuildConfig.class"
 }
+
+task makeJar(type: Copy) {
+    delete('build/libs')
+    from('build/outputs/aar')
+    into('build/libs')
+    include('aliyun_sls_android_producer-release.aar')
+}
+
+makeJar.dependsOn(build)
 
 publishing {
     publications {
@@ -89,7 +100,7 @@ publishing {
                         println(configuration)
                         configuration.dependencies.each {
                             println(it)
-                            if (it.name == "unspecified") {
+                            if (it.name == "unspecified" || it.version == 'unspecified') {
                                 // 忽略无法识别的
                                 return
                             }
