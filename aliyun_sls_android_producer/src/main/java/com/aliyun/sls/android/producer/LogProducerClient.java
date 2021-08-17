@@ -2,16 +2,30 @@ package com.aliyun.sls.android.producer;
 
 import java.util.Map;
 
+import android.content.Context;
+import com.aliyun.sls.android.producer.utils.TimeUtils;
+import com.aliyun.sls.android.scheme.Scheme;
+
 public class LogProducerClient {
 
+    public interface IAddLogInterceptor {
+        void onBeforeLogAdded(Log log);
+    }
+
+    private final LogProducerConfig config;
     private final long producer;
     private final long client;
+
+    @Deprecated
+    private IAddLogInterceptor addLogInterceptor;
 
     public LogProducerClient(LogProducerConfig logProducerConfig) throws LogProducerException {
         this(logProducerConfig, null);
     }
 
-    public LogProducerClient(LogProducerConfig logProducerConfig, LogProducerCallback callback) throws LogProducerException {
+    public LogProducerClient(LogProducerConfig logProducerConfig, LogProducerCallback callback)
+        throws LogProducerException {
+        this.config = logProducerConfig;
         producer = create_log_producer(logProducerConfig.getConfig(), callback);
         if (producer == 0) {
             throw new LogProducerException("Can not create log producer");
@@ -20,6 +34,8 @@ public class LogProducerClient {
         if (client == 0) {
             throw new LogProducerException("Can not create log producer client");
         }
+
+        TimeUtils.startUpdateServerTime(logProducerConfig.getContext(), logProducerConfig.getEndpoint(), logProducerConfig.getProject());
     }
 
     public LogProducerResult addLog(Log log) {
@@ -30,6 +46,21 @@ public class LogProducerClient {
         if (client == 0 || log == null) {
             return LogProducerResult.LOG_PRODUCER_INVALID;
         }
+
+        if (config.isEnableTrack()) {
+            final Context context = config.getContext();
+            if (null != context) {
+                Scheme scheme = Scheme.createDefaultScheme(config.getContext());
+                for (Map.Entry<String, String> entry : scheme.toMap().entrySet()) {
+                    log.putContent(entry.getKey(), entry.getValue());
+                }
+            }
+        } else {
+            if (null != addLogInterceptor) {
+                addLogInterceptor.onBeforeLogAdded(log);
+            }
+        }
+
         Map<String, String> contents = log.getContent();
         int pairCount = contents.size();
 
@@ -53,6 +84,11 @@ public class LogProducerClient {
         return LogProducerResult.fromInt(res);
     }
 
+    @Deprecated
+    public void setAddLogInterceptor(IAddLogInterceptor addLogInterceptor) {
+        this.addLogInterceptor = addLogInterceptor;
+    }
+
     public LogProducerResult addLogRaw(byte[][] keys, byte[][] values) {
         if (client == 0 || null == keys || null == values ) {
             return LogProducerResult.LOG_PRODUCER_INVALID;
@@ -71,7 +107,8 @@ public class LogProducerClient {
 
     private static native long get_log_producer_client(long producer);
 
-    private static native int log_producer_client_add_log_with_len(long config, long log_time, int pairCount, String[] keys, String[] values, int flush);
+    private static native int log_producer_client_add_log_with_len(long config, long log_time, int pairCount,
+        String[] keys, String[] values, int flush);
 
     private static native int log_producer_client_add_log_with_len_time_int32(long config, long log_time, int pairCount, byte[][] keys, byte[][] values);
 

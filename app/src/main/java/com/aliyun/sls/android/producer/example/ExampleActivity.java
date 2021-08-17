@@ -1,93 +1,116 @@
-package com.aliyun.sls.android.producer.test;
+package com.aliyun.sls.android.producer.example;
 
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.TextView;
 
-import com.aliyun.sls.android.producer.Log;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
+import com.aliyun.sls.android.producer.example.example.CrashExampleActivity;
+import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
 
 import java.io.UnsupportedEncodingException;
 
-public class MainActivity extends AppCompatActivity {
+/**
+ * @author gordon
+ * @date 2021/07/26
+ */
+public class ExampleActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private static final String TAG = "sls_example";
 
-    String endpoint = "https://cn-hangzhou.log.aliyuncs.com";
-    String project = "k8s-log-cdc990939f2f547e883a4cb9236e85872";
-    String logstore = "002";
-    String accesskeyid = "";
-    String accesskeysecret = "";
-    LogProducerClient client;
-    LogProducerClient client2;
+    private String endpoint;
+    private String logProject;
+    private String logStore;
+    private String accessKeyId;
+    private String accessKeySecret;
+    private String accessKeyToken;
 
+    private TextView parametersView;
+    private TextView consoleTextView;
 
-    int x = 0;
+    private LogProducerClient client;
+    private LogProducerConfig config;
+
+    private int x;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_example);
+        parametersView = findViewById(R.id.example_parameters_text);
+        consoleTextView = findViewById(R.id.example_console_text);
 
-        Button send = findViewById(R.id.send);
-        send.setOnClickListener(new View.OnClickListener() {
+        PreferenceUtils.registerOnSharedPreferenceChangeListener(this, this);
+        initOrUpdateParameters();
+
+        findViewById(R.id.example_update_config).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateConfig(config);
+            }
+        });
+
+        findViewById(R.id.example_send_one_text).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 send();
             }
         });
-        try {
-            final LogProducerConfig config1 = createClient("test1");
-            final LogProducerConfig config2 = createClient("test2");
-            client = new LogProducerClient(config1, new LogProducerCallback() {
-                @Override
-                public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
-                    System.out.printf("1: thread: %s\n", Thread.currentThread());
-                    System.out.printf("1: %s %s %s %s %s%n\n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
-                }
-            });
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        client2 = new LogProducerClient(config2, new LogProducerCallback() {
-                            @Override
-                            public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
-                                System.out.printf("2: thread: %s\n", Thread.currentThread());
-                                System.out.printf("2: %s %s %s %s %s%n\n", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes);
-                            }
-                        });
-                    } catch (LogProducerException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        } catch (LogProducerException e) {
-            e.printStackTrace();
-        }
 
-        Button test = findViewById(R.id.test);
-        test.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.example_send_multi_text).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        send(2048);
-                    }
-                }).start();
+                send(1024);
             }
         });
+
+        findViewById(R.id.example_crash_text).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CrashExampleActivity.start(ExampleActivity.this);
+            }
+        });
+
+        config = createConfig("example");
+        if (null != config) {
+            client = createClient(config, new LogProducerCallback() {
+                @Override
+                public void onCall(int resultCode, String reqId, String errorMessage, int logBytes, int compressedBytes) {
+                    @SuppressLint("DefaultLocale")
+                    String formatMsg = String.format("code: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d"
+                            , resultCode
+                            , reqId
+                            , errorMessage
+                            , logBytes
+                            , compressedBytes);
+                    Log.d(TAG, formatMsg);
+                    renderConsole("onCall: " + formatMsg);
+
+                }
+            });
+        }
     }
 
+    private LogProducerConfig createConfig(String path) {
+        LogProducerConfig config = null;
+        try {
+            config = new LogProducerConfig(this, endpoint, logProject, logStore, accessKeyId, accessKeySecret, accessKeyToken);
+        } catch (LogProducerException e) {
+            return null;
+        }
 
-    LogProducerConfig createClient(String path) throws LogProducerException {
-        // 指定sts token 创建config，过期之前调用resetSecurityToken重置token
-//        LogProducerConfig config = new LogProducerConfig(endpoint, project, logstore, accesskeyid, accesskeysecret, securityToken);
-        LogProducerConfig config = new LogProducerConfig(this, endpoint, project, logstore, accesskeyid, accesskeysecret);
         // 设置主题
         config.setTopic("test_topic");
         // 设置tag信息，此tag会附加在每条日志上
@@ -106,11 +129,11 @@ public class MainActivity extends AppCompatActivity {
 
         // 1 开启断点续传功能， 0 关闭
         // 每次发送前会把日志保存到本地的binlog文件，只有发送成功才会删除，保证日志上传At Least Once
-        config.setPersistent(0);
+        config.setPersistent(1);
         // 持久化的文件名，需要保证文件所在的文件夹已创建。配置多个客户端时，不应设置相同文件
-        config.setPersistentFilePath(getFilesDir() + String.format("%s_log.dat", path));
+        config.setPersistentFilePath(getFilesDir() + String.format("/%s_log.dat", path));
         // 是否每次AddLog强制刷新，高可靠性场景建议打开
-        config.setPersistentForceFlush(1);
+        config.setPersistentForceFlush(0);
         // 持久化文件滚动个数，建议设置成10。
         config.setPersistentMaxFileCount(10);
         // 每个持久化文件的大小，建议设置成1-10M
@@ -141,38 +164,110 @@ public class MainActivity extends AppCompatActivity {
         //是否丢弃鉴权失败的日志，0 不丢弃，1丢弃
         //默认为 0，即不丢弃
         config.setDropUnauthorizedLog(0);
-        //注册 获取服务器时间 的函数
-//        config.setGetTimeUnixFunc(new LogProducerTimeUnixFunc() {
-//            @Override
-//            public long getTimeUnix() {
-//                return System.currentTimeMillis()/1000;
-//            }
-//        });
 
         return config;
-//        client = new LogProducerClient(config);
     }
 
-    void send() {
-        System.out.printf("%s %n", Thread.currentThread());
-        Log log = oneLog();
+    private LogProducerClient createClient(LogProducerConfig config, LogProducerCallback callback) {
+        try {
+            return new LogProducerClient(config, callback);
+        } catch (LogProducerException e) {
+            return null;
+        }
+    }
+
+    private void updateConfig(LogProducerConfig config) {
+        config.setEndpoint(endpoint);
+        config.setProject(logProject);
+        config.setLogstore(logStore);
+
+        if (!TextUtils.isEmpty(accessKeyToken)) {
+            config.resetSecurityToken(accessKeyId, accessKeySecret, accessKeyToken);
+        } else {
+            config.setAccessKeyId(accessKeyId);
+            config.setAccessKeySecret(accessKeySecret);
+        }
+    }
+
+
+    private void initOrUpdateParameters() {
+        this.endpoint = PreferenceUtils.getEndpoint(this);
+        this.logProject = PreferenceUtils.getLogProject(this);
+        this.logStore = PreferenceUtils.getLogStore(this);
+        this.accessKeyId = PreferenceUtils.getAccessKeyId(this);
+        this.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
+        this.accessKeyToken = PreferenceUtils.getAccessKeyToken(this);
+
+        renderParametersWithTextView();
+    }
+
+    private void renderParametersWithTextView() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("endpoint: ").append(endpoint).append("\n");
+        builder.append("logProject: ").append(logProject).append("\n");
+        builder.append("logStore: ").append(logStore).append("\n");
+        builder.append("accessKeyId: ").append(accessKeyId).append("\n");
+        builder.append("accessKeySecret: ").append(accessKeySecret).append("\n");
+        builder.append("accessKeyToken: ").append(accessKeyToken).append("\n");
+
+        parametersView.setText(builder);
+    }
+
+    private void renderConsole(String text) {
+        consoleTextView.append(text);
+        consoleTextView.append("\n");
+        consoleTextView.post(new Runnable() {
+            @Override
+            public void run() {
+                int scrollAmount = consoleTextView.getLayout().getLineTop(consoleTextView.getLineCount()) - consoleTextView.getHeight();
+                consoleTextView.scrollTo(0, Math.max(scrollAmount, 0));
+            }
+        });
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        initOrUpdateParameters();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.example_menus, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.example_settings) {
+            SettingsActivity.start(this);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        PreferenceUtils.unregisterOnSharedPreferenceChangeListener(this, this);
+        super.onDestroy();
+    }
+
+    private void send() {
+        com.aliyun.sls.android.producer.Log log = oneLog();
         log.putContent("index", String.valueOf(x));
         x = x + 1;
         if (client != null) {
             LogProducerResult res = client.addLog(log, 0);
-            System.out.printf("%s %s%n", res, res.isLogProducerResultOk());
-        }
-
-        if (client2 != null) {
-            LogProducerResult res = client2.addLog(log, 0);
-            System.out.printf("%s %s%n", res, res.isLogProducerResultOk());
+            renderConsole(String.format("send one log: %s", res));
+            Log.d(TAG, String.format("%s %s%n", res, res.isLogProducerResultOk()));
         }
     }
 
     /**
      * send data with bytes.
      */
-    void sendRaw() {
+    private void sendRaw() {
         try {
             byte[][] keys = {"sw".getBytes("utf-8"), "中文 key".getBytes("utf-8")};
             byte[] v1 = {10, 36, 52, 98, 54, 51, 53, 54, 54, 52, 45, 53, 56, 53, 55, 45, 52, 98, 55, 53, 45, 97, 50, 53, 54, 45, 54, 99, 54, 51, 54, 49, 54, 102, 53, 97, 51, 48, 18, 36, 52, 55, 53, 55, 51, 55, 55, 57, 45, 55, 56, 51, 48, 45, 52, 54, 53, 97, 45, 56, 102, 51, 57, 45, 51, 56, 55, 51, 55, 48, 51, 50, 52, 99, 51, 52, 26, 92, 8, 1, 24, -92, -94, -11, -90, -87, 47, 32, -92, -94, -11, -90, -87, 47, 50, 22, 47, 112, 105, 110, 103, 32, 82, 101, 115, 112, 111, 110, 115, 101, 67, 97, 108, 108, 98, 97, 99, 107, 64, 2, 72, 4, 80, -78, 70, 98, 13, 10, 7, 99, 108, 105, 95, 115, 101, 113, 18, 2, 49, 53, 98, 13, 10, 8, 101, 114, 114, 95, 99, 111, 100, 101, 18, 1, 48, 98, 13, 10, 3, 117, 105, 100, 18, 6, 55, 48, 54, 50, 53, 57, 26, -72, 1, 16, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 24, -93, -94, -11, -90, -87, 47, 32, -86, -94, -11, -90, -87, 47, 42, 121, 18, 36, 52, 98, 54, 51, 53, 54, 54, 52, 45, 53, 56, 53, 55, 45, 52, 98, 55, 53, 45, 97, 50, 53, 54, 45, 54, 99, 54, 51, 54, 49, 54, 102, 53, 97, 51, 48, 26, 36, 53, 51, 54, 52, 52, 97, 54, 55, 45, 52, 49, 53, 53, 45, 52, 48, 52, 51, 45, 57, 54, 51, 55, 45, 55, 54, 53, 97, 52, 54, 55, 48, 51, 51, 54, 49, 42, 11, 105, 109, 95, 115, 100, 107, 95, 99, 111, 114, 101, 50, 11, 83, 101, 110, 100, 82, 101, 113, 117, 101, 115, 116, 58, 10, 47, 112, 105, 110, 103, 32, 83, 101, 110, 100, 66, 5, 47, 112, 105, 110, 103, 50, 14, 47, 112, 105, 110, 103, 32, 82, 101, 115, 112, 111, 110, 115, 101, 72, 4, 80, -78, 70, 98, 13, 10, 3, 117, 105, 100, 18, 6, 55, 48, 54, 50, 53, 57, 34, 11, 105, 109, 95, 115, 100, 107, 95, 99, 111, 114, 101, 42, 22, 73, 110, 118, 111, 107, 101, 82, 101, 115, 112, 111, 110, 115, 101, 67, 97, 108, 108, 98, 97, 99, 107};
@@ -185,11 +280,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void send(int logCountPerSecond) {
+    private void send(int logCountPerSecond) {
         while (true) {
             long time1 = System.currentTimeMillis();
             for (int i = 0; i < logCountPerSecond; i++) {
-                Log log = oneLog();
+                com.aliyun.sls.android.producer.Log log = oneLog();
                 client.addLog(log);
             }
             long time2 = System.currentTimeMillis();
@@ -203,8 +298,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    Log oneLog() {
-        Log log = new Log();
+    private  com.aliyun.sls.android.producer.Log oneLog() {
+        com.aliyun.sls.android.producer.Log log = new com.aliyun.sls.android.producer.Log();
         log.putContent("content_key_1", "1abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("content_key_2", "2abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("content_key_3", "3abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
@@ -220,5 +315,4 @@ public class MainActivity extends AppCompatActivity {
         log.putContent("null", null);
         return log;
     }
-
 }

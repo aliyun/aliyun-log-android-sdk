@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:layout_width="wrap_content"
+        android:title="HTTPS/HTTP">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="https_force_http"
+            android:title="Force HTTP" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:layout_width="wrap_content"
+        android:title="AccessKey">
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="settings_key_id"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="AccessKeyId: " />
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="settings_key_secret"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="AccessSecret: " />
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="settings_key_token"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Token: " />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:layout_width="wrap_content"
+        android:title="endpoint">
+        <EditTextPreference
+            android:defaultValue="plz_set_endpoint"
+            android:key="settings_end_point"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Endpoint: " />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:layout_width="wrap_content"
+        android:title="project/logstore">
+
+        <EditTextPreference
+            android:defaultValue="plz_set_project"
+            android:key="settings_project"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Project: " />
+
+        <EditTextPreference
+            android:defaultValue="plz_set_store"
+            android:key="settings_store"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="LogStore: " />
+    </PreferenceCategory>
+
+</PreferenceScreen>
