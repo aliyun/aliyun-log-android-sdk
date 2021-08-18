@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:visibility="visible"
-    tools:context=".example.CrashExampleActivity">
+    tools:context=".example.crash.CrashExampleActivity">
 
     <LinearLayout
         android:id="@+id/container"

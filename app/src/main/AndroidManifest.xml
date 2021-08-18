@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="com.aliyun.sls.android.producer.example.ExampleActivity">
+        <activity android:name="com.aliyun.sls.android.producer.example.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +23,11 @@
 
         <activity android:name=".SettingsActivity"/>
 
-        <activity android:name=".example.CrashExampleActivity"
+        <activity android:name=".example.producer.ProducerExample"/>
+        <activity android:name=".example.producer.ProducerWithNoPersistent"/>
+        <activity android:name=".example.producer.ProducerWithDynamicConfig"/>
+
+        <activity android:name=".example.crash.CrashExampleActivity"
             android:process=":crash"/>
     </application>
 
