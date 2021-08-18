@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:stretchColumns="1"
+        android:layout_height="wrap_content">
+        <TableRow>
+            <Button android:text="基本配置" android:padding="8dp" android:id="@+id/main_producer_basic"/>
+            <Button android:text="不带缓存" android:padding="8dp" android:id="@+id/main_producer_persistent"/>
+            <Button android:text="动态配置" android:padding="8dp" android:id="@+id/main_producer_dynamic_config"/>
+        </TableRow>
+
+        <TableRow android:layout_marginTop="24dp">
+            <Button android:text="崩溃监控" android:padding="8dp" android:id="@+id/main_apm_crash"/>
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>
