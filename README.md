@@ -131,6 +131,18 @@ config.setPersistentMaxFileSize(1024 * 1024);
 config.setPersistentMaxLogCount(65536);
 ```
 
+### 动态配置
+2.6.0版本开始， sdk 新增 endpoint、project、logstore 支持动态配置。目前，所有已知参数，均已支持动态配置。示例代码如下:
+
+```
+// 动态更新 endpoint
+config.setEndpoint(endpoint);
+// 动态更新 logproject
+config.setProject(project);
+// 动态更新 logstore 
+config.setLogstore(logstore);
+```
+
 #### config其他参数设置说明
 
 | 参数设置                  | 说明                                                                                      | 取值                                                                  |
