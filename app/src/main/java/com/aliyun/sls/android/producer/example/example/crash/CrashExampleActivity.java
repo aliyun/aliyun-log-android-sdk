@@ -1,4 +1,4 @@
-package com.aliyun.sls.android.producer.example.example;
+package com.aliyun.sls.android.producer.example.example.crash;
 
 import android.content.Context;
 import android.content.Intent;
