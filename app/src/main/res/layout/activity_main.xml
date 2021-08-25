@@ -7,12 +7,15 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:stretchColumns="1"
+        android:stretchColumns="0,1,2"
         android:layout_height="wrap_content">
         <TableRow>
             <Button android:text="基本配置" android:padding="8dp" android:id="@+id/main_producer_basic"/>
             <Button android:text="不带缓存" android:padding="8dp" android:id="@+id/main_producer_persistent"/>
             <Button android:text="动态配置" android:padding="8dp" android:id="@+id/main_producer_dynamic_config"/>
+        </TableRow>
+        <TableRow>
+            <Button android:text="多Clients" android:padding="8dp" android:id="@+id/main_producer_multi_clients"/>
         </TableRow>
 
         <TableRow android:layout_marginTop="24dp">

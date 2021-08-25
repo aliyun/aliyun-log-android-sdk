@@ -32,8 +32,8 @@ android {
 dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
-//    implementation project(':aliyun_sls_android_producer')
-    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:bricks_1.0.1'
+    implementation project(':aliyun_sls_android_producer')
+//    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:bricks_1.0.1'
 
     implementation 'com.aliyun.openservices:alysls-android-crashreporter:1.1.1'
 }
