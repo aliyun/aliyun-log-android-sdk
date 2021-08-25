@@ -410,6 +410,12 @@ Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1se
     (*env)->ReleaseStringUTFChars(env, source, c_source);
 }
 
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1callback_1from_1sender_1thread(
+        JNIEnv *env, jclass clazz, jlong config, jint num) {
+    return log_producer_config_set_callback_from_sender_thread((log_producer_config *) config, num);
+}
+
 #ifdef __cplusplus
 }
 #endif

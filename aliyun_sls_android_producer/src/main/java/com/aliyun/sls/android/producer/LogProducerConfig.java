@@ -143,6 +143,8 @@ public class LogProducerConfig {
 
     private static native void log_producer_config_set_drop_unauthorized_log(long config, int num);
 
+    private static native void log_producer_config_set_callback_from_sender_thread(long config ,int num);
+
     private static native void log_producer_config_set_source(long config, String source);
 
     private static native int log_producer_config_is_valid(long config);
@@ -291,6 +293,10 @@ public class LogProducerConfig {
 
     public void setDropUnauthorizedLog(int num) {
         log_producer_config_set_drop_unauthorized_log(config, num);
+    }
+
+    public void setCallbackFromSenderThread(boolean enable) {
+        log_producer_config_set_callback_from_sender_thread(config, enable ? 1 : 0);
     }
 
     public void setGetTimeUnixFunc(LogProducerTimeUnixFunc func) {
