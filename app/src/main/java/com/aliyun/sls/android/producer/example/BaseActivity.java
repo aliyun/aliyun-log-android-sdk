@@ -28,12 +28,21 @@ public class BaseActivity extends AppCompatActivity {
             return;
         }
 
-        this.endpoint = parameters.getString("endpoint");
-        this.logProject = parameters.getString("logProject");
-        this.logStore = parameters.getString("logStore");
-        this.accessKeyId = parameters.getString("accessKeyId");
-        this.accessKeySecret = parameters.getString("accessKeySecret");
-        this.accessKeyToken = parameters.getString("accessKeyToken");
+        if (BuildConfig.CONFIG_ENABLE) {
+            this.endpoint = BuildConfig.END_POINT;
+            this.logProject = BuildConfig.LOG_PROJECT;
+            this.logStore = BuildConfig.LOG_STORE;
+            this.accessKeyId = BuildConfig.ACCESS_KEYID;
+            this.accessKeySecret = BuildConfig.ACCESS_KEY_SECRET;
+            this.accessKeyToken = BuildConfig.ACCESS_KEY_TOKEN;
+        } else {
+            this.endpoint = parameters.getString("endpoint");
+            this.logProject = parameters.getString("logProject");
+            this.logStore = parameters.getString("logStore");
+            this.accessKeyId = parameters.getString("accessKeyId");
+            this.accessKeySecret = parameters.getString("accessKeySecret");
+            this.accessKeyToken = parameters.getString("accessKeyToken");
+        }
     }
 
     @Override
@@ -64,6 +73,7 @@ public class BaseActivity extends AppCompatActivity {
 
     /**
      * 打印状态信息
+     *
      * @param msg
      */
     protected void printStatus(String msg) {
