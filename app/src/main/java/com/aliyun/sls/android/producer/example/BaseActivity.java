@@ -67,12 +67,13 @@ public class BaseActivity extends AppCompatActivity {
      * @param msg
      */
     protected void printStatus(String msg) {
+        final String message = msg + " thread: " + Thread.currentThread();
         final TextView textView = findViewById(R.id.example_console_text);
-        textView.append(msg);
-        textView.append("\n");
         textView.post(new Runnable() {
             @Override
             public void run() {
+                textView.append(message);
+                textView.append("\n");
                 int scrollAmount = textView.getLayout().getLineTop(textView.getLineCount()) - textView.getHeight();
                 textView.scrollTo(0, Math.max(scrollAmount, 0));
             }
