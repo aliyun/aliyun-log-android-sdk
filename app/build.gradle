@@ -10,6 +10,14 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "boolean", "CONFIG_ENABLE", project.hasProperty("CONFIG_ENABLE") ? "${CONFIG_ENABLE}" : "false"
+        buildConfigField "String", "END_POINT", project.hasProperty("END_POINT") ? "\"${END_POINT}\"" : "\"\""
+        buildConfigField "String", "LOG_PROJECT", project.hasProperty("LOG_PROJECT") ? "\"${LOG_PROJECT}\"" : "\"\""
+        buildConfigField "String", "LOG_STORE", project.hasProperty("LOG_STORE") ? "\"${LOG_STORE}\"" : "\"\""
+        buildConfigField "String", "ACCESS_KEYID", project.hasProperty("ACCESS_KEYID") ? "\"${ACCESS_KEYID}\"" : "\"\""
+        buildConfigField "String", "ACCESS_KEY_SECRET", project.hasProperty("ACCESS_KEY_SECRET") ? "\"${ACCESS_KEY_SECRET}\"" : "\"\""
+        buildConfigField "String", "ACCESS_KEY_TOKEN", project.hasProperty("ACCESS_KEY_TOKEN") ? "\"${ACCESS_KEY_TOKEN}\"" : "\"\""
     }
     buildTypes {
         release {
