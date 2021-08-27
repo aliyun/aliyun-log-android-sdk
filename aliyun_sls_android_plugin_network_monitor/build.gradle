@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.0"
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 29
+        versionCode 1
+        versionName "0.1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+//    repositories {
+//        flatDir {
+//            dirs 'libs'
+//        }
+//    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'/*, '*.aar'*/])
+    implementation project(":aliyun_sls_android_producer")
+    implementation project(":alinetworkdiagnosis")
+//    implementation(name: "alinetworkdiagnosis-0.0.1.25", ext: 'aar')
+}
+
+ext {
+    moduleVersion = android.defaultConfig.versionName
+    moduleName = 'alysls-android-network-monitor'
+}
+
+//====以下是将android library上传到jcenter的脚本
+apply from: "${project.rootProject.file('maven-publish.gradle')}"
