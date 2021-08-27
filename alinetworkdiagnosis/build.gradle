@@ -1,0 +1,3 @@
+configurations.maybeCreate("default")
+//artifacts.add("default", file('alinetworkdiagnosis-0.0.1.25.aar'))
+artifacts.add("default", file('app-release.aar'))
