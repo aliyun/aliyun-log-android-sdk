@@ -1,33 +1,48 @@
-package com.aliyun.sls.android.plugin.network_monitor;
-
-//import com.alibaba.netspeed.network.DetectCallback;
-//import com.alibaba.netspeed.network.Diagnosis;
-//import com.alibaba.netspeed.network.PingConfig;
+package com.aliyun.sls.android.plugin.network_diagnosis;
 
 import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.alibaba.netspeed.network.Diagnosis;
 import com.alibaba.netspeed.network.MtrConfig;
 import com.alibaba.netspeed.network.PingConfig;
 import com.alibaba.netspeed.network.TcpPingConfig;
+import com.aliyun.sls.android.JsonUtil;
 import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.SLSLog;
 import com.aliyun.sls.android.plugin.ISender;
 import com.aliyun.sls.android.scheme.Scheme;
 
+import org.json.JSONObject;
+
 /**
  * @author gordon
  * @date 2021/08/26
  */
-public class SLSNetwork {
+public class SLSNetDiagnosis {
     private static final String TAG = "SLSNetwork";
+    /** default timeout: 1 second */
+    @SuppressWarnings("PointlessArithmeticExpression")
+    private static final int DEFAULT_TIMEOUT = 1 * 1000;
+
+    private enum Type {
+        /** PING */
+        PING,
+        /** TCPPING */
+        TCPPING,
+        /** MTR */
+        MTR
+    }
 
     private ISender sender;
     private SLSConfig config;
-    private TaskIdGenerator taskIdGenerator = new TaskIdGenerator();
+    private final TaskIdGenerator taskIdGenerator = new TaskIdGenerator();
+
+    private Handler handler;
 
     private static class Holder {
-        private static SLSNetwork INSTANCE = new SLSNetwork();
+        private final static SLSNetDiagnosis INSTANCE = new SLSNetDiagnosis();
     }
 
     public interface Callback {
@@ -46,7 +61,7 @@ public class SLSNetwork {
         }
     }
 
-    public static SLSNetwork getInstance() {
+    public static SLSNetDiagnosis getInstance() {
         return Holder.INSTANCE;
     }
 
@@ -55,18 +70,32 @@ public class SLSNetwork {
         this.sender = sender;
     }
 
-    private SLSNetwork() {
+    private SLSNetDiagnosis() {
         //no instance
+        handler = new Handler(Looper.getMainLooper());
     }
 
-    private void report(String result, Callback callback) {
+    private void report(Type type, String result, Callback callback) {
         SLSLog.e(TAG, "diagnosis, result: " + result);
         Scheme scheme = Scheme.createDefaultScheme(config);
         scheme.reserve6 = result;
+
+        JSONObject reserves = new JSONObject();
+        if (type == Type.PING) {
+            JsonUtil.putOpt(reserves, "method", "PING");
+        } else if (type == Type.TCPPING) {
+            JsonUtil.putOpt(reserves, "method", "TCPPING");
+        } else if (type == Type.MTR) {
+            JsonUtil.putOpt(reserves, "method", "MTR");
+        } else {
+            JsonUtil.putOpt(reserves, "method", "UNKNOWN");
+        }
+        scheme.reserves = reserves.toString();
+
         sender.send(scheme);
 
         if (null != callback) {
-            callback.onComplete(result);
+            handler.post(() -> callback.onComplete(result));
         }
     }
 
@@ -75,12 +104,12 @@ public class SLSNetwork {
     }
 
     public void ping(String domain, Callback callback) {
-        this.ping(domain, 10, 1 * 1000, callback);
+        this.ping(domain, 10, DEFAULT_TIMEOUT, callback);
     }
 
     public void ping(String domain, int maxTimes, int timeout, Callback callback) {
         Diagnosis.startPing(new PingConfig(taskIdGenerator.generate(), domain, maxTimes, timeout, (context, result) -> {
-            report(result, callback);
+            report(Type.PING, result, callback);
             return 0;
         }, this));
     }
@@ -91,12 +120,12 @@ public class SLSNetwork {
     }
 
     public void tcpPing(String domain, int port, Callback callback) {
-        this.tcpPing(domain, port, 10, 1 * 1000, callback);
+        this.tcpPing(domain, port, 10, DEFAULT_TIMEOUT, callback);
     }
 
     public void tcpPing(String domain, int port, int maxTimes, int timeout, Callback callback) {
         Diagnosis.startTcpPing(new TcpPingConfig(taskIdGenerator.generate(), domain, port, maxTimes, timeout, (context, result) -> {
-            report(result, callback);
+            report(Type.TCPPING, result, callback);
             return 0;
         }, this));
     }
@@ -106,44 +135,13 @@ public class SLSNetwork {
     }
 
     public void mtr(String domain, Callback callback) {
-        this.mtr(domain, 30, 1, 10, 20 * 1000, callback);
+        this.mtr(domain, 30, 1, 10, DEFAULT_TIMEOUT, callback);
     }
 
     public void mtr(String domain, int maxTtl, int maxPath, int maxTimes, int timeout, Callback callback) {
         Diagnosis.startMtr(new MtrConfig(taskIdGenerator.generate(), domain, maxTtl, maxPath, maxTimes, timeout, (context, result) -> {
-            report(result, callback);
+            report(Type.MTR, result, callback);
             return 0;
         }, this));
     }
-
-    public void testPing() {
-        Diagnosis.startPing(new PingConfig("123456", "www.aliyun.com", 10, 3000, (context, result) -> {
-            SLSLog.e(TAG, "diagnosis, result: " + result);
-            Scheme scheme = Scheme.createDefaultScheme(config);
-            scheme.reserve6 = result;
-            sender.send(scheme);
-            return 0;
-        }, this));
-    }
-
-    public void testTcpPing() {
-        Diagnosis.startTcpPing(new TcpPingConfig("123456", "www.aliyun.com", 80, 10, 3000, (context, result) -> {
-            SLSLog.e(TAG, "diagnosis, result: " + result);
-            Scheme scheme = Scheme.createDefaultScheme(config);
-            scheme.reserve6 = result;
-            sender.send(scheme);
-            return 0;
-        }, this));
-    }
-
-    public void testMtr() {
-        Diagnosis.startMtr(new MtrConfig("123456", "www.aliyun.com", 30, 1, 10, 3000, (context, result) -> {
-            SLSLog.e(TAG, "diagnosis, result: " + result);
-            Scheme scheme = Scheme.createDefaultScheme(config);
-            scheme.reserve6 = result;
-            sender.send(scheme);
-            return 0;
-        }, this));
-    }
-
 }

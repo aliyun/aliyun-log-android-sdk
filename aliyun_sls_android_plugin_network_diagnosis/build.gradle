@@ -26,23 +26,17 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-//    repositories {
-//        flatDir {
-//            dirs 'libs'
-//        }
-//    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'/*, '*.aar'*/])
     implementation project(":aliyun_sls_android_producer")
     implementation project(":alinetworkdiagnosis")
-//    implementation(name: "alinetworkdiagnosis-0.0.1.25", ext: 'aar')
 }
 
 ext {
     moduleVersion = android.defaultConfig.versionName
-    moduleName = 'alysls-android-network-monitor'
+    moduleName = 'alysls-android-network_diagnosis'
 }
 
 //====以下是将android library上传到jcenter的脚本
