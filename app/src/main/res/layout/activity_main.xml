@@ -16,6 +16,7 @@
         </TableRow>
         <TableRow>
             <Button android:text="多Clients" android:padding="8dp" android:id="@+id/main_producer_multi_clients"/>
+            <Button android:text="立即发送" android:padding="8dp" android:id="@+id/main_producer_immediately"/>
         </TableRow>
 
         <TableRow android:layout_marginTop="24dp">

@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.aliyun.sls.android.producer.example.example.crash.CrashExampleActivity;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerExample;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithDynamicConfig;
+import com.aliyun.sls.android.producer.example.example.producer.ProducerWithImmediately;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithMultiClients;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithNoPersistent;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.main_producer_persistent).setOnClickListener(this);
         findViewById(R.id.main_producer_dynamic_config).setOnClickListener(this);
         findViewById(R.id.main_producer_multi_clients).setOnClickListener(this);
+        findViewById(R.id.main_producer_immediately).setOnClickListener(this);
         findViewById(R.id.main_apm_crash).setOnClickListener(this);
 
     }
@@ -50,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (R.id.main_producer_multi_clients == v.getId()) {
             // 多 client（即：多个不同的 logstore）
             startActivity(ProducerWithMultiClients.class);
+        } else if (R.id.main_producer_immediately == v.getId()) {
+            // 多 client（即：多个不同的 logstore）
+            startActivity(ProducerWithImmediately.class);
         } else if (R.id.main_apm_crash == v.getId()) {
             // 崩溃监控
             startActivity(CrashExampleActivity.class);
