@@ -24,6 +24,7 @@
         <activity android:name=".SettingsActivity"/>
 
         <activity android:name=".example.producer.ProducerExample"/>
+        <activity android:name=".example.producer.ProducerWithImmediately"/>
         <activity android:name=".example.producer.ProducerWithNoPersistent"/>
         <activity android:name=".example.producer.ProducerWithDynamicConfig"/>
         <activity android:name=".example.producer.ProducerWithMultiClients" />
