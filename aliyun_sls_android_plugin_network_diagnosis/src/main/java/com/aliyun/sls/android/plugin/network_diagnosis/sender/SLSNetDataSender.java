@@ -1,4 +1,4 @@
-package com.aliyun.sls.android.plugin.network_monitor.sender;
+package com.aliyun.sls.android.plugin.network_diagnosis.sender;
 
 import android.text.TextUtils;
 
@@ -88,22 +88,16 @@ public class SLSNetDataSender implements ISender {
             producerConfig.setDropDelayLog(0);
             producerConfig.setDropUnauthorizedLog(0);
 
-            producerClient = new LogProducerClient(producerConfig);
-            //producerClient = new LogProducerClient(producerConfig,
-            //    (resultCode, reqId, errorMessage, logBytes, compressedBytes) -> {
-            //        if (config.debuggable) {
-            //            // @formatter:off
-            //            SLSLog.e(TAG, SLSLog.format(
-            //                "client onCall. resultCode: %d, reqId: %s, errorMessage: %s, logByres: %d, compressedByres: %d",
-            //                resultCode, reqId, errorMessage, logBytes, compressedBytes));
-            //        }
-            //    });
-            //producerClient.setAddLogInterceptor(log -> {
-            //    Scheme scheme = Scheme.createDefaultScheme(config.context);
-            //    for (Entry<String,String> entry : scheme.toMap().entrySet()) {
-            //        log.putContent(entry.getKey(), entry.getValue());
-            //    }
-            //});
+//            producerClient = new LogProducerClient(producerConfig);
+            producerClient = new LogProducerClient(producerConfig,
+                (resultCode, reqId, errorMessage, logBytes, compressedBytes) -> {
+                    if (config.debuggable) {
+                        // @formatter:off
+                        SLSLog.e(TAG, SLSLog.format(
+                            "client onCall. resultCode: %d, reqId: %s, errorMessage: %s, logByres: %d, compressedByres: %d",
+                            resultCode, reqId, errorMessage, logBytes, compressedBytes));
+                    }
+                });
 
             if (config.debuggable) {
                 SLSLog.v(TAG, "init success.");
