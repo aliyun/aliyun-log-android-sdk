@@ -26,6 +26,10 @@ public final class SLSConfig {
     public String pluginAppId;
     public String pluginLogproject;
 
+    public String pluginTraceEndpoint;
+    public String pluginTraceLogProject;
+    public String pluginTraceLogStore;
+
     public String channel;
     public String channelName;
     public String userNick;

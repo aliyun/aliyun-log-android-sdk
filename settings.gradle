@@ -1,2 +1,3 @@
 include ':aliyun_sls_android_plugin_crashreporter'
 include ':app', ':aliyun_sls_android_producer'
+include ':aliyun_sls_android_plugin_trace'
