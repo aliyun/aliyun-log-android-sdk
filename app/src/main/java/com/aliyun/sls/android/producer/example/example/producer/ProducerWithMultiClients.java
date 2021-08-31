@@ -12,33 +12,43 @@ import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.utils.ThreadUtils;
 
 import java.io.File;
 
 /**
- * 动态配置
  * @author gordon
- * @date 2021/08/18
+ * @date 2021/08/25
  */
-public class ProducerWithDynamicConfig extends BaseActivity {
-    private static final String TAG = "ProducerWithDynamicUpdate";
+public class ProducerWithMultiClients extends BaseActivity {
+    private static final String TAG = "ProducerWithMultiClient";
 
-    private LogProducerConfig config = null;
     private LogProducerClient client = null;
+    private LogProducerClient client2 = null;
+    private LogProducerClient client3 = null;
+    private LogProducerClient client4 = null;
+    private LogProducerClient client5 = null;
+    private LogProducerClient client6 = null;
+    private LogProducerClient client7 = null;
+    private LogProducerClient client8 = null;
+    private LogProducerClient client9 = null;
+    private LogProducerClient client10 = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_producer_with_dynamic_config);
-        initProducer();
+        setContentView(R.layout.activity_producer_with_persistent);
+        client = initProducer("test1");
+        client2 = initProducer("test2");
+        client3 = initProducer("test3");
+        client4 = initProducer("test4");
+        client5 = initProducer("test5");
+        client6 = initProducer("test6");
+        client7 = initProducer("test7");
+        client8 = initProducer("test8");
+        client9 = initProducer("test9");
+        client10 = initProducer("test10");
 
-        // 更新配置按钮
-        findViewById(R.id.example_update_config_text).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateConfig();
-            }
-        });
         // 测试发送日志的按钮
         findViewById(R.id.example_send_one_text).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,9 +58,17 @@ public class ProducerWithDynamicConfig extends BaseActivity {
         });
     }
 
-    private void initProducer() {
+    private LogProducerClient initProducer(String path) {
         try {
-            config = new LogProducerConfig(this, null, null, null);
+            // endpoint 必须是以 https:// 或 http:// 开头的链接
+            final String endpoint = this.endpoint;
+            final String project = this.logProject;
+            final String logstore = this.logStore;
+            final String accessKeyId = this.accessKeyId;
+            final String accessKeySecret = this.accessKeySecret;
+            final String accessKeyToken = this.accessKeyToken;
+
+            LogProducerConfig config = new LogProducerConfig(this, endpoint, project, logstore, accessKeyId, accessKeySecret, accessKeyToken);
             // 设置主题
             config.setTopic("test_topic");
             // 设置tag信息，此tag会附加在每条日志上
@@ -105,7 +123,12 @@ public class ProducerWithDynamicConfig extends BaseActivity {
             // 持久化的文件名，需要保证文件所在的文件夹已创建。
             // !!!!!!!!!!!!!!!!!!!注意!!!!!!!!!!!!!!!!!!!
             // 配置多个客户端时，不应设置相同文件
-            config.setPersistentFilePath(getFilesDir() + String.format("%slog_data.dat", File.separator));
+            File logPath = new File(getFilesDir(), String.format("%s%slog_data.dat", path, File.separator));
+            if (!logPath.exists()) {
+                logPath.mkdirs();
+            }
+
+            config.setPersistentFilePath(logPath.getAbsolutePath());
             // 是否每次AddLog强制刷新，高可靠性场景建议打开
             config.setPersistentForceFlush(0);
             // 持久化文件滚动个数，建议设置成10。
@@ -127,38 +150,56 @@ public class ProducerWithDynamicConfig extends BaseActivity {
                     // errorMessage: 失败信息
                     // logBytes: 日志原始字节数
                     // compressedBytes: 日志压缩字节数
-                    android.util.Log.e(TAG, String.format("resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", resultCode, reqId, errorMessage, logBytes, compressedBytes));
+                    android.util.Log.e(TAG, String.format("%s, resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d, thread: %s", path, resultCode, reqId, errorMessage, logBytes, compressedBytes, Thread.currentThread()));
                     printStatus(String.format("send log resultCode: %s, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
                 }
             };
             // 需要关注日志的发送成功或失败状态时, 第二个参数需要传入一个 callbak
-            client = new LogProducerClient(config, callback);
+            return new LogProducerClient(config, callback);
         } catch (LogProducerException e) {
             e.printStackTrace();
+            return null;
         }
-    }
-
-    private void updateConfig() {
-        // endpoint 必须是以 https:// 或 http:// 开头的链接
-        final String endpoint = this.endpoint;
-        final String project = this.logProject;
-        final String logstore = this.logStore;
-        final String accessKeyId = this.accessKeyId;
-        final String accessKeySecret = this.accessKeySecret;
-        final String accessKeyToken = this.accessKeyToken;
-
-        config.setEndpoint(endpoint);
-        config.setProject(project);
-        config.setLogstore(logstore);
-
-        config.setAccessKeyId(accessKeyId);
-        config.setAccessKeySecret(accessKeySecret);
     }
 
     private void sendLog() {
         com.aliyun.sls.android.producer.Log log = oneLog();
         LogProducerResult result = client.addLog(log);
         printStatus("addLog result: " + result);
+
+        result = client2.addLog(log);
+        printStatus("addLog result2: " + result);
+
+        result = client3.addLog(log);
+        printStatus("addLog result3: " + result);
+
+        sendFromThread();
+    }
+
+    private void sendFromThread() {
+        ThreadUtils.exec(() -> {
+            com.aliyun.sls.android.producer.Log log = oneLog();
+            LogProducerResult result = client4.addLog(log);
+            printStatus("addLog result4: " + result);
+
+            result = client5.addLog(log);
+            printStatus("addLog result5: " + result);
+
+            result = client6.addLog(log);
+            printStatus("addLog result6: " + result);
+
+            result = client7.addLog(log);
+            printStatus("addLog result7: " + result);
+
+            result = client8.addLog(log);
+            printStatus("addLog result8: " + result);
+
+            result = client9.addLog(log);
+            printStatus("addLog result9: " + result);
+
+            result = client10.addLog(log);
+            printStatus("addLog result10: " + result);
+        });
     }
 
     private com.aliyun.sls.android.producer.Log oneLog() {
