@@ -12,6 +12,19 @@
 
     <PreferenceCategory
         android:layout_width="wrap_content"
+        android:title="Plugin">
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="settings_plugin_appid"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="PluginAppId: " />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:layout_width="wrap_content"
         android:title="AccessKey">
         <EditTextPreference
             android:defaultValue=""
@@ -38,18 +51,13 @@
 
     <PreferenceCategory
         android:layout_width="wrap_content"
-        android:title="endpoint">
+        android:title="endpoint/project/logstore">
         <EditTextPreference
             android:defaultValue="plz_set_endpoint"
             android:key="settings_end_point"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="Endpoint: " />
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:layout_width="wrap_content"
-        android:title="project/logstore">
 
         <EditTextPreference
             android:defaultValue="plz_set_project"

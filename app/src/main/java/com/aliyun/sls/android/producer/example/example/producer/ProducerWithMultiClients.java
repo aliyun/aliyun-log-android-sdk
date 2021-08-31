@@ -43,11 +43,11 @@ public class ProducerWithMultiClients extends BaseActivity {
         client3 = initProducer("test3");
         client4 = initProducer("test4");
         client5 = initProducer("test5");
-        client6 = initProducer("test5");
-        client7 = initProducer("test5");
-        client8 = initProducer("test5");
-        client9 = initProducer("test5");
-        client10 = initProducer("test5");
+        client6 = initProducer("test6");
+        client7 = initProducer("test7");
+        client8 = initProducer("test8");
+        client9 = initProducer("test9");
+        client10 = initProducer("test10");
 
         // 测试发送日志的按钮
         findViewById(R.id.example_send_one_text).setOnClickListener(new View.OnClickListener() {
@@ -69,9 +69,6 @@ public class ProducerWithMultiClients extends BaseActivity {
             final String accessKeyToken = this.accessKeyToken;
 
             LogProducerConfig config = new LogProducerConfig(this, endpoint, project, logstore, accessKeyId, accessKeySecret, accessKeyToken);
-//            if (TextUtils.equals("test2", path)) {
-            config.setCallbackFromSenderThread(false);
-//            }
             // 设置主题
             config.setTopic("test_topic");
             // 设置tag信息，此tag会附加在每条日志上
@@ -111,6 +108,11 @@ public class ProducerWithMultiClients extends BaseActivity {
             //是否丢弃鉴权失败的日志，0 不丢弃，1丢弃
             //默认为 0，即不丢弃
             config.setDropUnauthorizedLog(0);
+            // 是否使用主线程回调
+            // false: 使用主线程回调。回调会在主线程上执行，且每个 client 都有自己单独的回调。
+            // true: 使用 sender 线程回调。回调会在 sender 现呈上执行，每次执行回调时都会 attach 一个新的 java 线程，所有 client 共用一个回调。
+            // 注意：默认使用 sender 线程回调。
+            config.setCallbackFromSenderThread(false);
 
             /**
              * 以下为开启断点续传的配置, 按照如下配置开启断点续传功能后, 日志会先缓存到本地
@@ -148,7 +150,7 @@ public class ProducerWithMultiClients extends BaseActivity {
                     // errorMessage: 失败信息
                     // logBytes: 日志原始字节数
                     // compressedBytes: 日志压缩字节数
-                    android.util.Log.e(TAG, String.format("resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d, thread: %s", resultCode, reqId, errorMessage, logBytes, compressedBytes, Thread.currentThread()));
+                    android.util.Log.e(TAG, String.format("%s, resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d, thread: %s", path, resultCode, reqId, errorMessage, logBytes, compressedBytes, Thread.currentThread()));
                     printStatus(String.format("send log resultCode: %s, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
                 }
             };
