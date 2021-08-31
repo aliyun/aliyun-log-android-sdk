@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.aliyun.sls.android.SLSAdapter;
 import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.plugin.crashreporter.SLSCrashReporterPlugin;
+import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
 import com.uc.crashsdk.JNIBridge;
@@ -26,7 +27,7 @@ import java.util.Locale;
  * @author gordon
  * @date 2021/07/26
  */
-public class CrashExampleActivity extends AppCompatActivity implements View.OnClickListener {
+public class CrashExampleActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = "CrashExample";
 
     public static void start(Context context) {
@@ -42,9 +43,9 @@ public class CrashExampleActivity extends AppCompatActivity implements View.OnCl
         super.onCreate(savedInstanceState);
 
         SLSConfig config = new SLSConfig(this);
-        config.endpoint = PreferenceUtils.getEndpoint(this);
-        config.pluginLogproject = PreferenceUtils.getLogProject(this);
-        config.pluginAppId = "sls-7011bc6fb3af0244d8";
+        config.endpoint = this.endpoint;
+        config.pluginLogproject = this.logProject;
+        config.pluginAppId = this.pluginAppId;
         config.debuggable = true;
         config.accessKeyId = PreferenceUtils.getAccessKeyId(this);
         config.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
