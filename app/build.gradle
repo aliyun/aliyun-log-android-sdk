@@ -12,6 +12,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField "boolean", "CONFIG_ENABLE", project.hasProperty("CONFIG_ENABLE") ? "${CONFIG_ENABLE}" : "false"
+        buildConfigField "String", "PLUGIN_APPID", project.hasProperty("PLUGIN_APPID") ? "\"${PLUGIN_APPID}\"" : "\"\""
         buildConfigField "String", "END_POINT", project.hasProperty("END_POINT") ? "\"${END_POINT}\"" : "\"\""
         buildConfigField "String", "LOG_PROJECT", project.hasProperty("LOG_PROJECT") ? "\"${LOG_PROJECT}\"" : "\"\""
         buildConfigField "String", "LOG_STORE", project.hasProperty("LOG_STORE") ? "\"${LOG_STORE}\"" : "\"\""
@@ -40,8 +41,14 @@ android {
 dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
-    implementation project(':aliyun_sls_android_producer')
-//    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:bricks_1.0.1'
+//    implementation project(':aliyun_sls_android_producer')
 
+    // sls android sdk lite version
+    // implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.2'
+
+    // sls android sdk bricks version
+    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:bricks_1.0.2'
+
+    // sls android crashreporter plugin
     implementation 'com.aliyun.openservices:alysls-android-crashreporter:1.1.1'
 }

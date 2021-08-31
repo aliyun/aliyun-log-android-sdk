@@ -1,10 +1,13 @@
 package com.aliyun.sls.android.producer.example;
 
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
 
 /**
  * @author gordon
@@ -18,31 +21,19 @@ public class BaseActivity extends AppCompatActivity {
     protected String accessKeyId;
     protected String accessKeySecret;
     protected String accessKeyToken;
+    protected String pluginAppId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle parameters = null != getIntent() ? getIntent().getExtras() : null;
-        if (null == parameters) {
-            return;
-        }
-
-        if (BuildConfig.CONFIG_ENABLE) {
-            this.endpoint = BuildConfig.END_POINT;
-            this.logProject = BuildConfig.LOG_PROJECT;
-            this.logStore = BuildConfig.LOG_STORE;
-            this.accessKeyId = BuildConfig.ACCESS_KEYID;
-            this.accessKeySecret = BuildConfig.ACCESS_KEY_SECRET;
-            this.accessKeyToken = BuildConfig.ACCESS_KEY_TOKEN;
-        } else {
-            this.endpoint = parameters.getString("endpoint");
-            this.logProject = parameters.getString("logProject");
-            this.logStore = parameters.getString("logStore");
-            this.accessKeyId = parameters.getString("accessKeyId");
-            this.accessKeySecret = parameters.getString("accessKeySecret");
-            this.accessKeyToken = parameters.getString("accessKeyToken");
-        }
+        this.endpoint = PreferenceUtils.getEndpoint(this);
+        this.logProject = PreferenceUtils.getLogProject(this);
+        this.logStore = PreferenceUtils.getLogStore(this);
+        this.accessKeyId = PreferenceUtils.getAccessKeyId(this);
+        this.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
+        this.accessKeyToken = PreferenceUtils.getAccessKeyToken(this);
+        this.pluginAppId = PreferenceUtils.getPluginAppId(this);
     }
 
     @Override
@@ -77,16 +68,18 @@ public class BaseActivity extends AppCompatActivity {
      * @param msg
      */
     protected void printStatus(String msg) {
-        final String message = msg + " thread: " + Thread.currentThread();
         final TextView textView = findViewById(R.id.example_console_text);
-        textView.post(new Runnable() {
-            @Override
-            public void run() {
-                textView.append(message);
-                textView.append("\n");
-                int scrollAmount = textView.getLayout().getLineTop(textView.getLineCount()) - textView.getHeight();
-                textView.scrollTo(0, Math.max(scrollAmount, 0));
-            }
+        if (null == textView) {
+            return;
+        }
+
+        final String message = "> " + msg + " thread: " + Thread.currentThread();
+        textView.post(() -> {
+            textView.setMovementMethod(ScrollingMovementMethod.getInstance());
+            textView.append(message);
+            textView.append("\n");
+            int scrollAmount = textView.getLayout().getLineTop(textView.getLineCount()) - textView.getHeight();
+            textView.scrollTo(0, Math.max(scrollAmount, 0));
         });
     }
 
