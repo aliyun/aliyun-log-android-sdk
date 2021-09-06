@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:paddingBottom="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cart_image"
+        android:layout_width="72dp"
+        android:layout_height="72dp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/cart_title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@+id/cart_image"
+        tools:text="title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/cart_price_text"
+        tools:text="19.9"
+        android:layout_alignLeft="@+id/cart_title_text"
+        android:layout_alignBottom="@+id/cart_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

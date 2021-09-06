@@ -68,7 +68,7 @@ public class DetailFragment extends Fragment {
     }
 
     private void updateImage(List<String> images) {
-        if (null == images || images.isEmpty() || detailBinding.traceDetailImage.getVisibility() != View.VISIBLE) {
+        if (null == images || images.isEmpty() || !detailBinding.traceDetailImage.isShown()) {
             detailBinding.traceDetailImage.removeCallbacks(updateImageCallback);
             detailBinding.traceDetailImage.setTag(R.id.trace_detail_image, 0);
             return;
