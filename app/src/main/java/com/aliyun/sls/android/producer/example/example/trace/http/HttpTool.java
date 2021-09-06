@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +47,10 @@ public class HttpTool {
     }
 
     public static Response post(String url, Map<String, String> headers, String body) {
+        if (null == headers) {
+            headers = new HashMap<>();
+        }
+        headers.put("Content-Length", TextUtils.isEmpty(body) ? "0" : String.valueOf(body.length()));
         return http(url, "POST", mapToStrings(headers), (null != body ? body.getBytes(Charset.forName("UTF-8")) : null));
     }
 
@@ -62,6 +67,7 @@ public class HttpTool {
             connection.setRequestProperty("User-agent", HttpConfigProxy.getUserAgent());
 
             if (header != null) {
+
                 int pairs = header.length / 2;
                 for (int i = 0; i < pairs; i++) {
                     String key = header[2 * i];
@@ -127,6 +133,8 @@ public class HttpTool {
         if (null == maps || maps.size() == 0) {
             return null;
         }
+
+        maps.put("Content-Type", "application/json; charset=UTF-8");
 
         String[] headers = new String[maps.size() * 2];
         int index = 0;
