@@ -17,6 +17,7 @@ import com.aliyun.sls.android.producer.example.example.producer.ProducerWithDyna
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithImmediately;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithMultiClients;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithNoPersistent;
+import com.aliyun.sls.android.producer.example.example.trace.TraceActivity;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
 
 /**
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.main_producer_multi_clients).setOnClickListener(this);
         findViewById(R.id.main_producer_immediately).setOnClickListener(this);
         findViewById(R.id.main_apm_crash).setOnClickListener(this);
+        findViewById(R.id.main_trace).setOnClickListener(this);
 
     }
 
@@ -58,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (R.id.main_apm_crash == v.getId()) {
             // 崩溃监控
             startActivity(CrashExampleActivity.class);
+        } else if (R.id.main_trace == v.getId()) {
+            // trace
+            startActivity(TraceActivity.class);
         }
     }
 
