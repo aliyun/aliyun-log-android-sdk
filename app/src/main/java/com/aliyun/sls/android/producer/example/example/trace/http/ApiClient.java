@@ -3,8 +3,11 @@ package com.aliyun.sls.android.producer.example.example.trace.http;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.aliyun.sls.android.JsonUtil;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -37,6 +40,35 @@ public class ApiClient {
             }
 
             postInMainThread(() -> callback.onError(response.code, response.error));
+        });
+    }
+
+    public static void getDetail(final String id, ApiCallback<ItemModel> callback) {
+        ThreadUtils.exec(() -> {
+            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue/" + id);
+            if (response.success()) {
+                ItemModel model = ItemModel.fromJSON(response.data);
+                if (null != model) {
+                    postInMainThread(() -> callback.onSuccess(model));
+                    return;
+                }
+
+                postInMainThread(() -> callback.onError(400, "json parser error"));
+            }
+            postInMainThread(() -> callback.onError(response.code, response.error));
+        });
+    }
+
+    public static void addToCart(final String id, ApiCallback<Boolean> callback) {
+        ThreadUtils.exec(() -> {
+            JSONObject parameters = new JSONObject();
+            JsonUtil.putOpt(parameters, "id", id);
+            HttpTool.Response response = HttpTool.post("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart", null, parameters.toString());
+            if (response.success()) {
+                postInMainThread(() -> callback.onSuccess(true));
+            } else {
+                postInMainThread(() -> callback.onError(response.code, response.error));
+            }
         });
     }
 

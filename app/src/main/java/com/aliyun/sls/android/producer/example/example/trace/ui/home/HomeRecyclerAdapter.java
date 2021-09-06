@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.sls.android.producer.example.databinding.TraceItemLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
+import com.aliyun.sls.android.producer.example.example.trace.ui.DetailActivity;
+import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
@@ -33,13 +35,12 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
             return;
         }
 
-        Glide.with(holder.binding.itemImage)
-                .load(model.imageUrl.get(0))
-                .optionalCenterCrop()
-                .into(holder.binding.itemImage);
+        ImageUtils.loadImage(model.imageUrl.get(0), holder.binding.itemImage);
         holder.binding.itemTitle.setText(model.name);
         holder.binding.itemDesc.setText(model.description);
         holder.binding.itemPrice.setText(model.price + "");
+
+        holder.binding.itemViewDetail.setOnClickListener(v -> DetailActivity.start(holder.binding.getRoot().getContext(), model.id));
     }
 
     @Override
