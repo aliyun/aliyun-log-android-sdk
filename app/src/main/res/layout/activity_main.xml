@@ -21,6 +21,7 @@
 
         <TableRow android:layout_marginTop="24dp">
             <Button android:text="崩溃监控" android:padding="8dp" android:id="@+id/main_apm_crash"/>
+            <Button android:text="Trace" android:padding="8dp" android:id="@+id/main_trace"/>
         </TableRow>
 
     </TableLayout>
