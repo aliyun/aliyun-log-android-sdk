@@ -4,15 +4,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.aliyun.sls.android.producer.example.databinding.FragmentNotificationsBinding;
+import com.aliyun.sls.android.producer.example.databinding.FragmentCartBinding;
 
 /**
  * @author gordon
@@ -21,7 +21,7 @@ import com.aliyun.sls.android.producer.example.databinding.FragmentNotifications
 public class CartFragment extends Fragment {
 
     private CartViewModel cartViewModel;
-    private FragmentNotificationsBinding binding;
+    private FragmentCartBinding binding;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -29,17 +29,21 @@ public class CartFragment extends Fragment {
         cartViewModel =
                 new ViewModelProvider(this).get(CartViewModel.class);
 
-        binding = FragmentNotificationsBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        binding = FragmentCartBinding.inflate(inflater, container, false);
+        final RecyclerView recyclerView = binding.cartRecyclerview;
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        final TextView textView = binding.textNotifications;
-        cartViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        return root;
+        final CartRecyclerAdapter adapter = new CartRecyclerAdapter();
+        recyclerView.setAdapter(adapter);
+
+        cartViewModel.getCartItems().observe(getViewLifecycleOwner(), adapter::update);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        cartViewModel.requestCartList(getActivity());
     }
 
     @Override

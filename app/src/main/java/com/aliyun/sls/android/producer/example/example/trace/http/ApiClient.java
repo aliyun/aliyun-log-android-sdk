@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.aliyun.sls.android.JsonUtil;
+import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
 
@@ -66,6 +67,22 @@ public class ApiClient {
             HttpTool.Response response = HttpTool.post("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart", null, parameters.toString());
             if (response.success()) {
                 postInMainThread(() -> callback.onSuccess(true));
+            } else {
+                postInMainThread(() -> callback.onError(response.code, response.error));
+            }
+        });
+    }
+
+    public static void getCart(ApiCallback<List<CartItemModel>> callback) {
+        ThreadUtils.exec(() -> {
+            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart");
+            if (response.success()) {
+                List<CartItemModel> itemModelList = CartItemModel.parseJson(response.data);
+                if (null != itemModelList) {
+                    postInMainThread(() -> callback.onSuccess(itemModelList));
+                    return;
+                }
+                postInMainThread(() -> callback.onError(400, "json parser error"));
             } else {
                 postInMainThread(() -> callback.onError(response.code, response.error));
             }

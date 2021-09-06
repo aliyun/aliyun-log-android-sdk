@@ -21,11 +21,11 @@
         android:id="@+id/navigation_notifications"
         android:name="com.aliyun.sls.android.producer.example.example.trace.ui.cart.CartFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_cart" />
 
     <fragment
         android:id="@+id/navigation_mine"
         android:name="com.aliyun.sls.android.producer.example.example.trace.ui.mine.MineFragment"
         android:label="@string/title_mine"
-        tools:layout="@layout/fragment_notifications"/>
+        tools:layout="@layout/fragment_cart"/>
 </navigation>
