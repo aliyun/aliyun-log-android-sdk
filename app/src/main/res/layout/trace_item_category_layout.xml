@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="12dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/category_image"
+        android:layout_width="86dp"
+        android:layout_height="86dp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/category_title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@+id/category_image"
+        tools:text="title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/category_desc_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/category_title_text"
+        android:layout_alignLeft="@+id/category_title_text"
+        android:layout_marginRight="12dp"
+        android:layout_toLeftOf="@+id/category_add_to_cart"
+        android:ellipsize="end"
+        android:maxLines="2"
+        tools:text="desc" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/category_price_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/category_title_text"
+        android:layout_alignBottom="@+id/category_image"
+        tools:text="19.9" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/category_add_to_cart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/category_image"
+        android:layout_alignParentRight="true"
+        android:text="加入购物车"
+        android:textSize="14dp" />
+
+</RelativeLayout>
