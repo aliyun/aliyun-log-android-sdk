@@ -4,15 +4,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.aliyun.sls.android.producer.example.databinding.FragmentDashboardBinding;
+import com.aliyun.sls.android.producer.example.databinding.FragmentCategoryBinding;
 
 /**
  * @author gordon
@@ -21,7 +21,7 @@ import com.aliyun.sls.android.producer.example.databinding.FragmentDashboardBind
 public class CategoryFragment extends Fragment {
 
     private CategoryViewModel categoryViewModel;
-    private FragmentDashboardBinding binding;
+    private FragmentCategoryBinding binding;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -29,17 +29,21 @@ public class CategoryFragment extends Fragment {
         categoryViewModel =
                 new ViewModelProvider(this).get(CategoryViewModel.class);
 
-        binding = FragmentDashboardBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        binding = FragmentCategoryBinding.inflate(inflater, container, false);
+        final RecyclerView recyclerView = binding.categoryRecyclerview;
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        final TextView textView = binding.textDashboard;
-        categoryViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        return root;
+        final CategoryRecyclerAdapter adapter = new CategoryRecyclerAdapter();
+        recyclerView.setAdapter(adapter);
+        categoryViewModel.getItemModelList().observe(getViewLifecycleOwner(), adapter::update);
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        categoryViewModel.update();
     }
 
     @Override

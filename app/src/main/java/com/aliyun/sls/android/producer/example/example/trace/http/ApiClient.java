@@ -29,7 +29,7 @@ public class ApiClient {
 
     public static void getCategory(ApiCallback<List<ItemModel>> callback) {
         ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue?size=5");
+            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue?size=10");
             if (response.success()) {
                 List<ItemModel> modelList = ItemModel.parseJSON(response.data);
                 if (null != modelList) {
