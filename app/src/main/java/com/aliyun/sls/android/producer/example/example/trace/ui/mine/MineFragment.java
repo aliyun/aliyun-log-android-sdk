@@ -28,4 +28,13 @@ public class MineFragment extends Fragment {
 
         return mineBinding.getRoot();
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        viewModel.getUser().observe(getViewLifecycleOwner(), userModel -> mineBinding.mineNicknameText.setText(userModel.username));
+        viewModel.getLoggedStatus().observe(getViewLifecycleOwner(), aBoolean -> mineBinding.mineLoginBtn.setVisibility(aBoolean ? View.GONE : View.VISIBLE));
+
+        viewModel.reqCustomerInfo(getActivity());
+    }
 }
