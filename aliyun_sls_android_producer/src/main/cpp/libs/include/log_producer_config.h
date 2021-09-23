@@ -66,7 +66,7 @@ typedef struct _log_producer_config
     int32_t dropDelayLog; // 1 true, 0 false, default 1
 
     int32_t dropUnauthorizedLog; // 1 true, 0 false, default 0
-    int32_t callbackFromSenderThread; // 1 true, 0 false, default 1
+    int32_t callbackFromSenderThread; // 1 true, 0 false, default 1int32_t callbackFromSenderThread;
 
 }log_producer_config;
 
@@ -309,6 +309,11 @@ LOG_EXPORT void log_producer_config_set_drop_delay_log(log_producer_config * con
  */
 LOG_EXPORT void log_producer_config_set_drop_unauthorized_log(log_producer_config * config, int32_t drop_or_not);
 
+/**
+ * set callback thread. default from sender thread.
+ * @param config
+ * @param callback_from_sender_thread
+ */
 LOG_EXPORT void log_producer_config_set_callback_from_sender_thread(log_producer_config * config, int32_t callback_from_sender_thread);
 
 /**

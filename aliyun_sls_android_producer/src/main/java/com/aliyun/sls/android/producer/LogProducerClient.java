@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.producer;
 
+import android.text.TextUtils;
+
 import java.util.Map;
 
 import com.aliyun.sls.android.producer.utils.TimeUtils;
@@ -29,7 +31,11 @@ public class LogProducerClient {
             throw new LogProducerException("Can not create log producer client");
         }
 
-        TimeUtils.startUpdateServerTime(logProducerConfig.getContext(), logProducerConfig.getEndpoint(), logProducerConfig.getProject());
+        final String endpoint = logProducerConfig.getEndpoint();
+        final String project = logProducerConfig.getProject();
+        if (!TextUtils.isEmpty(endpoint) && !TextUtils.isEmpty(project)) {
+            TimeUtils.startUpdateServerTime(logProducerConfig.getContext(), endpoint, project);
+        }
     }
 
     public LogProducerResult addLog(Log log) {
