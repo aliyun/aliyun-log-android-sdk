@@ -27,7 +27,7 @@ typedef struct _user_params {
 typedef struct _callback_data {
     char config_name[64];
     char req_id[64];
-    char error_message[64];
+    char error_message[128];
     log_producer_result result;
     size_t log_bytes;
     size_t compressed_bytes;
@@ -75,9 +75,9 @@ void on_log_send_done(const char *config_name,
     user_params *user_params = params;
     if (!user_params->callback_from_sender_thread && message_pipe[1]) {
         callback_data dt;
-        strcpy(dt.config_name, config_name);
-        strcpy(dt.req_id, req_id);
-        strcpy(dt.error_message, error_message);
+        strncpy(dt.config_name, config_name ? config_name : "", 64);
+        strncpy(dt.req_id, req_id ? req_id : "", 64);
+        strncpy(dt.error_message, error_message ? error_message : "", 128);
         dt.result = result;
         dt.log_bytes = log_bytes;
         dt.compressed_bytes = compressed_bytes;
@@ -146,6 +146,8 @@ static void init_main_looper_pipe()
 JNIEXPORT jlong JNICALL
 Java_com_aliyun_sls_android_producer_LogProducerClient_create_1log_1producer
         (JNIEnv *env, jclass obj, jlong config, jobject callback) {
+    aos_error_log("init client: %s", "test");
+
     if (callback == NULL) {
         return (jlong) create_log_producer((log_producer_config *) config, NULL, NULL);
     }
