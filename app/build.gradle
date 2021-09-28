@@ -50,7 +50,7 @@ dependencies {
     // implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.2'
 
     // sls android sdk bricks version
-    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:bricks_1.0.2'
+    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:bricks_1.0.3'
 
     // sls android crashreporter plugin
     implementation 'com.aliyun.openservices:alysls-android-crashreporter:1.1.1'
