@@ -16,14 +16,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity
-            android:name=".example.trace.ui.LoginActivity"
-            android:exported="true" />
+
         <activity
             android:name=".example.trace.TraceActivity"
             android:exported="true"
             android:label="@string/title_activity_trace" />
-        <activity android:name=".example.trace.ui.DetailActivity" />
+        <activity
+            android:name=".example.trace.ui.DetailActivity"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
