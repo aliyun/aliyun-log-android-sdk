@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 
@@ -13,11 +14,12 @@ import java.util.List;
  * @author gordon
  * @date 2021/09/01
  */
-public class CategoryViewModel extends ViewModel {
+public class CategoryViewModel extends TraceViewModel {
 
     private MutableLiveData<List<ItemModel>> itemMutableLiveData;
 
     public CategoryViewModel() {
+        super("CategoryViewModel");
         itemMutableLiveData = new MutableLiveData<>();
     }
 

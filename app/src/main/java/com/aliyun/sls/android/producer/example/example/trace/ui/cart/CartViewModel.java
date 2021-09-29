@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
@@ -17,11 +18,12 @@ import java.util.List;
  * @author gordon
  * @date 2021/09/01
  */
-public class CartViewModel extends ViewModel {
+public class CartViewModel extends TraceViewModel {
 
     private MutableLiveData<List<CartItemModel>> itemLiveData;
 
     public CartViewModel() {
+        super("CartViewModel");
         itemLiveData = new MutableLiveData<>();
     }
 

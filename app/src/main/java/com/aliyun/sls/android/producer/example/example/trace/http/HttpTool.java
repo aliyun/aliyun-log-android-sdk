@@ -5,6 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.aliyun.sls.android.plugin.trace.SLSTelemetrySdk;
+import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
 import com.aliyun.sls.android.producer.HttpConfigProxy;
 
 import java.io.BufferedReader;
@@ -13,10 +15,22 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.StatusCode;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.context.propagation.TextMapSetter;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 
 /**
  * @author gordon
@@ -30,12 +44,12 @@ public class HttpTool {
         //no instance
     }
 
-    public static Response get(String url) {
-        return get(url, null);
+    public static Response get(String url, Context context) {
+        return get(url, null, context);
     }
 
-    public static Response get(String url, Map<String, String> headers) {
-        return http(url, "GET", mapToStrings(headers), null);
+    public static Response get(String url, Map<String, String> headers, Context context) {
+        return http(url, "GET", mapToStrings(headers), null, context);
     }
 
     public static Response post(String url) {
@@ -51,13 +65,27 @@ public class HttpTool {
             headers = new HashMap<>();
         }
         headers.put("Content-Length", TextUtils.isEmpty(body) ? "0" : String.valueOf(body.length()));
-        return http(url, "POST", mapToStrings(headers), (null != body ? body.getBytes(Charset.forName("UTF-8")) : null));
+        return http(url, "POST", mapToStrings(headers), (null != body ? body.getBytes(Charset.forName("UTF-8")) : null), null);
     }
 
-    private static Response http(String urlString, String method, String[] header, byte[] body) {
+    private static Response http(String urlString, String method, String[] header, byte[] body, Context context) {
+        SLSTelemetrySdk traceSdk = SLSTracePlugin.getInstance().getTelemetrySdk();
+        Tracer tracer = traceSdk.getTracer("HttpTool");
+
+        Span span = tracer.spanBuilder("/").setSpanKind(SpanKind.CLIENT).startSpan();
+//        Scope scope = span.makeCurrent();
+        span.setAttribute(SemanticAttributes.HTTP_METHOD, method.toUpperCase(Locale.ROOT));
+        span.setAttribute("component", "http");
+        span.setAttribute(SemanticAttributes.HTTP_URL, urlString);
+
+        int responseCode = -1;
         try {
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            TextMapSetter<HttpURLConnection> setter = URLConnection::setRequestProperty;
+            // Inject the request with the current Context/Span.
+            traceSdk.getPropagators().getTextMapPropagator().inject(Context.current(), connection, setter);
 
             if (TextUtils.equals("POST", method)) {
                 connection.setDoOutput(true);
@@ -96,7 +124,7 @@ public class HttpTool {
                 response.headers = responseHeaders;
             }
 
-            int responseCode = connection.getResponseCode();
+            responseCode = connection.getResponseCode();
             response.code = responseCode;
 
             if (responseCode / 100 == 2) {
@@ -112,7 +140,16 @@ public class HttpTool {
             Response response = new Response();
             response.error = ex.getLocalizedMessage();
             response.code = 400;
+
+            span.setAttribute("exception", ex.getLocalizedMessage());
+            span.addEvent("exception", Attributes.builder().put("message", ex.getLocalizedMessage())
+                    .put("cause", ex.getCause().toString()).build());
+            span.setStatus(StatusCode.ERROR, "Http Code: " + responseCode);
+
             return response;
+        } finally {
+            span.end();
+//            scope.close();
         }
     }
 
