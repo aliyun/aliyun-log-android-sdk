@@ -52,7 +52,6 @@ public class SLSDemoApplication extends Application {
         adapter.addPlugin(SLSTracePlugin.getInstance());
         adapter.init(config);
 
-
         setupTrace();
     }
 

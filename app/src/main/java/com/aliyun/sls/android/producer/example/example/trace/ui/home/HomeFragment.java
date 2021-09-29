@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.sls.android.producer.example.databinding.FragmentHomeBinding;
+import com.aliyun.sls.android.producer.example.example.trace.core.VisibilityFragment;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
  * @author gordon
  * @date 2021/09/01
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends VisibilityFragment {
 
     private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
