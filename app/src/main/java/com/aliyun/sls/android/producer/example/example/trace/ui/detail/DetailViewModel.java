@@ -7,14 +7,16 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 
-public class DetailViewModel extends ViewModel {
+public class DetailViewModel extends TraceViewModel {
 
     private MutableLiveData<ItemModel> itemModelMutableLiveData;
 
     public DetailViewModel() {
+        super("DetailViewModel");
         this.itemModelMutableLiveData = new MutableLiveData<>();
     }
 

@@ -12,6 +12,8 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import io.opentelemetry.context.Context;
+
 /**
  * @author gordon
  * @date 2021/09/01
@@ -28,8 +30,9 @@ public class ApiClient {
 
 
     public static void getCategory(ApiCallback<List<ItemModel>> callback) {
+        final Context context = Context.current();
         ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue?size=10");
+            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue?size=10", context);
             if (response.success()) {
                 List<ItemModel> modelList = ItemModel.parseJSON(response.data);
                 if (null != modelList) {
@@ -45,8 +48,9 @@ public class ApiClient {
     }
 
     public static void getDetail(final String id, ApiCallback<ItemModel> callback) {
+        final Context context = Context.current();
         ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue/" + id);
+            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue/" + id, context);
             if (response.success()) {
                 ItemModel model = ItemModel.fromJSON(response.data);
                 if (null != model) {
@@ -74,8 +78,9 @@ public class ApiClient {
     }
 
     public static void getCart(ApiCallback<List<CartItemModel>> callback) {
+        final Context context = Context.current();
         ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart");
+            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart", context);
             if (response.success()) {
                 List<CartItemModel> itemModelList = CartItemModel.parseJson(response.data);
                 if (null != itemModelList) {

@@ -41,20 +41,6 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        SLSConfig config = new SLSConfig(this);
-        config.endpoint = this.endpoint;
-        config.pluginLogproject = this.logProject;
-        config.pluginAppId = this.pluginAppId;
-        config.debuggable = true;
-        config.accessKeyId = PreferenceUtils.getAccessKeyId(this);
-        config.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
-        config.securityToken = PreferenceUtils.getAccessKeyToken(this);
-
-        SLSAdapter adapter = SLSAdapter.getInstance();
-        adapter.addPlugin(new SLSCrashReporterPlugin());
-        adapter.init(config);
-
         setContentView(R.layout.activity_crash_example);
 
         // register onClick() event
