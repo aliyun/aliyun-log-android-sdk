@@ -13,12 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.sls.android.producer.example.databinding.FragmentCategoryBinding;
+import com.aliyun.sls.android.producer.example.example.trace.core.VisibilityFragment;
 
 /**
  * @author gordon
  * @date 2021/09/01
  */
-public class CategoryFragment extends Fragment {
+public class CategoryFragment extends VisibilityFragment {
 
     private CategoryViewModel categoryViewModel;
     private FragmentCategoryBinding binding;

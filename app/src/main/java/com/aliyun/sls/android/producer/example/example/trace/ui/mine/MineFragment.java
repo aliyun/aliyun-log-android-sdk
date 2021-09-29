@@ -10,12 +10,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.aliyun.sls.android.producer.example.databinding.FragmentMineBinding;
+import com.aliyun.sls.android.producer.example.example.trace.core.VisibilityFragment;
 
 /**
  * @author gordon
  * @date 2021/09/06
  */
-public class MineFragment extends Fragment {
+public class MineFragment extends VisibilityFragment {
 
     private MineViewModel viewModel;
     private FragmentMineBinding mineBinding;

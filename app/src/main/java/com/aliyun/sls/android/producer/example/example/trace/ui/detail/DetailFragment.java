@@ -12,12 +12,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.databinding.FragmentDetailBinding;
+import com.aliyun.sls.android.producer.example.example.trace.core.VisibilityFragment;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
 
 import java.util.List;
 
-public class DetailFragment extends Fragment {
+public class DetailFragment extends VisibilityFragment {
 
     private DetailViewModel viewModel;
     private FragmentDetailBinding detailBinding;
