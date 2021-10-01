@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.aliyun.sls.android.JsonUtil;
+import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
@@ -12,6 +13,8 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 
 /**
@@ -20,6 +23,7 @@ import io.opentelemetry.context.Context;
  */
 public class ApiClient {
 
+    private static Tracer tracer = SLSTracePlugin.getInstance().getTelemetrySdk().getTracer("ApiClient");
     private static Handler handler = new Handler(Looper.getMainLooper());
 
     public interface ApiCallback<RESULT> {
@@ -30,9 +34,11 @@ public class ApiClient {
 
 
     public static void getCategory(ApiCallback<List<ItemModel>> callback) {
-        final Context context = Context.current();
+        Span span = tracer.spanBuilder("getCategory").startSpan();
+        span.end();
+
         ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue?size=10", context);
+            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue?size=10", Context.current().with(span));
             if (response.success()) {
                 List<ItemModel> modelList = ItemModel.parseJSON(response.data);
                 if (null != modelList) {

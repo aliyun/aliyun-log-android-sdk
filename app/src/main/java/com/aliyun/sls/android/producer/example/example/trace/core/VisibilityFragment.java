@@ -8,8 +8,14 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 
 /**
  * @author gordon
@@ -28,6 +34,9 @@ public class VisibilityFragment extends Fragment implements View.OnAttachStateCh
 
     private VisibilityFragment localParentFragment;
     private final List<OnFragmentVisibilityChangedListener> listeners = new ArrayList<>();
+    private Tracer tracer = SLSTracePlugin.getInstance().getTelemetrySdk().getTracer(this.getClass().getSimpleName());
+    private Span pageSpan;
+    private Scope scope;
 
     public void addOnVisibilityChangedListener(OnFragmentVisibilityChangedListener listener) {
         listeners.add(listener);
@@ -165,11 +174,39 @@ public class VisibilityFragment extends Fragment implements View.OnAttachStateCh
         }
     }
 
+    private String getSpanName(String name) {
+        return this.getSpanName() + "_" + name;
+    }
+
+    private String getSpanName() {
+        return this.getClass().getSimpleName();
+    }
+
     /**
      * 可见性改变
      */
     protected void onVisibilityChanged(boolean visible) {
         info("==> onVisibilityChanged = " + visible);
+        if (visible) {
+            pageSpan = tracer.spanBuilder(getSpanName("Page_Appear"))
+                    .startSpan()
+                    .setAttribute("component", "Android.Fragment")
+                    .setAttribute("fragment.name", getSpanName())
+                    .setAttribute("page.method", "Page_Appear");
+            scope = pageSpan.makeCurrent();
+        } else {
+            tracer.spanBuilder(getSpanName("Page_disappear"))
+                    .startSpan()
+                    .setAttribute("component", "Android.Fragment")
+                    .setAttribute("fragment.name", getSpanName())
+                    .setAttribute("page.method", "Page_Disappear")
+                    .end();
+
+            pageSpan.end();
+            scope.close();
+        }
+
+
         for (OnFragmentVisibilityChangedListener listener : listeners) {
             listener.onFragmentVisibilityChanged(visible);
         }

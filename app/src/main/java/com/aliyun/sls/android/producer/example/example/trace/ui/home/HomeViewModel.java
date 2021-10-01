@@ -25,15 +25,11 @@ public class HomeViewModel extends TraceViewModel {
     public HomeViewModel() {
         super("HomeViewModel");
         listData = new MutableLiveData<>(new ArrayList<ItemModel>());
-
-        requestData();
     }
 
     public void requestData() {
         Span span = tracer.spanBuilder("requestHomeData").startSpan();
-        span.setAttribute("component", "callapi");
         span.end();
-
 
         ApiClient.getCategory(new ApiClient.ApiCallback<List<ItemModel>>() {
             @Override
