@@ -53,6 +53,14 @@ public class HomeFragment extends VisibilityFragment {
     }
 
     @Override
+    protected void onVisibilityChanged(boolean visible) {
+        super.onVisibilityChanged(visible);
+        if (visible) {
+            homeViewModel.requestData();
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;

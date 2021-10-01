@@ -37,8 +37,10 @@ import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
  * @date 2021/09/01
  */
 public class HttpTool {
-
     private static final String TAG = "HttpTool";
+
+    private static SLSTelemetrySdk traceSdk = SLSTracePlugin.getInstance().getTelemetrySdk();
+    private static Tracer tracer = traceSdk.getTracer("HttpTool");
 
     private HttpTool() {
         //no instance
@@ -69,10 +71,7 @@ public class HttpTool {
     }
 
     private static Response http(String urlString, String method, String[] header, byte[] body, Context context) {
-        SLSTelemetrySdk traceSdk = SLSTracePlugin.getInstance().getTelemetrySdk();
-        Tracer tracer = traceSdk.getTracer("HttpTool");
-
-        Span span = tracer.spanBuilder("/").setSpanKind(SpanKind.CLIENT).startSpan();
+        Span span = tracer.spanBuilder("/").setSpanKind(SpanKind.CLIENT).setParent(context).startSpan();
 //        Scope scope = span.makeCurrent();
         span.setAttribute(SemanticAttributes.HTTP_METHOD, method.toUpperCase(Locale.ROOT));
         span.setAttribute("component", "http");
@@ -85,7 +84,7 @@ public class HttpTool {
 
             TextMapSetter<HttpURLConnection> setter = URLConnection::setRequestProperty;
             // Inject the request with the current Context/Span.
-            traceSdk.getPropagators().getTextMapPropagator().inject(Context.current(), connection, setter);
+            traceSdk.getPropagators().getTextMapPropagator().inject(context, connection, setter);
 
             if (TextUtils.equals("POST", method)) {
                 connection.setDoOutput(true);
