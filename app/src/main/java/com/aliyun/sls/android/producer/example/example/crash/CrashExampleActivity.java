@@ -16,7 +16,7 @@ import com.aliyun.sls.android.plugin.crashreporter.SLSCrashReporterPlugin;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
-import com.uc.crashsdk.JNIBridge;
+//import com.uc.crashsdk.JNIBridge;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -149,7 +149,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void nativeCrash(int type) {
-        JNIBridge.nativeCrash(type, 0);
+//        JNIBridge.nativeCrash(type, 0);
     }
 
     private void crashInJavaNull() {

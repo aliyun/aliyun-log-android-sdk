@@ -14,6 +14,8 @@ import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 
 import java.util.List;
 
+import io.opentelemetry.api.trace.Span;
+
 /**
  * @author gordon
  * @date 2021/09/01
@@ -32,6 +34,8 @@ public class CartViewModel extends TraceViewModel {
     }
 
     public void requestCartList(Context context) {
+        Span span = tracer.spanBuilder("requestCartListData").startSpan();
+        span.end();
         ApiClient.getCart(new ApiClient.ApiCallback<List<CartItemModel>>() {
             @Override
             public void onSuccess(List<CartItemModel> itemModels) {

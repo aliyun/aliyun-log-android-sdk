@@ -59,7 +59,14 @@ public class DetailFragment extends VisibilityFragment {
 
         viewModel = new ViewModelProvider(this).get(DetailViewModel.class);
         viewModel.getItemModel().observe(getViewLifecycleOwner(), this::updateUI);
-        viewModel.requestData(itemId);
+    }
+
+    @Override
+    protected void onVisibilityChanged(boolean visible) {
+        super.onVisibilityChanged(visible);
+        if (visible) {
+            viewModel.requestData(itemId);
+        }
     }
 
     private void updateUI(ItemModel model) {

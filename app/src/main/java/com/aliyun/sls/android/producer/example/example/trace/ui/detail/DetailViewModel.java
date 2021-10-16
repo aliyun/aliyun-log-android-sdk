@@ -11,6 +11,8 @@ import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 
+import io.opentelemetry.api.trace.Span;
+
 public class DetailViewModel extends TraceViewModel {
 
     private MutableLiveData<ItemModel> itemModelMutableLiveData;
@@ -25,6 +27,8 @@ public class DetailViewModel extends TraceViewModel {
     }
 
     public void requestData(final String id) {
+        Span span = tracer.spanBuilder("requestDetailData").startSpan();
+        span.end();
         ApiClient.getDetail(id, new ApiClient.ApiCallback<ItemModel>() {
             @Override
             public void onSuccess(ItemModel itemModel) {
