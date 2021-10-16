@@ -9,12 +9,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import android.content.Context;
 import android.text.TextUtils;
 import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.SLSLog;
 import com.aliyun.sls.android.plugin.crashreporter.IReportSender;
 import com.aliyun.sls.android.plugin.crashreporter.ITraceFileParser;
+import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
 import com.aliyun.sls.android.scheme.Scheme;
+import com.aliyun.sls.android.utdid.Utdid;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +27,10 @@ import static com.aliyun.sls.android.SLSLog.e;
 import static com.aliyun.sls.android.SLSLog.format;
 import static com.aliyun.sls.android.SLSLog.v;
 import static com.aliyun.sls.android.SLSLog.w;
+
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.StatusCode;
+import io.opentelemetry.api.trace.Tracer;
 
 /**
  * @author gordon
@@ -58,10 +66,10 @@ public class UCSimpleITraceFileParser implements ITraceFileParser {
             return;
         }
 
+        BufferedReader bufferedReader = null;
         try {
-
             final FileReader fileReader = new FileReader(file);
-            final BufferedReader bufferedReader = new BufferedReader(fileReader);
+            bufferedReader = new BufferedReader(fileReader);
 
             String line;
             StringBuilder buffer = new StringBuilder();
@@ -100,7 +108,47 @@ public class UCSimpleITraceFileParser implements ITraceFileParser {
                 , file.getAbsolutePath()
                 , type
                 , t.getMessage()));
+        } finally {
+            Utils.close(bufferedReader);
         }
+    }
+
+    private String[] reportTraceIfNeed(File file, String logType) {
+        // pre-check trace plugin exist
+        boolean enable;
+        try {
+            enable = null != Class.forName("com.aliyun.sls.android.plugin.trace.SLSTracePlugin");
+        } catch (Throwable t) {
+            enable = false;
+        }
+        if (!enable) {
+            return new String[]{null, null};
+        }
+
+        final Context context = config.context;
+        final Tracer tracer = SLSTracePlugin.getInstance().getTelemetrySdk().getTracer("crash_reporter");
+        Span span = tracer.spanBuilder("crash_reporter")
+                .setParent(io.opentelemetry.context.Context.current())
+                .startSpan()
+                .setAttribute("exception.file", file.getName())
+                .setAttribute("exception.type", logType)
+                .setAttribute("exception.project", config.pluginLogproject)
+                .setAttribute("exception.logstore", "sls-alysls-track-android")
+                .setAttribute("exception.appid", config.pluginAppId)
+                .setAttribute("exception.utdid", Utdid.getInstance().getUtdid(context));
+        final String uuid = Utils.getUUID(context);
+        if (!TextUtils.isEmpty(uuid)) {
+            span.setAttribute("exception.uuid", uuid);
+        }
+//        if (null != crashApi.getUncaughtException()) {
+//            span.setAttribute("exception.type", crashApi.getUncaughtException().getClass().getCanonicalName());
+//            span.setAttribute("exception.message", crashApi.getUncaughtException().getMessage());
+//            span.recordException(crashApi.getUncaughtException());
+//        }
+        span.setStatus(StatusCode.ERROR);
+        span.end();
+
+        return new String[]{span.getSpanContext().getTraceId(), span.getSpanContext().getSpanId()};
     }
 
     private void onLogParsedEnd(final String time, final String type, final File file, final String content) {
@@ -108,9 +156,13 @@ public class UCSimpleITraceFileParser implements ITraceFileParser {
             v(TAG, SLSLog.format("onLogParsedEnd. type: %s, content length: %d", type, content.length()));
         }
 
+        final String[] trace = reportTraceIfNeed(file, type);
+
         Scheme data = Scheme.createDefaultScheme(config);
         data.app_version = Scheme.returnDashIfNull(config.appVersion);
         data.app_name = Scheme.returnDashIfNull(config.appName);
+        data.traceId = TextUtils.isEmpty(trace[0]) ? "-" : trace[0];
+        data.spanId = TextUtils.isEmpty(trace[1]) ? "-" : trace[1];
 
         if (!TextUtils.isEmpty(time)) {
             data.local_timestamp = parseTime(time);

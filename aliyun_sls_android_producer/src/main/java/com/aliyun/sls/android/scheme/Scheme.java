@@ -82,6 +82,8 @@ public class Scheme {
     public String city;
     public String district;
     public Map<String, String> ext;
+    public String traceId;
+    public String spanId;
 
     public Map<String, String> toMap() {
         Map<String, String> fields = new LinkedHashMap<>();
@@ -145,6 +147,8 @@ public class Scheme {
         putIfNotNull(fields, "province", country);
         putIfNotNull(fields, "city", city);
         putIfNotNull(fields, "district", district);
+        putIfNotNull(fields, "traceId", traceId);
+        putIfNotNull(fields, "spanId", spanId);
 
         if (null != ext && !ext.isEmpty()) {
             for (Entry<String, String> entry : ext.entrySet()) {
