@@ -44,7 +44,14 @@ public class CartFragment extends VisibilityFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        cartViewModel.requestCartList(getActivity());
+    }
+
+    @Override
+    protected void onVisibilityChanged(boolean visible) {
+        super.onVisibilityChanged(visible);
+        if (visible) {
+            cartViewModel.requestCartList(getActivity());
+        }
     }
 
     @Override

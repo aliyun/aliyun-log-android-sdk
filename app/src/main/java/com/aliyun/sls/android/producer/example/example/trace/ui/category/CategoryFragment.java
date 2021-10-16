@@ -44,7 +44,14 @@ public class CategoryFragment extends VisibilityFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        categoryViewModel.update();
+    }
+
+    @Override
+    protected void onVisibilityChanged(boolean visible) {
+        super.onVisibilityChanged(visible);
+        if (visible) {
+            categoryViewModel.update();
+        }
     }
 
     @Override

@@ -53,9 +53,10 @@ dependencies {
 //    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:bricks_1.0.3'
 
     // sls android crashreporter plugin
-    implementation 'com.aliyun.openservices:alysls-android-crashreporter:1.1.1'
+//    implementation 'com.aliyun.openservices:alysls-android-crashreporter:1.1.1'
     // sls android trace plugin
     implementation project(':aliyun_sls_android_plugin_trace')
+    implementation project(':aliyun_sls_android_plugin_crashreporter')
 
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'

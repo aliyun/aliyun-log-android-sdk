@@ -47,7 +47,9 @@ public class CartRecyclerAdapter extends RecyclerView.Adapter<CartRecyclerAdapte
 
             }
         });
-        holder.itemView.setOnClickListener(v -> DetailActivity.start(holder.itemView.getContext(), cartModel.itemId));
+//        holder.itemView.setOnClickListener(v -> DetailActivity.start(holder.itemView.getContext(), cartModel.itemId));
+        final String test = null;
+        holder.itemView.setOnClickListener(v -> test.length());
     }
 
     public CartItemModel getItem(int pos) {
