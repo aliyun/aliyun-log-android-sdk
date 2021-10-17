@@ -6,6 +6,7 @@ import android.os.Looper;
 import com.aliyun.sls.android.JsonUtil;
 import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
+import com.aliyun.sls.android.producer.example.example.trace.model.ErrorModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
 
@@ -45,11 +46,8 @@ public class ApiClient {
                     postInMainThread(() -> callback.onSuccess(modelList));
                     return;
                 }
-
-                postInMainThread(() -> callback.onError(400, "json parser error"));
             }
-
-            postInMainThread(() -> callback.onError(response.code, response.error));
+            postError(response, callback);
         });
     }
 
@@ -63,10 +61,9 @@ public class ApiClient {
                     postInMainThread(() -> callback.onSuccess(model));
                     return;
                 }
-
-                postInMainThread(() -> callback.onError(400, "json parser error"));
             }
-            postInMainThread(() -> callback.onError(response.code, response.error));
+
+            postError(response, callback);
         });
     }
 
@@ -77,9 +74,9 @@ public class ApiClient {
             HttpTool.Response response = HttpTool.post("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart", null, parameters.toString());
             if (response.success()) {
                 postInMainThread(() -> callback.onSuccess(true));
-            } else {
-                postInMainThread(() -> callback.onError(response.code, response.error));
             }
+
+            postError(response, callback);
         });
     }
 
@@ -93,11 +90,20 @@ public class ApiClient {
                     postInMainThread(() -> callback.onSuccess(itemModelList));
                     return;
                 }
-                postInMainThread(() -> callback.onError(400, "json parser error"));
-            } else {
-                postInMainThread(() -> callback.onError(response.code, response.error));
             }
+
+            postError(response, callback);
         });
+    }
+
+    private static void postError(HttpTool.Response response, ApiCallback callback) {
+        ErrorModel errorModel = ErrorModel.fromJSON(response.data);
+        if (null != errorModel) {
+            postInMainThread(() -> callback.onError(errorModel.code, errorModel.error));
+            return;
+        }
+
+        postInMainThread(() -> callback.onError(response.code, response.error));
     }
 
     private static void postInMainThread(Runnable r) {

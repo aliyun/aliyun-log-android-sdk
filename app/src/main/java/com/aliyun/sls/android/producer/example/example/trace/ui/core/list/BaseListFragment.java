@@ -45,7 +45,8 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
 
         listContainerLayoutBinding = BaseListContainerLayoutBinding.inflate(inflater, container, false);
         refreshLayout = listContainerLayoutBinding.swiperefresh;
-        refreshLayout.setOnRefreshListener(() -> BaseListFragment.this.onRefresh());
+        refreshLayout.setOnRefreshListener(BaseListFragment.this::onRefresh);
+        listContainerLayoutBinding.baseErrorBtn.setOnClickListener(v -> BaseListFragment.this.update());
 
         final BaseRecyclerAdapter.IViewUpdater<BIND, ITEM> viewUpdater = onCreateViewUpdater();
         if (null == viewUpdater) {
@@ -57,15 +58,34 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
         final BaseRecyclerAdapter<BIND, ITEM> adapter = new BaseRecyclerAdapter<>(viewUpdater);
         recyclerView.setAdapter(adapter);
 
-        viewModel.getItems().observe(getViewLifecycleOwner(), items -> {
-            adapter.updateDatum(items);
-        });
+        viewModel.getItems().observe(getViewLifecycleOwner(), adapter::updateDatum);
 
         viewModel.status.observe(getViewLifecycleOwner(), status -> {
             refreshLayout.setRefreshing(false);
+            if (status.success) {
+                listContainerLayoutBinding.swiperefresh.setVisibility(View.VISIBLE);
+                listContainerLayoutBinding.baseErrorLayout.setVisibility(View.GONE);
+            } else {
+                listContainerLayoutBinding.swiperefresh.setVisibility(View.GONE);
+                listContainerLayoutBinding.baseErrorLayout.setVisibility(View.VISIBLE);
+
+                listContainerLayoutBinding.baseErrorText.setText(status.error);
+            }
         });
 
         return listContainerLayoutBinding.getRoot();
+    }
+
+    protected void update() {
+        if (refreshLayout.isRefreshing()) {
+            return;
+        }
+
+        listContainerLayoutBinding.swiperefresh.setVisibility(View.VISIBLE);
+        listContainerLayoutBinding.baseErrorLayout.setVisibility(View.GONE);
+
+        refreshLayout.setRefreshing(true);
+        viewModel.requestItemsFromServer();
     }
 
     @Override
@@ -73,8 +93,7 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
         super.onVisibilityChanged(visible);
         if (visible && !init) {
             init = true;
-            refreshLayout.setRefreshing(true);
-            viewModel.requestItemsFromServer();
+            update();
         }
     }
 
