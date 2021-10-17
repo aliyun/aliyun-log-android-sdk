@@ -1,14 +1,17 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.cart;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
+import com.aliyun.sls.android.producer.example.databinding.FragmentCartBinding;
 import com.aliyun.sls.android.producer.example.databinding.TraceItemCartLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.DetailActivity;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListFragment;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseRecyclerAdapter;
 import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
 
@@ -17,6 +20,14 @@ import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
  * @date 2021/09/01
  */
 public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, CartItemModel, CartViewModel> {
+
+    private FragmentCartBinding cartBinding;
+
+    @Override
+    protected View onCreateFooterView(LayoutInflater inflater, ViewGroup parent) {
+        cartBinding = FragmentCartBinding.inflate(inflater, parent, false);
+        return cartBinding.getRoot();
+    }
 
     @Override
     protected BaseRecyclerAdapter.IViewUpdater<TraceItemCartLayoutBinding, CartItemModel> onCreateViewUpdater() {
@@ -51,5 +62,13 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
     @Override
     protected void onRefresh() {
         super.onRefresh();
+    }
+
+    @Override
+    protected void onStatusChanged(BaseListViewModel.Status status) {
+        super.onStatusChanged(status);
+        if (status.success) {
+            ((ViewGroup) cartBinding.getRoot().getParent()).setVisibility(View.VISIBLE);
+        }
     }
 }

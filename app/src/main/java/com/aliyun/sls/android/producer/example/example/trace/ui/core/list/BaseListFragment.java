@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,6 +47,13 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
         listContainerLayoutBinding = BaseListContainerLayoutBinding.inflate(inflater, container, false);
         refreshLayout = listContainerLayoutBinding.swiperefresh;
         refreshLayout.setOnRefreshListener(BaseListFragment.this::onRefresh);
+
+        final View footerView = onCreateFooterView(inflater, listContainerLayoutBinding.baseContentLayout);
+        if (null != footerView) {
+            listContainerLayoutBinding.baseFooterContainer.setVisibility(View.VISIBLE);
+            listContainerLayoutBinding.baseFooterContainer.addView(footerView, new LinearLayoutCompat.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+        }
+
         listContainerLayoutBinding.baseErrorBtn.setOnClickListener(v -> {
             viewModel.getTracer().spanBuilder(viewModel.generatorSpanName("retry")).startSpan().end();
             BaseListFragment.this.update();
@@ -65,19 +73,28 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
 
         viewModel.status.observe(getViewLifecycleOwner(), status -> {
             refreshLayout.setRefreshing(false);
-            if (status.success) {
-                listContainerLayoutBinding.swiperefresh.setVisibility(View.VISIBLE);
-                listContainerLayoutBinding.baseErrorLayout.setVisibility(View.GONE);
-            } else {
-                listContainerLayoutBinding.swiperefresh.setVisibility(View.GONE);
-                listContainerLayoutBinding.baseErrorLayout.setVisibility(View.VISIBLE);
-
-                listContainerLayoutBinding.baseErrorText.setText(status.error);
-            }
+            onStatusChanged(status);
         });
 
         return listContainerLayoutBinding.getRoot();
     }
+
+    protected View onCreateFooterView(final LayoutInflater inflater, final ViewGroup parent) {
+        return null;
+    }
+
+    protected void onStatusChanged(BaseListViewModel.Status status) {
+        if (status.success) {
+            listContainerLayoutBinding.baseContentLayout.setVisibility(View.VISIBLE);
+            listContainerLayoutBinding.baseErrorLayout.setVisibility(View.GONE);
+        } else {
+            listContainerLayoutBinding.baseContentLayout.setVisibility(View.GONE);
+            listContainerLayoutBinding.baseErrorLayout.setVisibility(View.VISIBLE);
+
+            listContainerLayoutBinding.baseErrorText.setText(status.error);
+        }
+    }
+
 
     protected void update() {
         if (refreshLayout.isRefreshing()) {
