@@ -27,29 +27,8 @@ public class CartViewModel extends BaseListViewModel<CartItemModel> {
 //    private MutableLiveData<List<CartItemModel>> itemLiveData;
 
     public CartViewModel() {
-        super("CartViewModel");
-//        itemLiveData = new MutableLiveData<>();
+        super("cart");
     }
-//
-//    public LiveData<List<CartItemModel>> getCartItems() {
-//        return itemLiveData;
-//    }
-//
-//    public void requestCartList(Context context) {
-//        Span span = tracer.spanBuilder("requestCartListData").startSpan();
-//        span.end();
-//        ApiClient.getCart(new ApiClient.ApiCallback<List<CartItemModel>>() {
-//            @Override
-//            public void onSuccess(List<CartItemModel> itemModels) {
-//                itemLiveData.setValue(itemModels);
-//            }
-//
-//            @Override
-//            public void onError(int code, String error) {
-//                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
 
     @Override
     protected void fetchItemsFromServer() {
@@ -57,10 +36,12 @@ public class CartViewModel extends BaseListViewModel<CartItemModel> {
             @Override
             public void onSuccess(List<CartItemModel> itemModels) {
                 items.setValue(itemModels);
+                status.setValue(Status.success());
             }
 
             @Override
             public void onError(int code, String error) {
+                status.setValue(Status.error(String.valueOf(code), error));
                 Toast.makeText(SLSGlobal.applicationContext, error, Toast.LENGTH_SHORT).show();
             }
         });
