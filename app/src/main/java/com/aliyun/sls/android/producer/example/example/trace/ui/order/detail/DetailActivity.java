@@ -1,6 +1,7 @@
-package com.aliyun.sls.android.producer.example.example.trace.ui;
+package com.aliyun.sls.android.producer.example.example.trace.ui.order.detail;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.content.Context;
 import android.content.Intent;

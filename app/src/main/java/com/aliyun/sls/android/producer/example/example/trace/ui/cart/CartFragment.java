@@ -9,7 +9,7 @@ import com.aliyun.sls.android.producer.example.databinding.TraceItemCartLayoutBi
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
-import com.aliyun.sls.android.producer.example.example.trace.ui.DetailActivity;
+import com.aliyun.sls.android.producer.example.example.trace.ui.order.detail.DetailActivity;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseRecyclerAdapter;
