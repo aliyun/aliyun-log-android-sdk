@@ -25,4 +25,8 @@ public class TraceViewModel extends ViewModel {
         return modelName;
     }
 
+    public String generatorSpanName(String name) {
+        return  String.format("%s_%s", modelName, name);
+    }
+
 }
