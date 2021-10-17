@@ -17,20 +17,15 @@ import io.opentelemetry.api.trace.Span;
 public abstract class BaseListViewModel<ITEM> extends TraceViewModel {
 
     protected MutableLiveData<List<ITEM>> items;
-    protected MutableLiveData<Status> status;
+
 
     public BaseListViewModel(String modelName) {
         super(modelName);
         items = new MutableLiveData<>(new ArrayList<>());
-        status = new MutableLiveData<>();
     }
 
     public LiveData<List<ITEM>> getItems() {
         return items;
-    }
-
-    public LiveData<Status> getStatus() {
-        return status;
     }
 
     public void requestItemsFromServer() {

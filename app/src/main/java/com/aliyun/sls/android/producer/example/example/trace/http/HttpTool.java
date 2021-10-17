@@ -8,11 +8,14 @@ import androidx.annotation.NonNull;
 import com.aliyun.sls.android.plugin.trace.SLSTelemetrySdk;
 import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
 import com.aliyun.sls.android.producer.HttpConfigProxy;
+import com.aliyun.sls.android.producer.example.example.trace.utils.UserUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -41,6 +44,11 @@ public class HttpTool {
 
     private static SLSTelemetrySdk traceSdk = SLSTracePlugin.getInstance().getTelemetrySdk();
     private static Tracer tracer = traceSdk.getTracer("HttpTool");
+
+    static {
+        CookieManager manager = new CookieManager();
+        CookieHandler.setDefault(manager);
+    }
 
     private HttpTool() {
         //no instance
@@ -93,8 +101,11 @@ public class HttpTool {
             connection.setRequestMethod(method);
             connection.setRequestProperty("User-agent", HttpConfigProxy.getUserAgent());
 
-            if (header != null) {
+//            if (!TextUtils.isEmpty(UserUtils.loginId)) {
+//                connection.setRequestProperty("Cookie", "logged_in=" + UserUtils.loginId);
+//            }
 
+            if (header != null) {
                 int pairs = header.length / 2;
                 for (int i = 0; i < pairs; i++) {
                     String key = header[2 * i];
