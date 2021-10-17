@@ -31,7 +31,7 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
     protected abstract BaseRecyclerAdapter.IViewUpdater<BIND, ITEM> onCreateViewUpdater();
 
     protected void onRefresh() {
-        viewModel.getTracer().spanBuilder(String.format("%s_pull_refresh", viewModel.getModelName())).startSpan().end();
+        viewModel.getTracer().spanBuilder(viewModel.generatorSpanName("pull_refresh")).startSpan().end();
         viewModel.requestItemsFromServer();
     }
 
@@ -46,7 +46,10 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
         listContainerLayoutBinding = BaseListContainerLayoutBinding.inflate(inflater, container, false);
         refreshLayout = listContainerLayoutBinding.swiperefresh;
         refreshLayout.setOnRefreshListener(BaseListFragment.this::onRefresh);
-        listContainerLayoutBinding.baseErrorBtn.setOnClickListener(v -> BaseListFragment.this.update());
+        listContainerLayoutBinding.baseErrorBtn.setOnClickListener(v -> {
+            viewModel.getTracer().spanBuilder(viewModel.generatorSpanName("retry")).startSpan().end();
+            BaseListFragment.this.update();
+        });
 
         final BaseRecyclerAdapter.IViewUpdater<BIND, ITEM> viewUpdater = onCreateViewUpdater();
         if (null == viewUpdater) {
