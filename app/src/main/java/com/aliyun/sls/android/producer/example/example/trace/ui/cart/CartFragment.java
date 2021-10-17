@@ -30,8 +30,8 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
     }
 
     @Override
-    protected BaseRecyclerAdapter.IViewUpdater<TraceItemCartLayoutBinding, CartItemModel> onCreateViewUpdater() {
-        return new BaseRecyclerAdapter.IViewUpdater<TraceItemCartLayoutBinding, CartItemModel>() {
+    protected BaseRecyclerAdapter.IViewContract<TraceItemCartLayoutBinding, CartItemModel> onCreateViewUpdater() {
+        return new BaseRecyclerAdapter.IViewContract<TraceItemCartLayoutBinding, CartItemModel>() {
             @Override
             public TraceItemCartLayoutBinding onCreateBinding(LayoutInflater inflater, ViewGroup parent, int viewType) {
                 return TraceItemCartLayoutBinding.inflate(inflater, parent, false);
