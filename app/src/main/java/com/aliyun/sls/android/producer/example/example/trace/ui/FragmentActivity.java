@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.example.trace.ui.order.OrderListFragment;
+import com.aliyun.sls.android.producer.example.example.trace.ui.user.LoginFragment;
 
 /**
  * @author gordon
@@ -29,6 +30,10 @@ public class FragmentActivity extends AppCompatActivity {
 
     public static void startOrderListPage(Context context) {
         FragmentActivity.start(context, OrderListFragment.class.getName(), null);
+    }
+
+    public static void startLoginPage(Context context) {
+        FragmentActivity.start(context, LoginFragment.class.getName(), null);
     }
 
     @Override

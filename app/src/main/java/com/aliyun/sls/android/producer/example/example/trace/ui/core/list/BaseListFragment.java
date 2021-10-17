@@ -74,7 +74,7 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
 
         viewModel.getItems().observe(getViewLifecycleOwner(), adapter::updateDatum);
 
-        viewModel.status.observe(getViewLifecycleOwner(), status -> {
+        viewModel.getStatus().observe(getViewLifecycleOwner(), status -> {
             refreshLayout.setRefreshing(false);
             onStatusChanged(status);
         });
