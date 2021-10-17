@@ -7,10 +7,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import com.aliyun.sls.android.producer.example.databinding.FragmentMineBinding;
-import com.aliyun.sls.android.producer.example.example.trace.core.VisibilityFragment;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
 
 /**
  * @author gordon

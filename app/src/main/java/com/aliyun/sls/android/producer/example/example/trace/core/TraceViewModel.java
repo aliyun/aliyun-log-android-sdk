@@ -10,8 +10,10 @@ import io.opentelemetry.api.trace.Tracer;
 public class TraceViewModel extends ViewModel {
     protected SLSTelemetrySdk telemetrySdk = SLSTracePlugin.getInstance().getTelemetrySdk();
     protected Tracer tracer;
+    protected String modelName;
 
     public TraceViewModel(String modelName) {
+        this.modelName  = modelName;
         this.tracer = telemetrySdk.getTracer(modelName);
     }
 }

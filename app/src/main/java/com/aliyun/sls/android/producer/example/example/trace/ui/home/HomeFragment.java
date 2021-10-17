@@ -4,18 +4,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.sls.android.producer.example.databinding.FragmentHomeBinding;
-import com.aliyun.sls.android.producer.example.example.trace.core.VisibilityFragment;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 
 import java.util.List;
