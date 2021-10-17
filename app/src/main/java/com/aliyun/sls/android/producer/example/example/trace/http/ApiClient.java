@@ -24,6 +24,9 @@ import io.opentelemetry.context.Context;
  */
 public class ApiClient {
 
+    private static final String API_BASE = "http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com";
+    private static final String API_ORDER_LIST = API_BASE + "/orders";
+
     private static Tracer tracer = SLSTracePlugin.getInstance().getTelemetrySdk().getTracer("ApiClient");
     private static Handler handler = new Handler(Looper.getMainLooper());
 
@@ -84,6 +87,22 @@ public class ApiClient {
         final Context context = Context.current();
         ThreadUtils.exec(() -> {
             HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart", context);
+            if (response.success()) {
+                List<CartItemModel> itemModelList = CartItemModel.parseJson(response.data);
+                if (null != itemModelList) {
+                    postInMainThread(() -> callback.onSuccess(itemModelList));
+                    return;
+                }
+            }
+
+            postError(response, callback);
+        });
+    }
+
+    public static void getOrders(ApiCallback<List<CartItemModel>> callback) {
+        final Context context = Context.current();
+        ThreadUtils.exec(() -> {
+            HttpTool.Response response = HttpTool.get(API_ORDER_LIST, context);
             if (response.success()) {
                 List<CartItemModel> itemModelList = CartItemModel.parseJson(response.data);
                 if (null != itemModelList) {

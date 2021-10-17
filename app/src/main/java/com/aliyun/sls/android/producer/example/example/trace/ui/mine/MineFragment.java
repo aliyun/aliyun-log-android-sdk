@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.databinding.TraceMineItemLayoutBinding;
+import com.aliyun.sls.android.producer.example.example.trace.ui.FragmentActivity;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseRecyclerAdapter;
 
@@ -56,6 +57,10 @@ public class MineFragment extends BaseListFragment<TraceMineItemLayoutBinding, M
                     binding.mineItemLayout.setVisibility(View.VISIBLE);
 
                     binding.mineItemTitle.setText(model.title);
+
+                    if (model.type == 2) {
+                        binding.getRoot().setOnClickListener(v -> FragmentActivity.startOrderListPage(getActivity()));
+                    }
                 }
             }
 
