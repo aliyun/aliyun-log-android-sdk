@@ -1,5 +1,6 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.core.list;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +30,7 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
     protected BaseListContainerLayoutBinding listContainerLayoutBinding;
     private SwipeRefreshLayout refreshLayout;
 
-    protected abstract BaseRecyclerAdapter.IViewUpdater<BIND, ITEM> onCreateViewUpdater();
+    protected abstract BaseRecyclerAdapter.IViewContract<BIND, ITEM> onCreateViewUpdater();
 
     protected void onRefresh() {
         viewModel.getTracer().spanBuilder(viewModel.generatorSpanName("pull_refresh")).startSpan().end();
@@ -59,15 +60,17 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
             BaseListFragment.this.update();
         });
 
-        final BaseRecyclerAdapter.IViewUpdater<BIND, ITEM> viewUpdater = onCreateViewUpdater();
+        final BaseRecyclerAdapter.IViewContract<BIND, ITEM> viewUpdater = onCreateViewUpdater();
         if (null == viewUpdater) {
             throw new IllegalArgumentException("Must implement onCreateViewUpdater method");
         }
 
         final RecyclerView recyclerView = listContainerLayoutBinding.baseRecyclerview;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(onCreateLayoutManager(getActivity()));
         final BaseRecyclerAdapter<BIND, ITEM> adapter = new BaseRecyclerAdapter<>(viewUpdater);
         recyclerView.setAdapter(adapter);
+
+        onInitRecyclerView(getActivity(), recyclerView);
 
         viewModel.getItems().observe(getViewLifecycleOwner(), adapter::updateDatum);
 
@@ -77,6 +80,14 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
         });
 
         return listContainerLayoutBinding.getRoot();
+    }
+
+    protected void onInitRecyclerView(Context context, RecyclerView recyclerView) {
+
+    }
+
+    protected RecyclerView.LayoutManager onCreateLayoutManager(Context context) {
+        return new LinearLayoutManager(context);
     }
 
     protected View onCreateFooterView(final LayoutInflater inflater, final ViewGroup parent) {

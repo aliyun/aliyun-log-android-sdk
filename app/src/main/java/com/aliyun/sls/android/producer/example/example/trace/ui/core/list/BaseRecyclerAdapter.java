@@ -17,9 +17,9 @@ public class BaseRecyclerAdapter<BIND extends ViewBinding, ITEM> extends Recycle
 
     private List<ITEM> datum;
 
-    private IViewUpdater<BIND, ITEM> viewUpdater;
+    private IViewContract<BIND, ITEM> viewUpdater;
 
-    public BaseRecyclerAdapter(IViewUpdater<BIND, ITEM> viewUpdater) {
+    public BaseRecyclerAdapter(IViewContract<BIND, ITEM> viewUpdater) {
         this.viewUpdater = viewUpdater;
     }
 
@@ -42,6 +42,11 @@ public class BaseRecyclerAdapter<BIND extends ViewBinding, ITEM> extends Recycle
         return null == datum ? 0 : datum.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return viewUpdater.getItemViewType(position);
+    }
+
     public void updateDatum(List<ITEM> datum) {
         this.datum = datum;
         notifyDataSetChanged();
@@ -57,10 +62,14 @@ public class BaseRecyclerAdapter<BIND extends ViewBinding, ITEM> extends Recycle
 
     }
 
-    public  interface IViewUpdater<BIND, ITEM> {
+    public  interface IViewContract<BIND, ITEM> {
 
         BIND onCreateBinding(LayoutInflater inflater, ViewGroup parent, int viewType);
 
         void onUpdate(BIND bind, ITEM item, int pos);
+
+        default int getItemViewType(int pos) {
+            return 0;
+        }
     }
 }

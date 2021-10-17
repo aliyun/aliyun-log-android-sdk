@@ -18,8 +18,8 @@ import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
 public class CategoryFragment extends BaseListFragment<TraceItemCategoryLayoutBinding, ItemModel, CategoryViewModel> {
 
     @Override
-    protected BaseRecyclerAdapter.IViewUpdater<TraceItemCategoryLayoutBinding, ItemModel> onCreateViewUpdater() {
-        return new BaseRecyclerAdapter.IViewUpdater<TraceItemCategoryLayoutBinding, ItemModel>() {
+    protected BaseRecyclerAdapter.IViewContract<TraceItemCategoryLayoutBinding, ItemModel> onCreateViewUpdater() {
+        return new BaseRecyclerAdapter.IViewContract<TraceItemCategoryLayoutBinding, ItemModel>() {
             @Override
             public TraceItemCategoryLayoutBinding onCreateBinding(LayoutInflater inflater, ViewGroup parent, int viewType) {
                 return TraceItemCategoryLayoutBinding.inflate(inflater, parent, false);
