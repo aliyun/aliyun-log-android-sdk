@@ -28,6 +28,8 @@ public class SLSDemoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        SLSGlobal.application = this;
+        SLSGlobal.applicationContext = this.getApplicationContext();
 
         if (BuildConfig.CONFIG_ENABLE) {
             PreferenceUtils.overrideConfig(this);

@@ -7,17 +7,16 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
 
 import com.aliyun.sls.android.producer.example.databinding.BaseListContainerLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.List;
 
 /**
  * @author gordon
@@ -27,8 +26,13 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
 
     private VM viewModel;
     protected BaseListContainerLayoutBinding listContainerLayoutBinding;
+    private SwipeRefreshLayout refreshLayout;
 
     protected abstract BaseRecyclerAdapter.IViewUpdater<BIND, ITEM> onCreateViewUpdater();
+
+    protected void onRefresh() {
+
+    }
 
     protected boolean init = false;
 
@@ -36,14 +40,18 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //noinspection unchecked
-        viewModel = new ViewModelProvider(this).get((Class<VM>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+        viewModel = new ViewModelProvider(this).get((Class<VM>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[2]);
 
         listContainerLayoutBinding = BaseListContainerLayoutBinding.inflate(inflater, container, false);
-        View root = listContainerLayoutBinding.getRoot();
+        refreshLayout = listContainerLayoutBinding.swiperefresh;
+        refreshLayout.setOnRefreshListener(() -> {
+            BaseListFragment.this.onRefresh();
+            refreshLayout.setRefreshing(false);
+        });
 
         final BaseRecyclerAdapter.IViewUpdater<BIND, ITEM> viewUpdater = onCreateViewUpdater();
         if (null == viewUpdater) {
-            return null;
+            throw new IllegalArgumentException("Must implement onCreateViewUpdater method");
         }
 
         final RecyclerView recyclerView = listContainerLayoutBinding.baseRecyclerview;
@@ -51,9 +59,14 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
         final BaseRecyclerAdapter<BIND, ITEM> adapter = new BaseRecyclerAdapter<>(viewUpdater);
         recyclerView.setAdapter(adapter);
 
-        viewModel.getItems().observe(getViewLifecycleOwner(), adapter::updateDatum);
+        viewModel.getItems().observe(getViewLifecycleOwner(), items -> {
+            adapter.updateDatum(items);
+            if (refreshLayout.isRefreshing()) {
+                refreshLayout.setRefreshing(false);
+            }
+        });
 
-        return root;
+        return listContainerLayoutBinding.getRoot();
     }
 
     @Override
@@ -61,6 +74,7 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
         super.onVisibilityChanged(visible);
         if (visible && !init) {
             init = true;
+            refreshLayout.setRefreshing(true);
             viewModel.requestItemsFromServer();
         }
     }

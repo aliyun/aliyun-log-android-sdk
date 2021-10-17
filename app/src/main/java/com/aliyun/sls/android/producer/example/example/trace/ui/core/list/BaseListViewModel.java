@@ -16,7 +16,7 @@ import io.opentelemetry.api.trace.Span;
  */
 public abstract class BaseListViewModel<ITEM> extends TraceViewModel {
 
-    private MutableLiveData<List<ITEM>> items;
+    protected MutableLiveData<List<ITEM>> items;
 
     public BaseListViewModel(String modelName) {
         super(modelName);
