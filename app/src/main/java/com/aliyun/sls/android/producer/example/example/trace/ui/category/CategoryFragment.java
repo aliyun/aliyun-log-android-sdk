@@ -1,61 +1,50 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.category;
 
-import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.aliyun.sls.android.producer.example.databinding.FragmentCategoryBinding;
-import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
+import com.aliyun.sls.android.producer.example.databinding.TraceItemCategoryLayoutBinding;
+import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
+import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListFragment;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseRecyclerAdapter;
+import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
 
 /**
  * @author gordon
  * @date 2021/09/01
  */
-public class CategoryFragment extends VisibilityFragment {
-
-    private CategoryViewModel categoryViewModel;
-    private FragmentCategoryBinding binding;
+public class CategoryFragment extends BaseListFragment<TraceItemCategoryLayoutBinding, ItemModel, CategoryViewModel> {
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        categoryViewModel =
-                new ViewModelProvider(this).get(CategoryViewModel.class);
+    protected BaseRecyclerAdapter.IViewUpdater<TraceItemCategoryLayoutBinding, ItemModel> onCreateViewUpdater() {
+        return new BaseRecyclerAdapter.IViewUpdater<TraceItemCategoryLayoutBinding, ItemModel>() {
+            @Override
+            public TraceItemCategoryLayoutBinding onCreateBinding(LayoutInflater inflater, ViewGroup parent, int viewType) {
+                return TraceItemCategoryLayoutBinding.inflate(inflater, parent, false);
+            }
 
-        binding = FragmentCategoryBinding.inflate(inflater, container, false);
-        final RecyclerView recyclerView = binding.categoryRecyclerview;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            @Override
+            public void onUpdate(TraceItemCategoryLayoutBinding binding, ItemModel model, int pos) {
+                binding.categoryTitleText.setText(model.name);
+                binding.categoryDescText.setText(model.description);
+                binding.categoryPriceText.setText(String.valueOf(model.price));
+                binding.categoryAddToCart.setOnClickListener(v -> ApiClient.addToCart(model.id, new ApiClient.ApiCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean aBoolean) {
+                        Toast.makeText(binding.getRoot().getContext(), "加入购物车成功", Toast.LENGTH_SHORT).show();
+                    }
 
-        final CategoryRecyclerAdapter adapter = new CategoryRecyclerAdapter();
-        recyclerView.setAdapter(adapter);
-        categoryViewModel.getItemModelList().observe(getViewLifecycleOwner(), adapter::update);
+                    @Override
+                    public void onError(int code, String error) {
+                        Toast.makeText(binding.getRoot().getContext(), error, Toast.LENGTH_SHORT).show();
+                    }
+                }));
 
-        return binding.getRoot();
+                ImageUtils.loadImage(model.imageUrl.get(0), binding.categoryImage);
+            }
+        };
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
-    protected void onVisibilityChanged(boolean visible) {
-        super.onVisibilityChanged(visible);
-        if (visible) {
-            categoryViewModel.update();
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
 }

@@ -51,6 +51,5 @@ public class HomeFragment extends BaseListFragment<TraceItemLayoutBinding, ItemM
     @Override
     protected void onRefresh() {
         super.onRefresh();
-        viewModel.requestItemsFromServer();
     }
 }

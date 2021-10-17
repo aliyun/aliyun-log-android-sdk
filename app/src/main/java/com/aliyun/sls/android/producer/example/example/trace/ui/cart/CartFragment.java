@@ -51,6 +51,5 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
     @Override
     protected void onRefresh() {
         super.onRefresh();
-        viewModel.requestItemsFromServer();
     }
 }

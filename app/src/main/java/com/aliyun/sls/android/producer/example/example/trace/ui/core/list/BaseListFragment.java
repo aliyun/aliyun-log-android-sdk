@@ -32,6 +32,7 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
 
     protected void onRefresh() {
         viewModel.getTracer().spanBuilder(String.format("%s_pull_refresh", viewModel.getModelName())).startSpan().end();
+        viewModel.requestItemsFromServer();
     }
 
     protected boolean init = false;
