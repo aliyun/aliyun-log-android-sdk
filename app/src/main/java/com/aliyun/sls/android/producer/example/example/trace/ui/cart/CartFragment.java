@@ -1,12 +1,7 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.cart;
 
-import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.aliyun.sls.android.producer.example.databinding.TraceItemCartLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
@@ -22,8 +17,6 @@ import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
  * @date 2021/09/01
  */
 public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, CartItemModel, CartViewModel> {
-
-    private CartViewModel cartViewModel;
 
     @Override
     protected BaseRecyclerAdapter.IViewUpdater<TraceItemCartLayoutBinding, CartItemModel> onCreateViewUpdater() {
@@ -56,19 +49,8 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    protected void onVisibilityChanged(boolean visible) {
-        super.onVisibilityChanged(visible);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    protected void onRefresh() {
+        super.onRefresh();
+        viewModel.requestItemsFromServer();
     }
 }

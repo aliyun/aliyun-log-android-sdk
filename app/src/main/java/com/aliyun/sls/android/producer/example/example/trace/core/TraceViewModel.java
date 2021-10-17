@@ -16,4 +16,13 @@ public class TraceViewModel extends ViewModel {
         this.modelName  = modelName;
         this.tracer = telemetrySdk.getTracer(modelName);
     }
+
+    public Tracer getTracer() {
+        return tracer;
+    }
+
+    public String getModelName() {
+        return modelName;
+    }
+
 }

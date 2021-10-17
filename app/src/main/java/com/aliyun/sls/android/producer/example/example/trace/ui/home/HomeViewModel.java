@@ -1,51 +1,34 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.home;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-
-import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.context.Context;
 
 /**
  * @author gordon
  * @date 2021/09/01
  */
-public class HomeViewModel extends TraceViewModel {
-
-    private MutableLiveData<List<ItemModel>> listData;
+public class HomeViewModel extends BaseListViewModel<ItemModel> {
 
     public HomeViewModel() {
-        super("HomeViewModel");
-        listData = new MutableLiveData<>(new ArrayList<ItemModel>());
+        super("home");
     }
 
-    public void requestData() {
-        Span span = tracer.spanBuilder("requestHomeData").startSpan();
-        span.end();
-
+    @Override
+    protected void fetchItemsFromServer() {
         ApiClient.getCategory(new ApiClient.ApiCallback<List<ItemModel>>() {
             @Override
             public void onSuccess(List<ItemModel> response) {
-                listData.setValue(response);
+                items.setValue(response);
+                status.setValue(Status.success());
             }
 
             @Override
             public void onError(int code, String error) {
-
+                status.setValue(Status.error(String.valueOf(code), error));
             }
         });
     }
-
-    public LiveData<List<ItemModel>> getList() {
-        return listData;
-    }
-
 }

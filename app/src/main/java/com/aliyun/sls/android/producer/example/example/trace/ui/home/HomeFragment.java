@@ -12,8 +12,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aliyun.sls.android.producer.example.databinding.FragmentHomeBinding;
+import com.aliyun.sls.android.producer.example.databinding.TraceItemLayoutBinding;
+import com.aliyun.sls.android.producer.example.example.trace.ui.DetailActivity;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListFragment;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseRecyclerAdapter;
+import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
 
 import java.util.List;
 
@@ -21,47 +26,31 @@ import java.util.List;
  * @author gordon
  * @date 2021/09/01
  */
-public class HomeFragment extends VisibilityFragment {
-
-    private HomeViewModel homeViewModel;
-    private FragmentHomeBinding binding;
+public class HomeFragment extends BaseListFragment<TraceItemLayoutBinding, ItemModel, HomeViewModel> {
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        final RecyclerView recyclerView = binding.homeRecyclerview;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        final HomeRecyclerAdapter adapter = new HomeRecyclerAdapter();
-        recyclerView.setAdapter(adapter);
-
-        homeViewModel.getList().observe(getViewLifecycleOwner(), new Observer<List<ItemModel>>() {
+    protected BaseRecyclerAdapter.IViewUpdater<TraceItemLayoutBinding, ItemModel> onCreateViewUpdater() {
+        return new BaseRecyclerAdapter.IViewUpdater<TraceItemLayoutBinding, ItemModel>() {
             @Override
-            public void onChanged(List<ItemModel> list) {
-                adapter.updateData(list);
+            public TraceItemLayoutBinding onCreateBinding(LayoutInflater inflater, ViewGroup parent, int viewType) {
+                return TraceItemLayoutBinding.inflate(inflater, parent, false);
             }
-        });
 
-        return root;
+            @Override
+            public void onUpdate(TraceItemLayoutBinding binding, ItemModel itemModel, int pos) {
+                ImageUtils.loadImage(itemModel.imageUrl.get(0), binding.itemImage);
+                binding.itemTitle.setText(itemModel.name);
+                binding.itemDesc.setText(itemModel.description);
+                binding.itemPrice.setText(itemModel.price + "");
+
+                binding.itemViewDetail.setOnClickListener(v -> DetailActivity.start(binding.getRoot().getContext(), itemModel.id));
+            }
+        };
     }
 
     @Override
-    protected void onVisibilityChanged(boolean visible) {
-        super.onVisibilityChanged(visible);
-        if (visible) {
-            homeViewModel.requestData();
-        }
+    protected void onRefresh() {
+        super.onRefresh();
+        viewModel.requestItemsFromServer();
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
-
 }

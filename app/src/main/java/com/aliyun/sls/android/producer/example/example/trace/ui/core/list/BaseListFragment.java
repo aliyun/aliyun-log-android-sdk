@@ -24,14 +24,14 @@ import java.lang.reflect.ParameterizedType;
  */
 public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extends BaseListViewModel<ITEM>> extends VisibilityFragment {
 
-    private VM viewModel;
+    protected VM viewModel;
     protected BaseListContainerLayoutBinding listContainerLayoutBinding;
     private SwipeRefreshLayout refreshLayout;
 
     protected abstract BaseRecyclerAdapter.IViewUpdater<BIND, ITEM> onCreateViewUpdater();
 
     protected void onRefresh() {
-
+        viewModel.getTracer().spanBuilder(String.format("%s_pull_refresh", viewModel.getModelName())).startSpan().end();
     }
 
     protected boolean init = false;
@@ -44,10 +44,7 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
 
         listContainerLayoutBinding = BaseListContainerLayoutBinding.inflate(inflater, container, false);
         refreshLayout = listContainerLayoutBinding.swiperefresh;
-        refreshLayout.setOnRefreshListener(() -> {
-            BaseListFragment.this.onRefresh();
-            refreshLayout.setRefreshing(false);
-        });
+        refreshLayout.setOnRefreshListener(() -> BaseListFragment.this.onRefresh());
 
         final BaseRecyclerAdapter.IViewUpdater<BIND, ITEM> viewUpdater = onCreateViewUpdater();
         if (null == viewUpdater) {
@@ -61,9 +58,10 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
 
         viewModel.getItems().observe(getViewLifecycleOwner(), items -> {
             adapter.updateDatum(items);
-            if (refreshLayout.isRefreshing()) {
-                refreshLayout.setRefreshing(false);
-            }
+        });
+
+        viewModel.status.observe(getViewLifecycleOwner(), status -> {
+            refreshLayout.setRefreshing(false);
         });
 
         return listContainerLayoutBinding.getRoot();
