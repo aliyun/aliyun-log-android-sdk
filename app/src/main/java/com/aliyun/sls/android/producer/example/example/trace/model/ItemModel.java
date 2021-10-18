@@ -58,7 +58,7 @@ public class ItemModel {
         }
     }
 
-    public static List<ItemModel> parseJSON(String json) {
+    public static List<ItemModel> fromJSONArray(String json) {
         if (TextUtils.isEmpty(json)) {
             return null;
         }
