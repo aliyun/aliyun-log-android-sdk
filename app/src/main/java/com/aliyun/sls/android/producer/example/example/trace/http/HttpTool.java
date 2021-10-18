@@ -8,14 +8,12 @@ import androidx.annotation.NonNull;
 import com.aliyun.sls.android.plugin.trace.SLSTelemetrySdk;
 import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
 import com.aliyun.sls.android.producer.HttpConfigProxy;
-import com.aliyun.sls.android.producer.example.example.trace.utils.UserUtils;
+import com.aliyun.sls.android.producer.utils.ThreadUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.CookieHandler;
-import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -31,7 +29,6 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
-import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapSetter;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 
@@ -42,6 +39,10 @@ import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 public class HttpTool {
     private static final String TAG = "HttpTool";
 
+    public interface HttpCallback {
+        void onComplete(Response response);
+    }
+
     private static SLSTelemetrySdk traceSdk = SLSTracePlugin.getInstance().getTelemetrySdk();
     private static Tracer tracer = traceSdk.getTracer("HttpTool");
 
@@ -49,36 +50,54 @@ public class HttpTool {
         //no instance
     }
 
-    public static Response get(String url, Context context) {
-        return get(url, null, context);
+    public static void get(String host, String path, HttpCallback callback) {
+        get(host, path, null, callback);
     }
 
-    public static Response get(String url, Map<String, String> headers, Context context) {
-        return http(url, "GET", mapToStrings(headers), null, context);
+    public static void get(String host, String path, Map<String, String> headers, HttpCallback callback) {
+        http(host, path, "GET", mapToStrings(headers), null, callback);
     }
 
-    public static Response post(String url) {
-        return post(url, null);
+    public static void post(String url, String body, HttpCallback callback) {
+        post(url, null, body, callback);
     }
 
-    public static Response post(String url, Map<String, String> headers) {
-        return post(url, headers, null);
+    public static void post(String host, String path, String body, HttpCallback callback) {
+        post(host, path, null, body, callback);
     }
 
-    public static Response post(String url, Map<String, String> headers, String body) {
+    public static void post(String host, String path, Map<String, String> headers, String body, HttpCallback callback) {
         if (null == headers) {
             headers = new HashMap<>();
         }
+
         headers.put("Content-Length", TextUtils.isEmpty(body) ? "0" : String.valueOf(body.length()));
-        return http(url, "POST", mapToStrings(headers), (null != body ? body.getBytes(Charset.forName("UTF-8")) : null), null);
+        http(host, path, "POST", mapToStrings(headers), body, callback);
     }
 
-    private static Response http(String urlString, String method, String[] header, byte[] body, Context context) {
+    private static void http(String host, String path, String method, String[] headers, String body, HttpCallback callback) {
+        Span span = tracer.spanBuilder(String.format("Request HTTP: %s", path)).startSpan()
+                .setAttribute(SemanticAttributes.HTTP_ROUTE, path)
+                .setAttribute("http.query", body);
+        span.end();
+
+        final Context context = Context.current().with(span);
+        ThreadUtils.exec(() -> {
+            Response response = internalHttp(host, path, method, headers, body, context);
+            callback.onComplete(response);
+        });
+    }
+
+    private static Response internalHttp(String host, String path, String method, String[] headers, String body, Context context) {
+        final String urlString = host + path;
+
         Span span = tracer.spanBuilder("/").setSpanKind(SpanKind.CLIENT).setParent(context).startSpan();
-//        Scope scope = span.makeCurrent();
         span.setAttribute(SemanticAttributes.HTTP_METHOD, method.toUpperCase(Locale.ROOT));
         span.setAttribute("component", "http");
         span.setAttribute(SemanticAttributes.HTTP_URL, urlString);
+        span.setAttribute(SemanticAttributes.HTTP_HOST, host);
+        span.setAttribute(SemanticAttributes.HTTP_ROUTE, path);
+        span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, HttpConfigProxy.getUserAgent());
 
         int responseCode = -1;
         try {
@@ -96,26 +115,24 @@ public class HttpTool {
             connection.setRequestMethod(method);
             connection.setRequestProperty("User-agent", HttpConfigProxy.getUserAgent());
 
-//            if (!TextUtils.isEmpty(UserUtils.loginId)) {
-//                connection.setRequestProperty("Cookie", "logged_in=" + UserUtils.loginId);
-//            }
             final String cookie = SLSCookieManager.getCookie();
             if (!TextUtils.isEmpty(cookie)) {
                 connection.setRequestProperty("Cookie", cookie);
             }
 
-            if (header != null) {
-                int pairs = header.length / 2;
+            if (headers != null) {
+                int pairs = headers.length / 2;
                 for (int i = 0; i < pairs; i++) {
-                    String key = header[2 * i];
-                    String val = header[2 * i + 1];
+                    String key = headers[2 * i];
+                    String val = headers[2 * i + 1];
                     connection.setRequestProperty(key, val);
                 }
             }
 
             if (null != body && connection.getDoOutput()) {
                 DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-                out.write(body);
+                //noinspection CharsetObjectCanBeUsed
+                out.write(body.getBytes(Charset.forName("UTF-8")));
                 out.flush();
                 out.close();
             }
@@ -142,7 +159,7 @@ public class HttpTool {
                 response.error = streamToString(connection.getErrorStream());
             }
 
-            Log.w(TAG, "code: " + responseCode + ", response: " + response.toString());
+            Log.v(TAG, "code: " + responseCode + ", response: " + response.toString());
             return response;
         } catch (Exception ex) {
             Log.w(TAG, "exception: " + ex.getLocalizedMessage());
@@ -158,7 +175,6 @@ public class HttpTool {
             return response;
         } finally {
             span.end();
-//            scope.close();
         }
     }
 
