@@ -89,6 +89,7 @@ public class HttpTool {
     }
 
     private static Response internalHttp(String host, String path, String method, String[] headers, String body, Context context) {
+        Log.v(TAG, "http request =>> host: " + host + ", path: " + path + ", method: " + method + ", headers: " + arrayToString(headers) + ", body: " + body);
         final String urlString = host + path;
 
         Span span = tracer.spanBuilder("/").setSpanKind(SpanKind.CLIENT).setParent(context).startSpan();
@@ -159,7 +160,7 @@ public class HttpTool {
                 response.error = streamToString(connection.getErrorStream());
             }
 
-            Log.v(TAG, "code: " + responseCode + ", response: " + response.toString());
+            Log.v(TAG, "http response=>> code: " + responseCode + ", response: " + response.toString());
             return response;
         } catch (Exception ex) {
             Log.w(TAG, "exception: " + ex.getLocalizedMessage());
@@ -206,6 +207,22 @@ public class HttpTool {
             index++;
         }
         return headers;
+    }
+
+    private static String arrayToString(String[] array) {
+        if (null == array) {
+            return "[]";
+        }
+
+        StringBuilder builder = new StringBuilder("[");
+        for (String s : array) {
+            builder.append(" ");
+            builder.append(s);
+            builder.append(",");
+        }
+
+        builder.append("]");
+        return builder.toString();
     }
 
     private static String streamToString(InputStream ins) throws Exception {
