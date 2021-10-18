@@ -18,6 +18,9 @@ public class BaseFragment extends Fragment {
 
     protected void setTile(String title) {
         this.title = title;
+        if (getActivity() != null) {
+            getActivity().setTitle(title);
+        }
     }
 
     @Nullable

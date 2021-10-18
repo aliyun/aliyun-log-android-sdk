@@ -37,8 +37,8 @@ public abstract class BaseListViewModel<ITEM> extends TraceViewModel {
     protected abstract void fetchItemsFromServer();
 
     public static class Status {
-
-        public int type = 1;
+        public static final int TYPE_DEF_SUCCESS = 1;
+        public int type = TYPE_DEF_SUCCESS;
         public boolean success;
         public String error;
         public String code;

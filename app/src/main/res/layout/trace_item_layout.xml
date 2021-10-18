@@ -4,15 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingLeft="24dp"
-    android:paddingRight="24dp"
-    android:paddingBottom="24dp">
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/item_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitXY" />
+        android:layout_height="156dp"
+        android:scaleType="centerCrop" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_title"
@@ -20,8 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center_horizontal"
-        android:textSize="14dp"
-        android:textStyle="bold"
+        style="@style/Text.Title"
         tools:text="Holy" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -30,16 +28,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center_horizontal"
-        android:textSize="14dp"
+        style="@style/Text"
         tools:text="desc" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <com.aliyun.sls.android.producer.example.example.trace.widget.PriceTextView
         android:id="@+id/item_price"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center_horizontal"
-        android:textSize="14dp"
+        style="@style/Text.Price"
         tools:text="price" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -55,8 +53,8 @@
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"
             android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="View detail" />
+            android:gravity="center"
+            android:text="查看" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/item_add_to_cart"
@@ -65,8 +63,8 @@
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"
             android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Add to cart" />
+            android:gravity="center"
+            android:text="加购" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 

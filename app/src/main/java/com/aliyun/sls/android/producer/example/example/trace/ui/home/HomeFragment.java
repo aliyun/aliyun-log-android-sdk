@@ -4,8 +4,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.aliyun.sls.android.producer.example.databinding.TraceItemLayoutBinding;
-import com.aliyun.sls.android.producer.example.example.trace.ui.order.detail.DetailActivity;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
+import com.aliyun.sls.android.producer.example.example.trace.ui.FragmentActivity;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseRecyclerAdapter;
 import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
@@ -29,9 +29,9 @@ public class HomeFragment extends BaseListFragment<TraceItemLayoutBinding, ItemM
                 ImageUtils.loadImage(itemModel.imageUrl.get(0), binding.itemImage);
                 binding.itemTitle.setText(itemModel.name);
                 binding.itemDesc.setText(itemModel.description);
-                binding.itemPrice.setText(itemModel.price + "");
+                binding.itemPrice.setPrice(itemModel.price);
 
-                binding.itemViewDetail.setOnClickListener(v -> DetailActivity.start(binding.getRoot().getContext(), itemModel.id));
+                binding.itemViewDetail.setOnClickListener(v -> FragmentActivity.startProductDetailPage(binding.getRoot().getContext(), itemModel.id));
             }
         };
     }

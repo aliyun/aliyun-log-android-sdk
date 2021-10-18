@@ -78,8 +78,9 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/trace_detail_add_to_cart_btn"
-        android:layout_width="108dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
+        android:layout_gravity="bottom"
+        android:gravity="center"
         android:text="加入购物车" />
 </FrameLayout>

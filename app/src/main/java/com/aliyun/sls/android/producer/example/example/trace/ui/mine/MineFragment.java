@@ -1,6 +1,7 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.mine;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,12 +34,6 @@ public class MineFragment extends BaseListFragment<TraceMineItemLayoutBinding, M
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
         dividerItemDecoration.setDrawable(context.getResources().getDrawable(R.drawable.divider_horizontal_line));
         recyclerView.addItemDecoration(dividerItemDecoration);
-
-        final int padding = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, context.getResources().getDisplayMetrics()) + 0.5f);
-        recyclerView.setPadding(recyclerView.getPaddingLeft() + padding
-                , recyclerView.getPaddingTop()
-                , recyclerView.getPaddingRight() + padding
-                , recyclerView.getPaddingBottom());
     }
 
     @Override

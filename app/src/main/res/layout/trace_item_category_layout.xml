@@ -12,6 +12,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/category_title_text"
+        style="@style/Text.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
@@ -20,6 +21,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/category_desc_text"
+        style="@style/Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/category_title_text"
@@ -30,8 +32,9 @@
         android:maxLines="2"
         tools:text="desc" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <com.aliyun.sls.android.producer.example.example.trace.widget.PriceTextView
         android:id="@+id/category_price_text"
+        style="@style/Text.Price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/category_title_text"
@@ -40,11 +43,11 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/category_add_to_cart"
+        style="@style/Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/category_image"
         android:layout_alignParentRight="true"
-        android:text="加入购物车"
-        android:textSize="14dp" />
+        android:layout_centerVertical="true"
+        android:text="加购" />
 
 </RelativeLayout>

@@ -2,6 +2,7 @@ package com.aliyun.sls.android.producer.example.example.trace.ui.core.list;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,7 +84,11 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
     }
 
     protected void onInitRecyclerView(Context context, RecyclerView recyclerView) {
-
+        final int padding = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, context.getResources().getDisplayMetrics()) + 0.5f);
+        recyclerView.setPadding(recyclerView.getPaddingLeft() + padding
+                , (int) (recyclerView.getPaddingTop() + padding/ 2f + 0.5f)
+                , recyclerView.getPaddingRight() + padding
+                , recyclerView.getPaddingBottom());
     }
 
     protected RecyclerView.LayoutManager onCreateLayoutManager(Context context) {

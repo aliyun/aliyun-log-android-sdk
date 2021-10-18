@@ -8,4 +8,27 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Text">
+        <item name="font">@dimen/font_size_14</item>
+        <item name="color">#4F4F4F</item>
+    </style>
+
+    <style name="Text.Title" parent="Text">
+        <item name="font">@dimen/font_size_16</item>
+        <item name="color">#1C1C1C</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.SubTitle" parent="Text">
+    </style>
+
+    <style name="Text.Price" parent="Text.Title">
+        <item name="font">@dimen/font_size_18</item>
+    </style>
+
+    <declare-styleable name="PriceTextView">
+        <attr name="prefixText" format="string"/>
+        <attr name="suffixText" format="string"/>
+    </declare-styleable>
+
 </resources>

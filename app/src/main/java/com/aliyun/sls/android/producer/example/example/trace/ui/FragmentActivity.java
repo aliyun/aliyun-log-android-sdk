@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.example.example.trace.ui.detail.DetailFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.order.OrderListFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.user.LoginFragment;
 
@@ -34,6 +35,12 @@ public class FragmentActivity extends AppCompatActivity {
 
     public static void startLoginPage(Context context) {
         FragmentActivity.start(context, LoginFragment.class.getName(), null);
+    }
+
+    public static void startProductDetailPage(Context context, String itemId) {
+        Bundle args = new Bundle();
+        args.putString("item_id", itemId);
+        FragmentActivity.start(context, DetailFragment.class.getName(), args);
     }
 
     @Override

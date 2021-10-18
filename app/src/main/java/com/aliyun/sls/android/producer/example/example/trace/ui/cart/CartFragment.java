@@ -1,12 +1,16 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.cart;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.databinding.FragmentCartBinding;
 import com.aliyun.sls.android.producer.example.databinding.TraceItemCartLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
@@ -16,7 +20,6 @@ import com.aliyun.sls.android.producer.example.example.trace.ui.FragmentActivity
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseRecyclerAdapter;
-import com.aliyun.sls.android.producer.example.example.trace.ui.order.detail.DetailActivity;
 import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
 
 /**
@@ -34,6 +37,14 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
     }
 
     @Override
+    protected void onInitRecyclerView(Context context, RecyclerView recyclerView) {
+        super.onInitRecyclerView(context, recyclerView);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+        dividerItemDecoration.setDrawable(context.getResources().getDrawable(R.drawable.divider_horizontal_line));
+        recyclerView.addItemDecoration(dividerItemDecoration);
+    }
+
+    @Override
     protected BaseRecyclerAdapter.IViewContract<TraceItemCartLayoutBinding, CartItemModel> onCreateViewUpdater() {
         return new BaseRecyclerAdapter.IViewContract<TraceItemCartLayoutBinding, CartItemModel>() {
             @Override
@@ -43,7 +54,8 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
 
             @Override
             public void onUpdate(TraceItemCartLayoutBinding binding, CartItemModel cartModel, int pos) {
-                binding.cartPriceText.setText(String.valueOf(cartModel.unitPrice));
+                binding.cartPriceText.setPrice(cartModel.unitPrice);
+                binding.cartCountText.setText(String.format("x%d", cartModel.quantity));
                 ApiClient.getDetail(cartModel.itemId, new ApiClient.ApiCallback<ItemModel>() {
                     @Override
                     public void onSuccess(ItemModel model) {
@@ -58,7 +70,7 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
 
                     }
                 });
-                binding.getRoot().setOnClickListener(v -> DetailActivity.start(CartFragment.this.getContext(), cartModel.itemId));
+                binding.getRoot().setOnClickListener(v -> FragmentActivity.startProductDetailPage(CartFragment.this.getContext(), cartModel.itemId));
             }
         };
     }
@@ -73,6 +85,14 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
                 }
             }
         });
+        viewModel.getItems().observe(getViewLifecycleOwner(), cartItemModels -> {
+            long total = 0;
+            for (CartItemModel cartItemModel : cartItemModels) {
+                total += ((long) cartItemModel.quantity * cartItemModel.unitPrice);
+            }
+            cartBinding.cartPurchaseTotalPrice.setPrice(total);
+        });
+
         cartBinding.cartPurchaseBtn.setOnClickListener(v -> viewModel.createOrder());
     }
 
