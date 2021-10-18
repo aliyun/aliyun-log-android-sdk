@@ -1,5 +1,6 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.order;
 
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -17,6 +18,12 @@ import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
  * @date 2021/10/17
  */
 public class OrderListFragment extends BaseListFragment<TraceItemOrderLayoutBinding, OrderModel, OrderViewModel> {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTile("订单列表");
+    }
 
     @Override
     protected BaseRecyclerAdapter.IViewContract<TraceItemOrderLayoutBinding, OrderModel> onCreateViewUpdater() {
