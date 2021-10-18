@@ -13,6 +13,16 @@ public class UserModel {
     public String lastName;
     public String username;
 
+    @Override
+    public String toString() {
+        return "UserModel{" +
+                "firstName='" + firstName + '\'' +
+                ", id='" + id + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", username='" + username + '\'' +
+                '}';
+    }
+
     public static UserModel fromJSON(String json) {
         try {
             JSONObject object = new JSONObject(json);
