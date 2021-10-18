@@ -1,6 +1,7 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.detail;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +12,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.databinding.FragmentDetailBinding;
-import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
 import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
 
 import java.util.List;
@@ -52,6 +53,9 @@ public class DetailFragment extends VisibilityFragment {
         detailBinding = FragmentDetailBinding.inflate(inflater, container, false);
         if (null != getArguments()) {
             this.itemId = getArguments().getString("item_id");
+            if (TextUtils.isEmpty(itemId)) {
+                throw new IllegalArgumentException("arguments item_id should not be empty or null");
+            }
         }
         return detailBinding.getRoot();
     }
