@@ -20,6 +20,16 @@ public class CartItemModel {
     public int quantity;
     public int unitPrice;
 
+    @Override
+    public String toString() {
+        return "CartItemModel{" +
+                "id='" + id + '\'' +
+                ", itemId='" + itemId + '\'' +
+                ", quantity=" + quantity +
+                ", unitPrice=" + unitPrice +
+                '}';
+    }
+
     public static List<CartItemModel> fromJSONArray(String json) {
         if (TextUtils.isEmpty(json)) {
             return null;

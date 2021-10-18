@@ -15,6 +15,15 @@ public class ErrorModel {
     public int code;
     public String status;
 
+    @Override
+    public String toString() {
+        return "ErrorModel{" +
+                "error='" + error + '\'' +
+                ", code=" + code +
+                ", status='" + status + '\'' +
+                '}';
+    }
+
     public static ErrorModel fromJSON(String json) {
         if (TextUtils.isEmpty(json)) {
             return null;

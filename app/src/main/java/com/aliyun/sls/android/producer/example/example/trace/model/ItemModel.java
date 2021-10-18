@@ -22,6 +22,19 @@ public class ItemModel {
     public int count;
     public List<String> tag;
 
+    @Override
+    public String toString() {
+        return "ItemModel{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", imageUrl=" + imageUrl +
+                ", price=" + price +
+                ", count=" + count +
+                ", tag=" + tag +
+                '}';
+    }
+
     public static ItemModel fromJSON(String json) {
         if (TextUtils.isEmpty(json)) {
             return null;

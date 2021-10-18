@@ -27,6 +27,19 @@ public class OrderModel {
 
     public List<CartItemModel> items;
 
+    @Override
+    public String toString() {
+        return "OrderModel{" +
+                "id='" + id + '\'' +
+                ", customerId='" + customerId + '\'' +
+                ", date='" + date + '\'' +
+                ", shipment='" + shipment + '\'' +
+                ", status='" + status + '\'' +
+                ", total=" + total +
+                ", items=" + items +
+                '}';
+    }
+
     public static OrderModel fromJSON(String json) {
         try {
             JSONObject object = new JSONObject(json);

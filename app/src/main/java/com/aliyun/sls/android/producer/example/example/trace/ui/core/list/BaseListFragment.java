@@ -18,6 +18,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.aliyun.sls.android.producer.example.databinding.BaseListContainerLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.trace.UITracer;
 
 import java.lang.reflect.ParameterizedType;
 
@@ -68,7 +69,18 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
 
         final RecyclerView recyclerView = listContainerLayoutBinding.baseRecyclerview;
         recyclerView.setLayoutManager(onCreateLayoutManager(getActivity()));
-        final BaseRecyclerAdapter<BIND, ITEM> adapter = new BaseRecyclerAdapter<>(viewUpdater);
+        final BaseRecyclerAdapter<BIND, ITEM> adapter = new BaseRecyclerAdapter<>(new BaseRecyclerAdapter.IViewContract<BIND, ITEM>() {
+            @Override
+            public BIND onCreateBinding(LayoutInflater inflater, ViewGroup parent, int viewType) {
+                return viewUpdater.onCreateBinding(inflater, parent, viewType);
+            }
+
+            @Override
+            public void onUpdate(BIND bind, ITEM item, int pos) {
+                viewUpdater.onUpdate(bind, item, pos);
+                UITracer.traceExpose(bind, item, pos);
+            }
+        });
         recyclerView.setAdapter(adapter);
 
         onInitRecyclerView(getActivity(), recyclerView);
@@ -86,7 +98,7 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
     protected void onInitRecyclerView(Context context, RecyclerView recyclerView) {
         final int padding = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, context.getResources().getDisplayMetrics()) + 0.5f);
         recyclerView.setPadding(recyclerView.getPaddingLeft() + padding
-                , (int) (recyclerView.getPaddingTop() + padding/ 2f + 0.5f)
+                , (int) (recyclerView.getPaddingTop() + padding / 2f + 0.5f)
                 , recyclerView.getPaddingRight() + padding
                 , recyclerView.getPaddingBottom());
     }
