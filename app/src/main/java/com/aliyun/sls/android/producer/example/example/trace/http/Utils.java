@@ -36,4 +36,24 @@ class Utils {
 
         return null;
     }
+
+    public static String getCookie(String[] headers) {
+        boolean found = false;
+        for (String header : headers) {
+            if (TextUtils.isEmpty(header)) {
+                continue;
+            }
+
+            if (header.contains("Set-Cookie")) {
+                found = true;
+                continue;
+            }
+
+            if (found) {
+                return header;
+            }
+        }
+
+        return null;
+    }
 }

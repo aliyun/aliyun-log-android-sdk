@@ -1,6 +1,11 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.mine;
 
+import androidx.lifecycle.MutableLiveData;
+
+import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
+import com.aliyun.sls.android.producer.example.example.trace.model.UserModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
+import com.aliyun.sls.android.producer.example.example.trace.utils.UserUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +16,12 @@ import java.util.List;
  */
 public class MineViewModel extends BaseListViewModel<MineModel> {
 
+    public MutableLiveData<UserModel> userModelMutableLiveData;
+
     public MineViewModel() {
         super("mine");
+        userModelMutableLiveData = new MutableLiveData<>();
+        userModelMutableLiveData.setValue(UserUtils.userModel);
     }
 
     @Override
@@ -30,5 +39,21 @@ public class MineViewModel extends BaseListViewModel<MineModel> {
 
         items.setValue(models);
         status.setValue(Status.success());
+    }
+
+    public void getCustomerInfo(String loginId) {
+        ApiClient.getCustomerInfo(loginId, new ApiClient.ApiCallback<UserModel>() {
+            @Override
+            public void onSuccess(UserModel userModel) {
+                UserUtils.userModel = userModel;
+                userModelMutableLiveData.setValue(userModel);
+                status.setValue(BaseListViewModel.Status.success());
+            }
+
+            @Override
+            public void onError(int code, String error) {
+
+            }
+        });
     }
 }

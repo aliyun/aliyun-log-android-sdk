@@ -134,6 +134,7 @@ public class ApiClient {
             HttpTool.Response response = HttpTool.get(API_USER_LOGIN, headers, context);
             if (response.success()) {
                 final String loginId = Utils.getLoginId(response.headers);
+                SLSCookieManager.setCookie(response.headers);
                 postInMainThread(() -> callback.onSuccess(loginId));
             } else {
                 postError(response, callback);

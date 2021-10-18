@@ -45,11 +45,6 @@ public class HttpTool {
     private static SLSTelemetrySdk traceSdk = SLSTracePlugin.getInstance().getTelemetrySdk();
     private static Tracer tracer = traceSdk.getTracer("HttpTool");
 
-    static {
-        CookieManager manager = new CookieManager();
-        CookieHandler.setDefault(manager);
-    }
-
     private HttpTool() {
         //no instance
     }
@@ -104,6 +99,10 @@ public class HttpTool {
 //            if (!TextUtils.isEmpty(UserUtils.loginId)) {
 //                connection.setRequestProperty("Cookie", "logged_in=" + UserUtils.loginId);
 //            }
+            final String cookie = SLSCookieManager.getCookie();
+            if (!TextUtils.isEmpty(cookie)) {
+                connection.setRequestProperty("Cookie", cookie);
+            }
 
             if (header != null) {
                 int pairs = header.length / 2;
