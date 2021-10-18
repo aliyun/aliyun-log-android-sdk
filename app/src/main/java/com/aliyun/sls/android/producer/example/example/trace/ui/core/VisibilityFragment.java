@@ -175,7 +175,7 @@ public class VisibilityFragment extends BaseFragment implements View.OnAttachSta
     }
 
     private String getSpanName(String name) {
-        return this.getSpanName() + "_" + name;
+        return name + ": " + this.getSpanName();
     }
 
     private String getSpanName() {
@@ -188,24 +188,23 @@ public class VisibilityFragment extends BaseFragment implements View.OnAttachSta
     protected void onVisibilityChanged(boolean visible) {
         info("==> onVisibilityChanged = " + visible);
         if (visible) {
-            pageSpan = tracer.spanBuilder(getSpanName("Page_Appear"))
+            pageSpan = tracer.spanBuilder(getSpanName("Page In"))
                     .startSpan()
-                    .setAttribute("component", "Android.Fragment")
-                    .setAttribute("fragment.name", getSpanName())
-                    .setAttribute("page.method", "Page_Appear");
+                    .setAttribute("component", "Android.Page")
+                    .setAttribute("page.name", getSpanName())
+                    .setAttribute("page.visibility", "visible");
             scope = pageSpan.makeCurrent();
         } else {
-            tracer.spanBuilder(getSpanName("Page_disappear"))
+            tracer.spanBuilder(getSpanName("Page Out"))
                     .startSpan()
-                    .setAttribute("component", "Android.Fragment")
-                    .setAttribute("fragment.name", getSpanName())
-                    .setAttribute("page.method", "Page_Disappear")
+                    .setAttribute("component", "Android.Page")
+                    .setAttribute("page.name", getSpanName())
+                    .setAttribute("page.visibility", "in_visibile")
                     .end();
 
             pageSpan.end();
             scope.close();
         }
-
 
         for (OnFragmentVisibilityChangedListener listener : listeners) {
             listener.onFragmentVisibilityChanged(visible);
