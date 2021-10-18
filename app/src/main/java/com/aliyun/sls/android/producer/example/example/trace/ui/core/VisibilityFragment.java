@@ -20,7 +20,7 @@ import io.opentelemetry.context.Scope;
 /**
  * @author gordon
  */
-public class VisibilityFragment extends Fragment implements View.OnAttachStateChangeListener, OnFragmentVisibilityChangedListener {
+public class VisibilityFragment extends BaseFragment implements View.OnAttachStateChangeListener, OnFragmentVisibilityChangedListener {
     private static final String TAG = "VisibilityFragment";
     /**
      * ParentActivity是否可见
