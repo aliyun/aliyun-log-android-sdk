@@ -37,7 +37,7 @@ public class DetailViewModel extends TraceViewModel {
 
             @Override
             public void onError(int code, String error) {
-
+                itemModelMutableLiveData.setValue(null);
             }
         });
     }

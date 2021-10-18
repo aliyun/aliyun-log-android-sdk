@@ -53,9 +53,6 @@ public class DetailFragment extends VisibilityFragment {
         detailBinding = FragmentDetailBinding.inflate(inflater, container, false);
         if (null != getArguments()) {
             this.itemId = getArguments().getString("item_id");
-            if (TextUtils.isEmpty(itemId)) {
-                throw new IllegalArgumentException("arguments item_id should not be empty or null");
-            }
         }
         return detailBinding.getRoot();
     }
@@ -79,6 +76,12 @@ public class DetailFragment extends VisibilityFragment {
     }
 
     private void updateUI(ItemModel model) {
+        if (null == model) {
+            if (TextUtils.isEmpty(itemId)) {
+                throw new NullPointerException("fragment arguments item_id must not be null or empty.");
+            }
+            return;
+        }
         detailBinding.traceDetailDescText.setText(model.description);
         setTile(model.name);
 
