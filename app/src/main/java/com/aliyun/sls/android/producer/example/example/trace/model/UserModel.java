@@ -16,6 +16,10 @@ public class UserModel {
     public static UserModel fromJSON(String json) {
         try {
             JSONObject object = new JSONObject(json);
+            if (!object.has("id")) {
+                return null;
+            }
+
             UserModel model = new UserModel();
             model.firstName = object.optString("firstName");
             model.id = object.optString("id");

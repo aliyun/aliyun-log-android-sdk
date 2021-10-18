@@ -30,29 +30,13 @@ public class LoginViewModel extends TraceViewModel {
         ApiClient.login(userName, password, new ApiClient.ApiCallback<String>() {
             @Override
             public void onSuccess(String loginId) {
-                UserUtils.loginId = loginId;
-                getCustomerInfo(loginId);
-            }
-
-            @Override
-            public void onError(int code, String error) {
-                status.setValue(BaseListViewModel.Status.error(String.valueOf(code), error));
-            }
-        });
-    }
-
-    public void getCustomerInfo(String loginId) {
-        ApiClient.getCustomerInfo(loginId, new ApiClient.ApiCallback<UserModel>() {
-            @Override
-            public void onSuccess(UserModel userModel) {
-                UserUtils.userModel = userModel;
-                LoginViewModel.this.userModel.setValue(userModel);
+                UserUtils.setLoginId(loginId);
                 status.setValue(BaseListViewModel.Status.success());
             }
 
             @Override
             public void onError(int code, String error) {
-
+                status.setValue(BaseListViewModel.Status.error(String.valueOf(code), error));
             }
         });
     }
