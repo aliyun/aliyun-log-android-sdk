@@ -20,7 +20,7 @@ public class CartItemModel {
     public int quantity;
     public int unitPrice;
 
-    public static List<CartItemModel> parseJson(String json) {
+    public static List<CartItemModel> fromJSONArray(String json) {
         if (TextUtils.isEmpty(json)) {
             return null;
         }
@@ -34,7 +34,7 @@ public class CartItemModel {
 
         List<CartItemModel> itemModelList = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
-            CartItemModel itemModel = CartItemModel.fromJson(array.optJSONObject(i).toString());
+            CartItemModel itemModel = CartItemModel.fromJSON(array.optJSONObject(i).toString());
             if (null != itemModel) {
                 itemModelList.add(itemModel);
             }
@@ -43,7 +43,7 @@ public class CartItemModel {
         return itemModelList;
     }
 
-    public static CartItemModel fromJson(String json) {
+    public static CartItemModel fromJSON(String json) {
         if (TextUtils.isEmpty(json)) {
             return null;
         }

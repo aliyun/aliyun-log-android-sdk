@@ -41,7 +41,7 @@ public class OrderModel {
             model.total = object.optLong("total");
 
             if (object.has("items")) {
-                model.items = CartItemModel.parseJson(object.optJSONArray("items").toString());
+                model.items = CartItemModel.fromJSONArray(object.optJSONArray("items").toString());
             }
 
             return model;

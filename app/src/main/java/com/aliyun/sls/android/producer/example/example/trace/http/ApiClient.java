@@ -53,7 +53,7 @@ public class ApiClient {
         ThreadUtils.exec(() -> {
             HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue?size=10", Context.current().with(span));
             if (response.success()) {
-                List<ItemModel> modelList = ItemModel.parseJSON(response.data);
+                List<ItemModel> modelList = ItemModel.fromJSONArray(response.data);
                 if (null != modelList) {
                     postInMainThread(() -> callback.onSuccess(modelList));
                     return;
@@ -98,7 +98,7 @@ public class ApiClient {
         ThreadUtils.exec(() -> {
             HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart", context);
             if (response.success()) {
-                List<CartItemModel> itemModelList = CartItemModel.parseJson(response.data);
+                List<CartItemModel> itemModelList = CartItemModel.fromJSONArray(response.data);
                 if (null != itemModelList) {
                     postInMainThread(() -> callback.onSuccess(itemModelList));
                     return;
