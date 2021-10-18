@@ -40,8 +40,6 @@ public class LoginFragment extends VisibilityFragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        binding.loginLoginBtn.setOnClickListener(v -> {
-            viewModel.doLogin(binding.loginUsernameEdit.getText().toString(), binding.loginPasswordEdit.getText().toString());
-        });
+        binding.loginLoginBtn.setOnClickListener(v -> viewModel.doLogin(binding.loginUsernameEdit.getText().toString(), binding.loginPasswordEdit.getText().toString()));
     }
 }

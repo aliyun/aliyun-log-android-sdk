@@ -6,6 +6,9 @@ import androidx.viewbinding.ViewBinding;
 
 import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
 
+import java.util.Map;
+
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 
 /**
@@ -29,8 +32,14 @@ public final class UITracer {
                 .end());
     }
 
-    public static void traceClick() {
-
+    public static void traceClick(String module, String event, Map<String, String> ext) {
+        Span span = tracer.spanBuilder(String.format("click_%s_%s", module, event)).startSpan();
+        if (null != ext) {
+            for (Map.Entry<String, String> entry : ext.entrySet()) {
+                span.setAttribute(entry.getKey(), entry.getValue());
+            }
+        }
+        span.end();
     }
 
     public static void tracePage() {

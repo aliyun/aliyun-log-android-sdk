@@ -5,7 +5,6 @@ import android.os.Looper;
 import android.util.Base64;
 
 import com.aliyun.sls.android.JsonUtil;
-import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ErrorModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
@@ -20,10 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Context;
-
 /**
  * @author gordon
  * @date 2021/09/01
@@ -31,13 +26,15 @@ import io.opentelemetry.context.Context;
 public class ApiClient {
 
     private static final String API_BASE = "http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com";
-    private static final String API_ORDER_LIST = API_BASE + "/orders";
-    private static final String API_USER_LOGIN = API_BASE + "/login";
-    private static final String API_USER_CUSTOMER = API_BASE + "/customers";
-    private static final String API_ORDER_CREATE = API_BASE + "/orders";
 
-    private static Tracer tracer = SLSTracePlugin.getInstance().getTelemetrySdk().getTracer("ApiClient");
-    private static Handler handler = new Handler(Looper.getMainLooper());
+    private static final String API_CATEGORY = "/catalogue";
+    private static final String API_CART = "/cart";
+    private static final String API_ORDER_LIST = "/orders";
+    private static final String API_USER_LOGIN = "/login";
+    private static final String API_USER_CUSTOMER = "/customers";
+    private static final String API_ORDER_CREATE = "/orders";
+
+    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
     public interface ApiCallback<RESULT> {
         void onSuccess(RESULT result);
@@ -45,13 +42,8 @@ public class ApiClient {
         void onError(int code, String error);
     }
 
-
     public static void getCategory(ApiCallback<List<ItemModel>> callback) {
-        Span span = tracer.spanBuilder("getCategory").startSpan();
-        span.end();
-
-        ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue?size=10", Context.current().with(span));
+        HttpTool.get(API_BASE, API_CATEGORY + "?size=10", response -> {
             if (response.success()) {
                 List<ItemModel> modelList = ItemModel.fromJSONArray(response.data);
                 if (null != modelList) {
@@ -64,9 +56,7 @@ public class ApiClient {
     }
 
     public static void getDetail(final String id, ApiCallback<ItemModel> callback) {
-        final Context context = Context.current();
-        ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue/" + id, context);
+        HttpTool.get(API_BASE, API_CATEGORY + "/" + id, response -> {
             if (response.success()) {
                 ItemModel model = ItemModel.fromJSON(response.data);
                 if (null != model) {
@@ -80,10 +70,9 @@ public class ApiClient {
     }
 
     public static void addToCart(final String id, ApiCallback<Boolean> callback) {
-        ThreadUtils.exec(() -> {
-            JSONObject parameters = new JSONObject();
-            JsonUtil.putOpt(parameters, "id", id);
-            HttpTool.Response response = HttpTool.post("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart", null, parameters.toString());
+        JSONObject parameters = new JSONObject();
+        JsonUtil.putOpt(parameters, "id", id);
+        HttpTool.post(API_BASE, API_CART, parameters.toString(), response -> {
             if (response.success()) {
                 postInMainThread(() -> callback.onSuccess(true));
                 return;
@@ -94,9 +83,7 @@ public class ApiClient {
     }
 
     public static void getCart(ApiCallback<List<CartItemModel>> callback) {
-        final Context context = Context.current();
-        ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart", context);
+        HttpTool.get(API_BASE, API_CART, response -> {
             if (response.success()) {
                 List<CartItemModel> itemModelList = CartItemModel.fromJSONArray(response.data);
                 if (null != itemModelList) {
@@ -110,9 +97,7 @@ public class ApiClient {
     }
 
     public static void getOrders(ApiCallback<List<OrderModel>> callback) {
-        final Context context = Context.current();
-        ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get(API_ORDER_LIST, context);
+        HttpTool.get(API_BASE, API_ORDER_LIST, response -> {
             if (response.success()) {
                 List<OrderModel> itemModelList = OrderModel.fromJSONArray(response.data);
                 if (null != itemModelList) {
@@ -126,12 +111,10 @@ public class ApiClient {
     }
 
     public static void login(String userName, String password, ApiCallback<String> callback) {
-        final Context context = Context.current();
-        ThreadUtils.exec(() -> {
-            Map<String, String> headers = new HashMap<>();
-            headers.put("Authorization", "Basic " + base64(userName + ":" + password));
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Basic " + base64(userName + ":" + password));
 
-            HttpTool.Response response = HttpTool.get(API_USER_LOGIN, headers, context);
+        HttpTool.get(API_BASE, API_USER_LOGIN, headers, response -> {
             if (response.success()) {
                 final String loginId = Utils.getLoginId(response.headers);
                 SLSCookieManager.setCookie(response.headers);
@@ -143,9 +126,7 @@ public class ApiClient {
     }
 
     public static void getCustomerInfo(String loginId, ApiCallback<UserModel> callback) {
-        final Context context = Context.current();
-        ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get(API_USER_CUSTOMER + "/" + loginId, context);
+        HttpTool.get(API_BASE, API_USER_CUSTOMER + "/" + loginId, response -> {
             if (response.success()) {
                 UserModel model = UserModel.fromJSON(response.data);
                 if (null != model) {
@@ -159,15 +140,15 @@ public class ApiClient {
     }
 
     public static void createOrder(ApiCallback<Boolean> callback) {
-        final Context context = Context.current();
         ThreadUtils.exec(() -> {
-            HttpTool.Response response = HttpTool.get(API_ORDER_CREATE, context);
-            if (response.success()) {
-                postInMainThread(() -> callback.onSuccess(true));
-                return;
-            }
+            HttpTool.get(API_BASE, API_ORDER_CREATE, response -> {
+                if (response.success()) {
+                    postInMainThread(() -> callback.onSuccess(true));
+                    return;
+                }
 
-            postError(response, callback);
+                postError(response, callback);
+            });
         });
     }
 
@@ -182,7 +163,7 @@ public class ApiClient {
     }
 
     private static void postInMainThread(Runnable r) {
-        handler.post(r);
+        HANDLER.post(r);
     }
 
     private static String base64(String content) {

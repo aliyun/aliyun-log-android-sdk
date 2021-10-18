@@ -7,7 +7,11 @@ import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.UserModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
+import com.aliyun.sls.android.producer.example.example.trace.ui.core.trace.UITracer;
 import com.aliyun.sls.android.producer.example.example.trace.utils.UserUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author gordon
@@ -27,6 +31,10 @@ public class LoginViewModel extends TraceViewModel {
     }
 
     public void doLogin(final String userName, final String password) {
+        Map<String, String> ext = new HashMap<>();
+        ext.put("user_name", userName);
+        UITracer.traceClick(getModelName(), "login", ext);
+
         ApiClient.login(userName, password, new ApiClient.ApiCallback<String>() {
             @Override
             public void onSuccess(String loginId) {
