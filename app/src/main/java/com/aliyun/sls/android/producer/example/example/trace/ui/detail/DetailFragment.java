@@ -39,6 +39,12 @@ public class DetailFragment extends VisibilityFragment {
         return fragment;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTile("");
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -70,6 +76,7 @@ public class DetailFragment extends VisibilityFragment {
 
     private void updateUI(ItemModel model) {
         detailBinding.traceDetailDescText.setText(model.description);
+        setTile(model.name);
 
         updateImage(model.imageUrl);
     }

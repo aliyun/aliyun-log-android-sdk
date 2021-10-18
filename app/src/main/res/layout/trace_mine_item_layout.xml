@@ -11,6 +11,7 @@
         android:id="@+id/mine_user_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="24dp"
         android:orientation="horizontal"
         android:visibility="gone"
         tools:visibility="visible">
@@ -50,8 +51,8 @@
             android:id="@+id/mine_item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="title"
-            android:textSize="24dp" />
+            android:textSize="24dp"
+            tools:text="title" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

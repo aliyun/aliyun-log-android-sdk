@@ -86,6 +86,7 @@ public class ApiClient {
             HttpTool.Response response = HttpTool.post("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/cart", null, parameters.toString());
             if (response.success()) {
                 postInMainThread(() -> callback.onSuccess(true));
+                return;
             }
 
             postError(response, callback);

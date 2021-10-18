@@ -21,8 +21,7 @@
             android:name=".example.trace.TraceActivity"
             android:exported="true"
             android:label="@string/title_activity_trace" />
-        <activity android:name=".example.trace.ui.order.detail.DetailActivity"/>
-        <activity android:name=".example.trace.ui.FragmentActivity"/>
+        <activity android:name=".example.trace.ui.FragmentActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
