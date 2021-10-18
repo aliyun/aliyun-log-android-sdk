@@ -9,6 +9,7 @@ import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ErrorModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
+import com.aliyun.sls.android.producer.example.example.trace.model.OrderModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.UserModel;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
 
@@ -33,6 +34,7 @@ public class ApiClient {
     private static final String API_ORDER_LIST = API_BASE + "/orders";
     private static final String API_USER_LOGIN = API_BASE + "/login";
     private static final String API_USER_CUSTOMER = API_BASE + "/customers";
+    private static final String API_ORDER_CREATE = API_BASE + "/orders";
 
     private static Tracer tracer = SLSTracePlugin.getInstance().getTelemetrySdk().getTracer("ApiClient");
     private static Handler handler = new Handler(Looper.getMainLooper());
@@ -106,12 +108,12 @@ public class ApiClient {
         });
     }
 
-    public static void getOrders(ApiCallback<List<CartItemModel>> callback) {
+    public static void getOrders(ApiCallback<List<OrderModel>> callback) {
         final Context context = Context.current();
         ThreadUtils.exec(() -> {
             HttpTool.Response response = HttpTool.get(API_ORDER_LIST, context);
             if (response.success()) {
-                List<CartItemModel> itemModelList = CartItemModel.parseJson(response.data);
+                List<OrderModel> itemModelList = OrderModel.fromJSONArray(response.data);
                 if (null != itemModelList) {
                     postInMainThread(() -> callback.onSuccess(itemModelList));
                     return;
@@ -148,6 +150,19 @@ public class ApiClient {
                     postInMainThread(() -> callback.onSuccess(model));
                     return;
                 }
+            }
+
+            postError(response, callback);
+        });
+    }
+
+    public static void createOrder(ApiCallback<Boolean> callback) {
+        final Context context = Context.current();
+        ThreadUtils.exec(() -> {
+            HttpTool.Response response = HttpTool.get(API_ORDER_CREATE, context);
+            if (response.success()) {
+                postInMainThread(() -> callback.onSuccess(true));
+                return;
             }
 
             postError(response, callback);

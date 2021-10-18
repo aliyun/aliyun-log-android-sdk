@@ -1,28 +1,20 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.cart;
 
-import android.content.Context;
 import android.widget.Toast;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-
 import com.aliyun.sls.android.producer.example.SLSGlobal;
-import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
-import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
 
 import java.util.List;
-
-import io.opentelemetry.api.trace.Span;
 
 /**
  * @author gordon
  * @date 2021/09/01
  */
 public class CartViewModel extends BaseListViewModel<CartItemModel> {
+    public static final int STATUS_TYPE_CREATE_ORDER = 0x3011;
 
 //    private MutableLiveData<List<CartItemModel>> itemLiveData;
 
@@ -43,6 +35,20 @@ public class CartViewModel extends BaseListViewModel<CartItemModel> {
             public void onError(int code, String error) {
                 status.setValue(Status.error(String.valueOf(code), error));
                 Toast.makeText(SLSGlobal.applicationContext, error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void createOrder() {
+        ApiClient.createOrder(new ApiClient.ApiCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean aBoolean) {
+                status.setValue(Status.success(STATUS_TYPE_CREATE_ORDER));
+            }
+
+            @Override
+            public void onError(int code, String error) {
+                status.setValue(Status.error(STATUS_TYPE_CREATE_ORDER, String.valueOf(code), error));
             }
         });
     }

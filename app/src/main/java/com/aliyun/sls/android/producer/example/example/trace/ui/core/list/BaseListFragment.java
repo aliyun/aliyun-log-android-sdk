@@ -95,14 +95,16 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
     }
 
     protected void onStatusChanged(BaseListViewModel.Status status) {
-        if (status.success) {
-            listContainerLayoutBinding.baseContentLayout.setVisibility(View.VISIBLE);
-            listContainerLayoutBinding.baseErrorLayout.setVisibility(View.GONE);
-        } else {
-            listContainerLayoutBinding.baseContentLayout.setVisibility(View.GONE);
-            listContainerLayoutBinding.baseErrorLayout.setVisibility(View.VISIBLE);
+        if (status.type == 1) {
+            if (status.success) {
+                listContainerLayoutBinding.baseContentLayout.setVisibility(View.VISIBLE);
+                listContainerLayoutBinding.baseErrorLayout.setVisibility(View.GONE);
+            } else {
+                listContainerLayoutBinding.baseContentLayout.setVisibility(View.GONE);
+                listContainerLayoutBinding.baseErrorLayout.setVisibility(View.VISIBLE);
 
-            listContainerLayoutBinding.baseErrorText.setText(status.error);
+                listContainerLayoutBinding.baseErrorText.setText(status.error);
+            }
         }
     }
 
