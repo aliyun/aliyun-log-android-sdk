@@ -435,6 +435,12 @@ Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1se
     return log_producer_config_set_callback_from_sender_thread((log_producer_config *) config, num);
 }
 
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1use_1webtracking(
+        JNIEnv *env, jclass clazz, jlong config, jint use) {
+    return log_producer_config_set_use_webtracking((log_producer_config *)config, use);
+}
+
 #ifdef __cplusplus
 }
 #endif
