@@ -22,6 +22,9 @@ import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseLi
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseRecyclerAdapter;
 import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+
 /**
  * @author gordon
  * @date 2021/09/01
@@ -53,7 +56,7 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
             }
 
             @Override
-            public void onUpdate(TraceItemCartLayoutBinding binding, CartItemModel cartModel, int pos) {
+            public void onUpdate(TraceItemCartLayoutBinding binding, CartItemModel cartModel, final int pos) {
                 binding.cartPriceText.setPrice(cartModel.unitPrice);
                 binding.cartCountText.setText(String.format("x%d", cartModel.quantity));
                 ApiClient.getDetail(cartModel.itemId, new ApiClient.ApiCallback<ItemModel>() {
@@ -70,9 +73,21 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
 
                     }
                 });
-                binding.getRoot().setOnClickListener(v -> FragmentActivity.startProductDetailPage(CartFragment.this.getContext(), cartModel.itemId));
+                binding.getRoot().setOnClickListener(v -> {
+                    tracer.spanBuilder("Clicked: start detail page").startSpan()
+                            .setAttribute("itemId", cartModel.itemId)
+                            .end();
+                    if (3 == pos) {
+                        mockCrash(null);
+                    }
+                    FragmentActivity.startProductDetailPage(CartFragment.this.getContext(), cartModel.itemId);
+                });
             }
         };
+    }
+
+    private void mockCrash(CartItemModel model) {
+        FragmentActivity.startProductDetailPage(CartFragment.this.getContext(), model.itemId);
     }
 
     @Override
