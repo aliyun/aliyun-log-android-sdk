@@ -78,13 +78,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void startActivity(Class<? extends Activity> clazz) {
         Intent intent = new Intent(this, clazz);
-        intent.putExtra("endpoint", PreferenceUtils.getEndpoint(this));
-        intent.putExtra("logProject", PreferenceUtils.getLogProject(this));
-        intent.putExtra("logStore", PreferenceUtils.getLogStore(this));
-        intent.putExtra("accessKeyId", PreferenceUtils.getAccessKeyId(this));
-        intent.putExtra("accessKeySecret", PreferenceUtils.getAccessKeySecret(this));
-        intent.putExtra("accessKeyToken", PreferenceUtils.getAccessKeyToken(this));
-
         startActivity(intent);
     }
 }
