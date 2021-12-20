@@ -65,7 +65,7 @@ public class ProducerWithNoPersistent extends BaseActivity {
             // 默认为64 * 1024 * 1024
             config.setMaxBufferLimit(64 * 1024 * 1024);
             // 发送线程数，默认为1
-            config.setSendThreadCount(1);
+            config.setSendThreadCount(3);
 
             //网络连接超时时间，整数，单位秒，默认为10
             config.setConnectTimeoutSec(10);
@@ -90,6 +90,11 @@ public class ProducerWithNoPersistent extends BaseActivity {
             //是否丢弃鉴权失败的日志，0 不丢弃，1丢弃
             //默认为 0，即不丢弃
             config.setDropUnauthorizedLog(0);
+            // 是否使用主线程回调
+            // false: 使用主线程回调。回调会在主线程上执行，且每个 client 都有自己单独的回调。
+            // true: 使用 sender 线程回调。回调会在 sender 现呈上执行，每次执行回调时都会 attach 一个新的 java 线程，所有 client 共用一个回调。
+            // 注意：默认使用 sender 线程回调。
+            config.setCallbackFromSenderThread(false);
 
             /**
              * 以下为关闭断点续传的配置

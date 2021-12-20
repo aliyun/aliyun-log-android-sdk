@@ -12,7 +12,7 @@ public final class HttpConfigProxy {
     private static final Map<String, String> PLUGIN_USER_AGENTS = new LinkedHashMap<>();
 
     static {
-        addPluginUserAgent("sls-android-sdk", "2.5.25");
+        addPluginUserAgent("sls-android-sdk", BuildConfig.VERSION_NAME);
     }
 
     private HttpConfigProxy() {

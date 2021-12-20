@@ -27,6 +27,10 @@ public class LogProducerConfig {
         this(null, endpoint, project, logstore, accessKeyId, accessKeySecret, securityToken);
     }
 
+    public LogProducerConfig(Context context) throws LogProducerException {
+        this(context, null, null, null);
+    }
+
     // @formatter:off
     public LogProducerConfig(Context context, String endpoint, String project, String logstore) throws LogProducerException {
         this(context, endpoint, project, logstore, null, null);
@@ -156,9 +160,6 @@ public class LogProducerConfig {
     }
 
     public void setEndpoint(String endpoint) {
-        if (TextUtils.isEmpty(endpoint)) {
-            endpoint = "please_set_endpoint";
-        }
         this.endpoint = endpoint;
         log_producer_config_set_endpoint(config, endpoint);
     }
@@ -168,9 +169,6 @@ public class LogProducerConfig {
     }
 
     public void setProject(String project) {
-        if (TextUtils.isEmpty(project)) {
-            project = "please_set_project";
-        }
         this.project = project;
         log_producer_config_set_project(config, project);
     }
@@ -180,9 +178,6 @@ public class LogProducerConfig {
     }
 
     public void setLogstore(String logstore) {
-        if (TextUtils.isEmpty(logstore)) {
-            logstore = "please_set_logstore";
-        }
         this.logstore = logstore;
         log_producer_config_set_logstore(config, logstore);
     }
