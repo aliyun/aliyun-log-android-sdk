@@ -15,6 +15,7 @@ public class LogProducerClient {
     private final long producer;
     private final long client;
     private IAddLogInterceptor addLogInterceptor;
+    private boolean enable = false;
 
     public LogProducerClient(LogProducerConfig logProducerConfig) throws LogProducerException {
         this(logProducerConfig, null);
@@ -36,6 +37,7 @@ public class LogProducerClient {
         if (!TextUtils.isEmpty(endpoint) && !TextUtils.isEmpty(project)) {
             TimeUtils.startUpdateServerTime(logProducerConfig.getContext(), endpoint, project);
         }
+        enable = true;
     }
 
     public LogProducerResult addLog(Log log) {
@@ -43,7 +45,7 @@ public class LogProducerClient {
     }
 
     public LogProducerResult addLog(Log log, int flush) {
-        if (client == 0 || log == null) {
+        if (!enable || client == 0 || log == null) {
             return LogProducerResult.LOG_PRODUCER_INVALID;
         }
 
@@ -80,7 +82,7 @@ public class LogProducerClient {
     }
 
     public LogProducerResult addLogRaw(byte[][] keys, byte[][] values) {
-        if (client == 0 || null == keys || null == values ) {
+        if (!enable || client == 0 || null == keys || null == values ) {
             return LogProducerResult.LOG_PRODUCER_INVALID;
         }
 
@@ -90,6 +92,10 @@ public class LogProducerClient {
     }
 
     public void destroyLogProducer() {
+        if (!enable) {
+            return;
+        }
+        enable = false;
         destroy_log_producer(producer);
     }
 
