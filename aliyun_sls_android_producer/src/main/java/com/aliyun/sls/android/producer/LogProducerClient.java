@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import java.util.Map;
 
+import com.aliyun.sls.android.producer.utils.ThreadUtils;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 
 public class LogProducerClient {
@@ -96,7 +97,13 @@ public class LogProducerClient {
             return;
         }
         enable = false;
-        destroy_log_producer(producer);
+        // destroy method will send data in mem. in case of anr, this should work on sub thread.
+        ThreadUtils.exec(new Runnable() {
+            @Override
+            public void run() {
+                destroy_log_producer(producer);
+            }
+        });
     }
 
     private static native long create_log_producer(long config, LogProducerCallback callback);
