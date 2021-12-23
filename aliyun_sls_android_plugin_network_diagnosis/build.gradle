@@ -29,9 +29,9 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'/*, '*.aar'*/])
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation project(":aliyun_sls_android_producer")
-    implementation project(":alinetworkdiagnosis")
 }
 
 ext {

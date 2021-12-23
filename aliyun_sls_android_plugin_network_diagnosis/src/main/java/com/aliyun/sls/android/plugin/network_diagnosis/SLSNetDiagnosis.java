@@ -3,8 +3,10 @@ package com.aliyun.sls.android.plugin.network_diagnosis;
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 
 import com.alibaba.netspeed.network.Diagnosis;
+import com.alibaba.netspeed.network.HttpConfig;
 import com.alibaba.netspeed.network.MtrConfig;
 import com.alibaba.netspeed.network.PingConfig;
 import com.alibaba.netspeed.network.TcpPingConfig;
@@ -22,17 +24,29 @@ import org.json.JSONObject;
  */
 public class SLSNetDiagnosis {
     private static final String TAG = "SLSNetwork";
-    /** default timeout: 1 second */
+    /**
+     * default timeout: 1 second
+     */
     @SuppressWarnings("PointlessArithmeticExpression")
     private static final int DEFAULT_TIMEOUT = 1 * 1000;
 
     private enum Type {
-        /** PING */
+        /**
+         * PING
+         */
         PING,
-        /** TCPPING */
+        /**
+         * TCPPING
+         */
         TCPPING,
-        /** MTR */
-        MTR
+        /**
+         * MTR
+         */
+        MTR,
+        /**
+         * HTTP
+         */
+        HTTP
     }
 
     private ISender sender;
@@ -78,6 +92,9 @@ public class SLSNetDiagnosis {
     private void report(Type type, String result, Callback callback) {
         SLSLog.e(TAG, "diagnosis, result: " + result);
         Scheme scheme = Scheme.createDefaultScheme(config);
+        if (!TextUtils.isEmpty(scheme.app_id) && scheme.app_id.contains("@")) {
+            scheme.app_id = scheme.app_id.substring(0, scheme.app_id.indexOf("@"));
+        }
         scheme.reserve6 = result;
 
         JSONObject reserves = new JSONObject();
@@ -87,6 +104,8 @@ public class SLSNetDiagnosis {
             JsonUtil.putOpt(reserves, "method", "TCPPING");
         } else if (type == Type.MTR) {
             JsonUtil.putOpt(reserves, "method", "MTR");
+        } else if (type == Type.HTTP) {
+            JsonUtil.putOpt(reserves, "method", "HTTP");
         } else {
             JsonUtil.putOpt(reserves, "method", "UNKNOWN");
         }
@@ -139,9 +158,22 @@ public class SLSNetDiagnosis {
     }
 
     public void mtr(String domain, int maxTtl, int maxPath, int maxTimes, int timeout, Callback callback) {
-        Diagnosis.startMtr(new MtrConfig(taskIdGenerator.generate(), domain, maxTtl, maxPath, maxTimes, timeout, (context, result) -> {
+        MtrConfig config = new MtrConfig(taskIdGenerator.generate(), domain, maxTtl, maxPath, maxTimes, timeout, (context, result) -> {
             report(Type.MTR, result, callback);
             return 0;
+        }, this);
+        config.setCombineCallback(true);
+        Diagnosis.startMtr(config);
+    }
+
+    public void http(String httpUrl, Callback callback) {
+        Diagnosis.startHttpPing(new HttpConfig(taskIdGenerator.generate(), httpUrl, (context, result) -> {
+            report(Type.HTTP, result, callback);
+            return 0;
         }, this));
+    }
+
+    public void http(String httpUrl) {
+        this.http(httpUrl, null);
     }
 }
