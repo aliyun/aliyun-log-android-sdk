@@ -30,7 +30,8 @@ public class SLSNetDataSender implements ISender {
     public void init(SLSConfig config) {
         this.slsConfig = config;
 
-        final String endpoint = "https://cn-shanghai.log.aliyuncs.com";
+//        final String endpoint = "http://pub-cn-hangzhou-staging-share.log.aliyuncs.com";
+        final String endpoint = "http://cn-shanghai.log.aliyuncs.com";
         final String logProjectName = "sls-aysls-network-monitor";
         final String logStoreName = "central-logsotre";
 
