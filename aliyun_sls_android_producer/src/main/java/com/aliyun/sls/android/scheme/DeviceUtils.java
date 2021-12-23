@@ -114,10 +114,6 @@ class DeviceUtils {
             return NETWORK_INFO_DEFAULT;
         } else {
             try {
-                if (!PermissionHelper.checkPermission(context, "android.permission.ACCESS_NETWORK_STATE")) {
-                    return NETWORK_INFO_DEFAULT;
-                }
-
                 ConnectivityManager cManager = (ConnectivityManager)context.getSystemService(
                     Context.CONNECTIVITY_SERVICE);
                 if (cManager == null) {
