@@ -16,58 +16,48 @@ import com.aliyun.sls.android.producer.example.R;
 import java.io.File;
 
 /**
- * 动态配置
+ * 推荐配置
  * @author gordon
  * @date 2021/08/18
  */
-public class ProducerWithDynamicConfig extends BaseActivity {
-    private static final String TAG = "ProducerWithDynamic";
+public class ProducerWithDestroy extends BaseActivity {
+    private static final String TAG = "ProducerWithDestroy";
 
-    private LogProducerConfig config = null;
     private LogProducerClient client = null;
-    private int index = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_producer_with_dynamic_config);
+        setContentView(R.layout.activity_producer_with_destroy);
         initProducer();
 
-        // 更新配置按钮
-        findViewById(R.id.example_update_config_text).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateConfig();
-            }
-        });
-        // 更新AK
-        findViewById(R.id.example_update_config_ak_text).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateAK();
-            }
-        });
-        // 重置
-        findViewById(R.id.example_reset_text).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                reset();
-            }
-        });
-        // 测试发送日志的按钮
         findViewById(R.id.example_send_one_text).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendLog();
             }
         });
+        findViewById(R.id.example_send_destroy_text).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                printStatus("开始销毁实例...");
+                client.destroyLogProducer();
+                printStatus("销毁实例完成.");
+            }
+        });
     }
 
     private void initProducer() {
         try {
-            config = new LogProducerConfig(this);
-            config.logProducerDebug();
+            // endpoint 必须是以 https:// 或 http:// 开头的链接
+            final String endpoint = this.endpoint;
+            final String project = this.logProject;
+            final String logstore = this.logStore;
+            final String accessKeyId = this.accessKeyId;
+            final String accessKeySecret = this.accessKeySecret;
+            final String accessKeyToken = this.accessKeyToken;
 
+            LogProducerConfig config = new LogProducerConfig(this, endpoint, project, logstore, accessKeyId, accessKeySecret, accessKeyToken);
             // 设置主题
             config.setTopic("test_topic");
             // 设置tag信息，此tag会附加在每条日志上
@@ -77,7 +67,7 @@ public class ProducerWithDynamicConfig extends BaseActivity {
             // 每个缓存的日志包中包含日志数量的最大值，取值为1~4096，默认为1024
             config.setPacketLogCount(1024);
             // 被缓存日志的发送超时时间，如果缓存超时，则会被立即发送，单位为毫秒，默认为3000
-            config.setPacketTimeout(3000);
+            config.setPacketTimeout(10000);
             // 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败
             // 默认为64 * 1024 * 1024
             config.setMaxBufferLimit(64 * 1024 * 1024);
@@ -146,17 +136,6 @@ public class ProducerWithDynamicConfig extends BaseActivity {
                     // compressedBytes: 日志压缩字节数
                     android.util.Log.e(TAG, String.format("resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", resultCode, reqId, errorMessage, logBytes, compressedBytes));
                     printStatus(String.format("send log resultCode: %s, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
-
-
-                    if (LogProducerResult.fromInt(resultCode) == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
-                        updateConfig();
-                    }
-
-                    if (index % 9 == 0 && LogProducerResult.fromInt(resultCode) == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
-                        updateAK();
-                    }
-
-                    index += 1;
                 }
             };
             // 需要关注日志的发送成功或失败状态时, 第二个参数需要传入一个 callbak
@@ -164,35 +143,6 @@ public class ProducerWithDynamicConfig extends BaseActivity {
         } catch (LogProducerException e) {
             e.printStackTrace();
         }
-    }
-
-    private void updateConfig() {
-        // endpoint 必须是以 https:// 或 http:// 开头的链接
-        final String endpoint = this.endpoint;
-        final String project = this.logProject;
-        final String logstore = this.logStore;
-
-        config.setEndpoint(endpoint);
-        config.setProject(project);
-        config.setLogstore(logstore);
-    }
-
-    private void updateAK() {
-        final String accessKeyId = this.accessKeyId;
-        final String accessKeySecret = this.accessKeySecret;
-        final String accessKeyToken = this.accessKeyToken;
-
-        config.setAccessKeyId(accessKeyId);
-        config.setAccessKeySecret(accessKeySecret);
-    }
-
-    private void reset() {
-        config.setEndpoint("");
-        config.setProject("");
-        config.setLogstore("");
-
-        config.setAccessKeyId("");
-        config.setAccessKeySecret("");
     }
 
     private void sendLog() {

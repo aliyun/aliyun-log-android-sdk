@@ -1,13 +1,14 @@
 package com.aliyun.sls.android.producer;
 
+import android.util.Log;
+
+import com.aliyun.sls.android.producer.utils.TimeUtils;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import android.util.Log;
-import com.aliyun.sls.android.producer.utils.TimeUtils;
 
 public class LogProducerHttpTool {
     private static final String TAG = "LogProducerHttpTool";
@@ -19,9 +20,12 @@ public class LogProducerHttpTool {
     public static int android_http_post(String urlString, String method, String[] header, byte[] body) {
         try {
             URL url = new URL(urlString);
-            HttpURLConnection httpConn = (HttpURLConnection)url.openConnection();
+            HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
 
-            httpConn.setDoOutput(true);
+            if ("post".equalsIgnoreCase(method)) {
+                httpConn.setDoOutput(true);
+            }
+
             httpConn.setRequestMethod(method);
             httpConn.setRequestProperty("User-agent", HttpConfigProxy.getUserAgent());
 
@@ -33,10 +37,14 @@ public class LogProducerHttpTool {
                     httpConn.setRequestProperty(key, val);
                 }
             }
-            DataOutputStream out = new DataOutputStream(httpConn.getOutputStream());
-            out.write(body);
-            out.flush();
-            out.close();
+
+            if ("post".equalsIgnoreCase(method)) {
+                DataOutputStream out = new DataOutputStream(httpConn.getOutputStream());
+                out.write(body);
+                out.flush();
+                out.close();
+            }
+
             String timeVal = httpConn.getHeaderField("x-log-time");
             if (timeVal != null && !"".equals(timeVal)) {
                 long serverTime = toLong(timeVal);
@@ -45,7 +53,9 @@ public class LogProducerHttpTool {
                 }
             }
             int responseCode = httpConn.getResponseCode();
-            if (responseCode / 100 == 2) { return responseCode; }
+            if (responseCode / 100 == 2) {
+                return responseCode;
+            }
             BufferedReader in = new BufferedReader(new InputStreamReader(httpConn.getErrorStream()));
             String inputLine;
             StringBuilder response = new StringBuilder();

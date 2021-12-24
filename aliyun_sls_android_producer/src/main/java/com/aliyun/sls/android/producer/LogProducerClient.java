@@ -1,8 +1,11 @@
 package com.aliyun.sls.android.producer;
 
+import android.text.TextUtils;
+
 import java.util.Map;
 
 import android.content.Context;
+import com.aliyun.sls.android.producer.utils.ThreadUtils;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 import com.aliyun.sls.android.scheme.Scheme;
 
@@ -18,6 +21,7 @@ public class LogProducerClient {
 
     @Deprecated
     private IAddLogInterceptor addLogInterceptor;
+    private boolean enable = false;
 
     public LogProducerClient(LogProducerConfig logProducerConfig) throws LogProducerException {
         this(logProducerConfig, null);
@@ -35,7 +39,12 @@ public class LogProducerClient {
             throw new LogProducerException("Can not create log producer client");
         }
 
-        TimeUtils.startUpdateServerTime(logProducerConfig.getContext(), logProducerConfig.getEndpoint(), logProducerConfig.getProject());
+        final String endpoint = logProducerConfig.getEndpoint();
+        final String project = logProducerConfig.getProject();
+        if (!TextUtils.isEmpty(endpoint) && !TextUtils.isEmpty(project)) {
+            TimeUtils.startUpdateServerTime(logProducerConfig.getContext(), endpoint, project);
+        }
+        enable = true;
     }
 
     public LogProducerResult addLog(Log log) {
@@ -43,7 +52,7 @@ public class LogProducerClient {
     }
 
     public LogProducerResult addLog(Log log, int flush) {
-        if (client == 0 || log == null) {
+        if (!enable || client == 0 || log == null) {
             return LogProducerResult.LOG_PRODUCER_INVALID;
         }
 
@@ -90,7 +99,7 @@ public class LogProducerClient {
     }
 
     public LogProducerResult addLogRaw(byte[][] keys, byte[][] values) {
-        if (client == 0 || null == keys || null == values ) {
+        if (!enable || client == 0 || null == keys || null == values ) {
             return LogProducerResult.LOG_PRODUCER_INVALID;
         }
 
@@ -100,7 +109,17 @@ public class LogProducerClient {
     }
 
     public void destroyLogProducer() {
-        destroy_log_producer(producer);
+        if (!enable) {
+            return;
+        }
+        enable = false;
+        // destroy method will send data in mem. in case of anr, this should work on sub thread.
+        ThreadUtils.exec(new Runnable() {
+            @Override
+            public void run() {
+                destroy_log_producer(producer);
+            }
+        });
     }
 
     private static native long create_log_producer(long config, LogProducerCallback callback);

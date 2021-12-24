@@ -16,44 +16,21 @@ import com.aliyun.sls.android.producer.example.R;
 import java.io.File;
 
 /**
- * 动态配置
+ * 立即发送。不推荐使用。使用该功能会导致每条日志都会单独发送
  * @author gordon
  * @date 2021/08/18
  */
-public class ProducerWithDynamicConfig extends BaseActivity {
-    private static final String TAG = "ProducerWithDynamic";
+public class ProducerWithImmediately extends BaseActivity {
+    private static final String TAG = "ProducerExample";
 
-    private LogProducerConfig config = null;
     private LogProducerClient client = null;
-    private int index = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_producer_with_dynamic_config);
+        setContentView(R.layout.activity_producer_with_persistent);
         initProducer();
 
-        // 更新配置按钮
-        findViewById(R.id.example_update_config_text).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateConfig();
-            }
-        });
-        // 更新AK
-        findViewById(R.id.example_update_config_ak_text).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateAK();
-            }
-        });
-        // 重置
-        findViewById(R.id.example_reset_text).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                reset();
-            }
-        });
         // 测试发送日志的按钮
         findViewById(R.id.example_send_one_text).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,9 +42,15 @@ public class ProducerWithDynamicConfig extends BaseActivity {
 
     private void initProducer() {
         try {
-            config = new LogProducerConfig(this);
-            config.logProducerDebug();
+            // endpoint 必须是以 https:// 或 http:// 开头的链接
+            final String endpoint = this.endpoint;
+            final String project = this.logProject;
+            final String logstore = this.logStore;
+            final String accessKeyId = this.accessKeyId;
+            final String accessKeySecret = this.accessKeySecret;
+            final String accessKeyToken = this.accessKeyToken;
 
+            LogProducerConfig config = new LogProducerConfig(this, endpoint, project, logstore, accessKeyId, accessKeySecret, accessKeyToken);
             // 设置主题
             config.setTopic("test_topic");
             // 设置tag信息，此tag会附加在每条日志上
@@ -82,7 +65,7 @@ public class ProducerWithDynamicConfig extends BaseActivity {
             // 默认为64 * 1024 * 1024
             config.setMaxBufferLimit(64 * 1024 * 1024);
             // 发送线程数，默认为1
-            config.setSendThreadCount(1);
+            config.setSendThreadCount(10);
 
             //网络连接超时时间，整数，单位秒，默认为10
             config.setConnectTimeoutSec(10);
@@ -146,17 +129,6 @@ public class ProducerWithDynamicConfig extends BaseActivity {
                     // compressedBytes: 日志压缩字节数
                     android.util.Log.e(TAG, String.format("resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", resultCode, reqId, errorMessage, logBytes, compressedBytes));
                     printStatus(String.format("send log resultCode: %s, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
-
-
-                    if (LogProducerResult.fromInt(resultCode) == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
-                        updateConfig();
-                    }
-
-                    if (index % 9 == 0 && LogProducerResult.fromInt(resultCode) == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
-                        updateAK();
-                    }
-
-                    index += 1;
                 }
             };
             // 需要关注日志的发送成功或失败状态时, 第二个参数需要传入一个 callbak
@@ -166,39 +138,13 @@ public class ProducerWithDynamicConfig extends BaseActivity {
         }
     }
 
-    private void updateConfig() {
-        // endpoint 必须是以 https:// 或 http:// 开头的链接
-        final String endpoint = this.endpoint;
-        final String project = this.logProject;
-        final String logstore = this.logStore;
-
-        config.setEndpoint(endpoint);
-        config.setProject(project);
-        config.setLogstore(logstore);
-    }
-
-    private void updateAK() {
-        final String accessKeyId = this.accessKeyId;
-        final String accessKeySecret = this.accessKeySecret;
-        final String accessKeyToken = this.accessKeyToken;
-
-        config.setAccessKeyId(accessKeyId);
-        config.setAccessKeySecret(accessKeySecret);
-    }
-
-    private void reset() {
-        config.setEndpoint("");
-        config.setProject("");
-        config.setLogstore("");
-
-        config.setAccessKeyId("");
-        config.setAccessKeySecret("");
-    }
-
     private void sendLog() {
-        com.aliyun.sls.android.producer.Log log = oneLog();
-        LogProducerResult result = client.addLog(log);
-        printStatus("addLog result: " + result);
+        for (int i = 0; i < 100; i++) {
+            com.aliyun.sls.android.producer.Log log = oneLog();
+            log.putContent("indexxxx", String.valueOf(i));
+            LogProducerResult result = client.addLog(log, 1);
+            printStatus("addLog result: " + result);
+        }
     }
 
     private com.aliyun.sls.android.producer.Log oneLog() {

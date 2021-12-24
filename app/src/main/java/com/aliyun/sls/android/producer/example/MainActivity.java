@@ -3,14 +3,20 @@ package com.aliyun.sls.android.producer.example;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.aliyun.sls.android.producer.example.example.crash.CrashExampleActivity;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerExample;
+import com.aliyun.sls.android.producer.example.example.producer.ProducerWithDestroy;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithDynamicConfig;
+import com.aliyun.sls.android.producer.example.example.producer.ProducerWithImmediately;
+import com.aliyun.sls.android.producer.example.example.producer.ProducerWithMultiClients;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithNoPersistent;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
 
@@ -27,6 +33,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.main_producer_basic).setOnClickListener(this);
         findViewById(R.id.main_producer_persistent).setOnClickListener(this);
         findViewById(R.id.main_producer_dynamic_config).setOnClickListener(this);
+        findViewById(R.id.main_producer_multi_clients).setOnClickListener(this);
+        findViewById(R.id.main_producer_immediately).setOnClickListener(this);
+        findViewById(R.id.main_producer_destroy).setOnClickListener(this);
         findViewById(R.id.main_apm_crash).setOnClickListener(this);
 
     }
@@ -42,21 +51,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (R.id.main_producer_dynamic_config == v.getId()) {
             // 动态配置
             startActivity(ProducerWithDynamicConfig.class);
+        } else if (R.id.main_producer_multi_clients == v.getId()) {
+            // 多 client（即：多个不同的 logstore）
+            startActivity(ProducerWithMultiClients.class);
+        } else if (R.id.main_producer_immediately == v.getId()) {
+            // 多 client（即：多个不同的 logstore）
+            startActivity(ProducerWithImmediately.class);
+        } else if (R.id.main_producer_destroy == v.getId()) {
+            // 销毁LogProducerClient
+            startActivity(ProducerWithDestroy.class);
         } else if (R.id.main_apm_crash == v.getId()) {
             // 崩溃监控
             startActivity(CrashExampleActivity.class);
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.example_menus, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.example_settings) {
+            SettingsActivity.start(this);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void startActivity(Class<? extends Activity> clazz) {
         Intent intent = new Intent(this, clazz);
-        intent.putExtra("endpoint", PreferenceUtils.getEndpoint(this));
-        intent.putExtra("logProject", PreferenceUtils.getLogProject(this));
-        intent.putExtra("logStore", PreferenceUtils.getLogStore(this));
-        intent.putExtra("accessKeyId", PreferenceUtils.getAccessKeyId(this));
-        intent.putExtra("accessKeySecret", PreferenceUtils.getAccessKeySecret(this));
-        intent.putExtra("accessKeyToken", PreferenceUtils.getAccessKeyToken(this));
-
         startActivity(intent);
     }
 }

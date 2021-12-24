@@ -33,35 +33,26 @@
         android:layout_height="120dp"
         android:textSize="14dp" />
 
-    <TableLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:stretchColumns="0,1,2">
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp">
 
-        <TableRow>
+        <Button
+            android:id="@+id/example_send_destroy_text"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="销毁实例" />
 
-            <Button
-                android:id="@+id/example_update_config_text"
-                android:text="更新Logstore" />
+        <Button
+            android:id="@+id/example_send_one_text"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="发送日志" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <Button
-                android:id="@+id/example_update_config_ak_text"
-                android:text="更新AK" />
-
-            <Button
-                android:id="@+id/example_reset_text"
-                android:text="重置" />
-        </TableRow>
-
-        <TableRow android:layout_marginTop="12dp">
-
-            <Button
-                android:id="@+id/example_send_one_text"
-                android:layout_span="3"
-                android:text="发送日志" />
-        </TableRow>
-
-    </TableLayout>
 
 </LinearLayout>
