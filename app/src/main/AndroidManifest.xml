@@ -29,6 +29,7 @@
         <activity android:name=".example.producer.ProducerWithNoPersistent"/>
         <activity android:name=".example.producer.ProducerWithDynamicConfig"/>
         <activity android:name=".example.producer.ProducerWithMultiClients" />
+        <activity android:name=".example.producer.ProducerWithDestroy" />
 
         <activity android:name=".example.crash.CrashExampleActivity"/>
     </application>
