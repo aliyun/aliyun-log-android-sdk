@@ -21,10 +21,11 @@ import java.io.File;
  * @date 2021/08/18
  */
 public class ProducerWithDynamicConfig extends BaseActivity {
-    private static final String TAG = "ProducerWithDynamicUpdate";
+    private static final String TAG = "ProducerWithDynamic";
 
     private LogProducerConfig config = null;
     private LogProducerClient client = null;
+    private int index = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,6 +40,20 @@ public class ProducerWithDynamicConfig extends BaseActivity {
                 updateConfig();
             }
         });
+        // 更新AK
+        findViewById(R.id.example_update_config_ak_text).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateAK();
+            }
+        });
+        // 重置
+        findViewById(R.id.example_reset_text).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reset();
+            }
+        });
         // 测试发送日志的按钮
         findViewById(R.id.example_send_one_text).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,7 +65,9 @@ public class ProducerWithDynamicConfig extends BaseActivity {
 
     private void initProducer() {
         try {
-            config = new LogProducerConfig(this, null, null, null);
+            config = new LogProducerConfig(this);
+            config.logProducerDebug();
+
             // 设置主题
             config.setTopic("test_topic");
             // 设置tag信息，此tag会附加在每条日志上
@@ -129,6 +146,17 @@ public class ProducerWithDynamicConfig extends BaseActivity {
                     // compressedBytes: 日志压缩字节数
                     android.util.Log.e(TAG, String.format("resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", resultCode, reqId, errorMessage, logBytes, compressedBytes));
                     printStatus(String.format("send log resultCode: %s, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
+
+
+                    if (LogProducerResult.fromInt(resultCode) == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
+                        updateConfig();
+                    }
+
+                    if (index % 9 == 0 && LogProducerResult.fromInt(resultCode) == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
+                        updateAK();
+                    }
+
+                    index += 1;
                 }
             };
             // 需要关注日志的发送成功或失败状态时, 第二个参数需要传入一个 callbak
@@ -143,16 +171,28 @@ public class ProducerWithDynamicConfig extends BaseActivity {
         final String endpoint = this.endpoint;
         final String project = this.logProject;
         final String logstore = this.logStore;
-        final String accessKeyId = this.accessKeyId;
-        final String accessKeySecret = this.accessKeySecret;
-        final String accessKeyToken = this.accessKeyToken;
 
         config.setEndpoint(endpoint);
         config.setProject(project);
         config.setLogstore(logstore);
+    }
+
+    private void updateAK() {
+        final String accessKeyId = this.accessKeyId;
+        final String accessKeySecret = this.accessKeySecret;
+        final String accessKeyToken = this.accessKeyToken;
 
         config.setAccessKeyId(accessKeyId);
         config.setAccessKeySecret(accessKeySecret);
+    }
+
+    private void reset() {
+        config.setEndpoint("");
+        config.setProject("");
+        config.setLogstore("");
+
+        config.setAccessKeyId("");
+        config.setAccessKeySecret("");
     }
 
     private void sendLog() {
