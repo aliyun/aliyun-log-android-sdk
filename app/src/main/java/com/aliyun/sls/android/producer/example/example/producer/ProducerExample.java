@@ -114,7 +114,6 @@ public class ProducerExample extends BaseActivity {
             config.setPersistentMaxFileSize(1024 * 1024);
             // 本地最多缓存的日志数，不建议超过1M，通常设置为65536即可
             config.setPersistentMaxLogCount(65536);
-            config.setUseWebtracking(true);
             config.logProducerDebug();
 
             /**
