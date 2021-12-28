@@ -16,6 +16,8 @@ import com.aliyun.sls.android.SLSLog;
 import com.aliyun.sls.android.plugin.ISender;
 import com.aliyun.sls.android.scheme.Scheme;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -159,7 +161,17 @@ public class SLSNetDiagnosis {
 
     public void mtr(String domain, int maxTtl, int maxPath, int maxTimes, int timeout, Callback callback) {
         MtrConfig config = new MtrConfig(taskIdGenerator.generate(), domain, maxTtl, maxPath, maxTimes, timeout, (context, result) -> {
-            report(Type.MTR, result, callback);
+            if (!TextUtils.isEmpty(result)) {
+                try {
+                    JSONArray array = new JSONArray(result);
+                    final int size = array.length();
+                    for (int i = 0; i < size; i++) {
+                        report(Type.MTR, array.getJSONObject(i).toString(), i == size - 1 ? callback : null);
+                    }
+                } catch (JSONException e) {
+                    report(Type.MTR, result, callback);
+                }
+            }
             return 0;
         }, this);
         config.setCombineCallback(true);
