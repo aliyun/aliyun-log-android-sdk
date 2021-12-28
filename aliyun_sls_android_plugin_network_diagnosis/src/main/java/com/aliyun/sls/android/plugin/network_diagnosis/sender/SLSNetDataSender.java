@@ -131,7 +131,7 @@ public class SLSNetDataSender implements ISender {
         TimeUtils.fixTime(log);
         final boolean res =  producerClient.addLog(log).isLogProducerResultOk();
         if (slsConfig.debuggable) {
-            SLSLog.v(TAG, "send log success.");
+            SLSLog.v(TAG, "add log success.");
         }
 
         return res;
