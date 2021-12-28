@@ -30,8 +30,7 @@ public class SLSNetDataSender implements ISender {
     public void init(SLSConfig config) {
         this.slsConfig = config;
 
-//        final String endpoint = "http://pub-cn-hangzhou-staging-share.log.aliyuncs.com";
-        final String endpoint = "http://cn-shanghai.log.aliyuncs.com";
+        final String endpoint = "https://cn-shanghai.log.aliyuncs.com";
         final String logProjectName = "sls-aysls-network-monitor";
         final String logStoreName = "central-logsotre";
 
@@ -88,13 +87,15 @@ public class SLSNetDataSender implements ISender {
             producerConfig.setPersistentMaxLogCount(65536);
             producerConfig.setDropDelayLog(0);
             producerConfig.setDropUnauthorizedLog(0);
+            producerConfig.setUseWebtracking(true);
+//            producerConfig.logProducerDebug();
 
 //            producerClient = new LogProducerClient(producerConfig);
             producerClient = new LogProducerClient(producerConfig,
                 (resultCode, reqId, errorMessage, logBytes, compressedBytes) -> {
                     if (config.debuggable) {
                         // @formatter:off
-                        SLSLog.e(TAG, SLSLog.format(
+                        SLSLog.d(TAG, SLSLog.format(
                             "client onCall. resultCode: %d, reqId: %s, errorMessage: %s, logByres: %d, compressedByres: %d",
                             resultCode, reqId, errorMessage, logBytes, compressedBytes));
                     }
