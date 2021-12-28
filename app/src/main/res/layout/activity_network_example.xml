@@ -33,13 +33,39 @@
         android:layout_height="120dp"
         android:textSize="14dp" />
 
-    <Button
-        android:id="@+id/example_send_one_text"
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:layout_marginTop="50dp"
-        android:text="PING" />
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/example_send_http_text"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="HTTP" />
+
+        <Button
+            android:id="@+id/example_send_ping_text"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="PING" />
+
+        <Button
+            android:id="@+id/example_send_tcpping_text"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="TCPPING" />
+
+        <Button
+            android:id="@+id/example_send_mtr_text"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="MTR" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 
 </LinearLayout>
