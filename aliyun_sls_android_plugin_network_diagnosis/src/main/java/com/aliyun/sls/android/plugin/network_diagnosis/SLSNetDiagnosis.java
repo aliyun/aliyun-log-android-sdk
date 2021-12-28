@@ -92,7 +92,9 @@ public class SLSNetDiagnosis {
     }
 
     private void report(Type type, String result, Callback callback) {
-        SLSLog.e(TAG, "diagnosis, result: " + result);
+        if (config.debuggable) {
+            SLSLog.v(TAG, "diagnosis, result: " + result);
+        }
         Scheme scheme = Scheme.createDefaultScheme(config);
         if (!TextUtils.isEmpty(scheme.app_id) && scheme.app_id.contains("@")) {
             scheme.app_id = scheme.app_id.substring(0, scheme.app_id.indexOf("@"));
