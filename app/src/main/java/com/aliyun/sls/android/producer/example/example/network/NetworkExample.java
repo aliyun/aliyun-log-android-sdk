@@ -69,6 +69,19 @@ public class NetworkExample extends BaseActivity {
                 printStatus(String.format("mtr result: %s", result));
             });
         });
+
+        findViewById(R.id.example_send_auto_text).setOnClickListener(this::auto);
+    }
+
+    private void auto(View v) {
+        printStatus("start auto...");
+
+        SLSNetDiagnosis.getInstance().ping("www.aliyun.com");
+        SLSNetDiagnosis.getInstance().http("https://www.aliyun.com");
+        SLSNetDiagnosis.getInstance().tcpPing("www.aliyun.com", 80);
+        SLSNetDiagnosis.getInstance().mtr("www.aliyun.com");
+
+        v.postDelayed(() -> auto(v), 30000);
     }
 
 
