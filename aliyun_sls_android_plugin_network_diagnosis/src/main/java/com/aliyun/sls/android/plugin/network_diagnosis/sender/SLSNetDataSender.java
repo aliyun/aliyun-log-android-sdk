@@ -31,7 +31,7 @@ public class SLSNetDataSender implements ISender {
         this.slsConfig = config;
 
         final String endpoint = "https://cn-shanghai.log.aliyuncs.com";
-        final String logProjectName = "sls-aysls-network-monitor";
+        final String logProjectName = "sls-aysls-network-diagnosis";
         final String logStoreName = "central-logsotre";
 
         if (config.debuggable) {
@@ -55,7 +55,7 @@ public class SLSNetDataSender implements ISender {
                         , config.accessKeyId
                         , config.accessKeySecret);
             }
-            producerConfig.setTopic("network_monitor");
+            producerConfig.setTopic("network_diagnosis");
             producerConfig.setPacketLogBytes(1024 * 1024 * 5);
             // 每个缓存的日志包中包含日志数量的最大值，取值为1~4096，默认为1024
             producerConfig.setPacketLogCount(4096);

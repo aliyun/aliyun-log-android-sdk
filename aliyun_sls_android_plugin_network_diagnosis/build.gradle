@@ -31,6 +31,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
+//    implementation "androidx.work:work-runtime:2.7.1"
     implementation project(":aliyun_sls_android_producer")
 }
 
