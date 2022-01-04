@@ -46,9 +46,15 @@ public class AppUtils {
         final ApplicationInfo applicationInfo = context.getApplicationInfo();
         if (null != applicationInfo) {
             int resId = applicationInfo.labelRes;
-            return appName = (0 == resId ?
-                applicationInfo.nonLocalizedLabel.toString()
-                : context.getString(resId));
+            if (0 != resId) {
+                return appName = context.getString(resId);
+            }
+
+            if (null != applicationInfo.nonLocalizedLabel) {
+                return appName = applicationInfo.nonLocalizedLabel.toString();
+            }
+
+            return context.getPackageName();
         }
 
         return "";
