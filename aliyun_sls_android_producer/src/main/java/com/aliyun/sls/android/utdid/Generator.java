@@ -17,33 +17,11 @@ import com.aliyun.sls.android.utils.PermissionHelper;
 class Generator {
 
     public static String getImei(Context context) {
-        if (!PermissionHelper.checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
-            return "";
-        }
-
-        TelephonyManager tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
-            try {
-                return tm.getImei();
-            } catch (Throwable e) {
-                return "";
-            }
-        } else {
-            return tm.getDeviceId();
-        }
+        return "";
     }
 
     public static String getImsi(Context context) {
-        if (!PermissionHelper.checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
-            return "";
-        }
-
-        TelephonyManager tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-        try {
-            return tm.getSubscriberId();
-        } catch (Throwable e) {
-            return "";
-        }
+        return "";
     }
 
     public static String md5(String code) {
