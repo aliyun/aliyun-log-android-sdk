@@ -16,7 +16,7 @@ import io.opentelemetry.api.trace.Tracer;
  * @date 2021/10/18
  */
 public final class UITracer {
-    private static Tracer tracer = SLSTracePlugin.getInstance().getTelemetrySdk().getTracer("UITracer");
+    private static Tracer tracer = SLSTracePlugin.getInstance().getSLSTelemetry().getTracer("UITracer");
 
     private UITracer() {
         //no instance
