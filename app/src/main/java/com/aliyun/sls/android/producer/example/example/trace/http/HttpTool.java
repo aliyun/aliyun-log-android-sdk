@@ -5,7 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.aliyun.sls.android.plugin.trace.SLSTelemetrySdk;
+import com.aliyun.sls.android.plugin.trace.SLSTelemetry;
 import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
 import com.aliyun.sls.android.producer.HttpConfigProxy;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
@@ -43,7 +43,7 @@ public class HttpTool {
         void onComplete(Response response);
     }
 
-    private static SLSTelemetrySdk traceSdk = SLSTracePlugin.getInstance().getTelemetrySdk();
+    private static SLSTelemetry traceSdk = SLSTracePlugin.getInstance().getSLSTelemetry();
     private static Tracer tracer = traceSdk.getTracer("HttpTool");
 
     private HttpTool() {

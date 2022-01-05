@@ -34,7 +34,7 @@ public class VisibilityFragment extends BaseFragment implements View.OnAttachSta
 
     private VisibilityFragment localParentFragment;
     private final List<OnFragmentVisibilityChangedListener> listeners = new ArrayList<>();
-    protected Tracer tracer = SLSTracePlugin.getInstance().getTelemetrySdk().getTracer(this.getClass().getSimpleName());
+    protected Tracer tracer = SLSTracePlugin.getInstance().getSLSTelemetry().getTracer(this.getClass().getSimpleName());
     private Span pageSpan;
     private Scope scope;
 

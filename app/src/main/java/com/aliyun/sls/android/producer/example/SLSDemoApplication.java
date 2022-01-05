@@ -69,7 +69,7 @@ public class SLSDemoApplication extends Application {
             }
 
             private void startSpan(Activity activity, String method) {
-                Tracer tracer = SLSTracePlugin.getInstance().getTelemetrySdk().getTracer(getActivityName(activity));
+                Tracer tracer = SLSTracePlugin.getInstance().getSLSTelemetry().getTracer(getActivityName(activity));
 
                 if (TextUtils.equals("Paused", method)) {
                     tracer.spanBuilder(getSpanName(activity, "Page_disappear")).startSpan()
