@@ -2,7 +2,6 @@ package com.aliyun.sls.android.plugin.trace;
 
 import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.plugin.AbstractPlugin;
-import com.aliyun.sls.android.plugin.trace.BuildConfig;
 
 /**
  * @author gordon
@@ -10,10 +9,11 @@ import com.aliyun.sls.android.plugin.trace.BuildConfig;
  */
 public class SLSTracePlugin extends AbstractPlugin {
 
-    private SLSTelemetrySdk telemetrySdk;
+    private SLSTelemetry slsTelemetry;
+    private SLSSpanExporter spanExporter;
 
     private static class Holder {
-        private static SLSTracePlugin INSTANCE = new SLSTracePlugin();
+        private static final SLSTracePlugin INSTANCE = new SLSTracePlugin();
     }
 
     public static SLSTracePlugin getInstance() {
@@ -26,7 +26,7 @@ public class SLSTracePlugin extends AbstractPlugin {
 
     @Override
     public String name() {
-        return "SLSTracePlugin";
+        return "trace";
     }
 
     @Override
@@ -36,11 +36,31 @@ public class SLSTracePlugin extends AbstractPlugin {
 
     @Override
     public void init(SLSConfig config) {
-        telemetrySdk = new SLSTelemetrySdk(config);
+        spanExporter = new SLSSpanExporter();
+        spanExporter.init(config);
+
+        slsTelemetry = new SLSTelemetry(config, spanExporter);
     }
 
-    public SLSTelemetrySdk getTelemetrySdk() {
-        return telemetrySdk;
+    public SLSTelemetry getSLSTelemetry() {
+        return slsTelemetry;
+    }
+
+    @Override
+    public void resetSecurityToken(String accessKeyId, String accessKeySecret, String securityToken) {
+        super.resetSecurityToken(accessKeyId, accessKeySecret, securityToken);
+        spanExporter.resetSecurityToken(accessKeyId, accessKeySecret, securityToken);
+    }
+
+    @Override
+    public void resetProject(String endpoint, String project, String logstore) {
+        super.resetProject(endpoint, project, logstore);
+        spanExporter.resetProject(endpoint, project, logstore);
+    }
+
+    @Override
+    public void updateConfig(SLSConfig config) {
+        super.updateConfig(config);
     }
 }
 

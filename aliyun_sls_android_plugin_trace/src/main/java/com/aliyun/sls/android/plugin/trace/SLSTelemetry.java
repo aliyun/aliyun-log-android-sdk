@@ -22,22 +22,21 @@ import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
-import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 
 /**
  * @author gordon
  * @date 2021/07/29
  */
-public class SLSTelemetrySdk {
+public class SLSTelemetry {
 
     private final OpenTelemetrySdk telemetrySdk;
 
-    SLSTelemetrySdk(SLSConfig config) {
+    SLSTelemetry(SLSConfig config, SLSSpanExporter spanExporter) {
         //no instance
         SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder()
 //                .setClock(new SLSClock())
                 .addSpanProcessor(SLSSpanProcessor.create(Arrays.asList(
-                        SimpleSpanProcessor.create(new SLSSpanExporter(config))
+                        SimpleSpanProcessor.create(spanExporter)
 //                        , new SLSDefaultSpanProcessor(config.context)
                         , new SLSAutoEndParentSpanProcessor()
                 )))

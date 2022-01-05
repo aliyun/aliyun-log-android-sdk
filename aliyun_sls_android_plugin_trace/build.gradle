@@ -9,7 +9,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -27,7 +27,8 @@ android {
 dependencies {
     implementation project(":aliyun_sls_android_producer")
 
-    api platform("io.opentelemetry:opentelemetry-bom:1.4.1")
+    // https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-bom
+    implementation 'io.opentelemetry:opentelemetry-bom:1.9.1'
     implementation 'io.opentelemetry:opentelemetry-sdk'
     api 'io.opentelemetry:opentelemetry-api'
 

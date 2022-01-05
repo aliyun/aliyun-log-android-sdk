@@ -25,6 +25,7 @@ public class SLSAutoEndParentSpanProcessor implements SpanProcessor {
 
     @Override
     public void onStart(Context parentContext, ReadWriteSpan span) {
+        // connect crash reporter
         if (TextUtils.equals("crash_reporter", span.getName())) {
             if (contextCacheList.get(span) == null) {
                 contextCacheList.put(span, parentContext);
@@ -43,6 +44,8 @@ public class SLSAutoEndParentSpanProcessor implements SpanProcessor {
         if (null != parentContext) {
             Span parentSpan = Span.fromContext(parentContext);
             if (null != parentSpan) {
+                // Auto end parent span and make spans will be in the special trace.
+                // The only scene is crash reporter current now.
                 parentSpan.end();
             }
             contextCacheList.remove(span);
