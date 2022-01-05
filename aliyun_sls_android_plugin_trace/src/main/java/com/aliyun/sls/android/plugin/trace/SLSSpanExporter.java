@@ -8,15 +8,19 @@ import android.text.TextUtils;
 import com.aliyun.sls.android.JsonUtil;
 import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.SLSLog;
+import com.aliyun.sls.android.plugin.ISender;
+import com.aliyun.sls.android.plugin.trace.utils.TraceTranslator;
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
+import com.aliyun.sls.android.producer.LogProducerResult;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -37,7 +41,7 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
  * @author gordon
  * @date 2021/07/29
  */
-public class SLSSpanExporter implements SpanExporter {
+public class SLSSpanExporter implements SpanExporter, ISender {
     private static final String TAG = "SLSSpanExporter";
 
     private LogProducerConfig config;
@@ -45,8 +49,13 @@ public class SLSSpanExporter implements SpanExporter {
 
     private SLSConfig slsConfig;
 
-    SLSSpanExporter(SLSConfig slsConfig) {
-        this.slsConfig = slsConfig;
+    SLSSpanExporter() {
+        // package only
+    }
+
+    @Override
+    public void init(SLSConfig config) {
+        this.slsConfig = config;
         initLogProducer();
     }
 
@@ -59,7 +68,7 @@ public class SLSSpanExporter implements SpanExporter {
         try {
             this.client = new LogProducerClient(config);
         } catch (LogProducerException e) {
-            // ignore
+            SLSLog.e(TAG, "new LogProducerClient() case error. e: " + e);
         }
     }
 
@@ -83,24 +92,25 @@ public class SLSSpanExporter implements SpanExporter {
         if (!TextUtils.isEmpty(slsConfig.pluginTraceLogStore)) {
             logStore = slsConfig.pluginTraceLogStore;
         } else {
-            logStore = slsConfig.pluginTraceLogStore;
+            logStore = slsConfig.pluginLogStore;
         }
 
         String accessKeyId = slsConfig.accessKeyId;
         String accessKeySecret = slsConfig.accessKeySecret;
+        String securityToken = slsConfig.securityToken;
         LogProducerConfig config;
         try {
-            config = new LogProducerConfig(context, endpoint, logProject, logStore, accessKeyId, accessKeySecret);
+            config = new LogProducerConfig(context, endpoint, logProject, logStore, accessKeyId, accessKeySecret, securityToken);
         } catch (LogProducerException e) {
             return null;
         }
 
-        config.setTopic("trace");
+        config.setTopic("trace_android");
         config.setPacketLogBytes(1024 * 1024 * 5);
         // 每个缓存的日志包中包含日志数量的最大值，取值为1~4096，默认为1024
         config.setPacketLogCount(4096);
         // 被缓存日志的发送超时时间，如果缓存超时，则会被立即发送，单位为毫秒，默认为3000
-        //        config.setPacketTimeout(3000);
+        config.setPacketTimeout(3000);
         // 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败
         // 默认为64 * 1024 * 1024
         config.setMaxBufferLimit(200 * 1024 * 1024);
@@ -131,24 +141,57 @@ public class SLSSpanExporter implements SpanExporter {
         return config;
     }
 
+
+    @Override
+    public boolean send(Log data) {
+        final LogProducerResult result = client.addLog(data);
+        if (LogProducerResult.LOG_PRODUCER_OK != result) {
+            SLSLog.e(TAG, "send spans to sls error. code: " + result);
+        } else if (slsConfig.debuggable) {
+            SLSLog.v(TAG, "send spans to sls success.");
+        }
+
+        return LogProducerResult.LOG_PRODUCER_OK == result;
+    }
+
+    @Override
+    public void resetSecurityToken(String accessKeyId, String accessKeySecret, String securityToken) {
+        this.config.resetSecurityToken(accessKeyId, accessKeySecret, securityToken);
+    }
+
+    @Override
+    public void resetProject(String endpoint, String project, String logstore) {
+        this.config.setEndpoint(endpoint);
+        this.config.setProject(project);
+        this.config.setLogstore(logstore);
+    }
+
     @Override
     public CompletableResultCode export(Collection<SpanData> spans) {
+        final List<CompletableResultCode> resultCodes = new ArrayList<>();
+
         for (SpanData span : spans) {
-            SLSLog.e(TAG, "span: " + span.getName());
-            if (null != client) {
-                client.addLog(spanToLog(span));
+            final Log log = spanToLog(span);
+            if (slsConfig.debuggable) {
+                SLSLog.v(TAG, "export span: " + log);
             }
+
+            final boolean succ = this.send(log);
+            resultCodes.add(succ ? CompletableResultCode.ofSuccess() : CompletableResultCode.ofFailure());
         }
-        return CompletableResultCode.ofSuccess();
+
+        return CompletableResultCode.ofAll(resultCodes);
     }
 
     @Override
     public CompletableResultCode flush() {
+        // sls not support flush now, default success.
         return CompletableResultCode.ofSuccess();
     }
 
     @Override
     public CompletableResultCode shutdown() {
+        // default success
         return CompletableResultCode.ofSuccess();
     }
 
