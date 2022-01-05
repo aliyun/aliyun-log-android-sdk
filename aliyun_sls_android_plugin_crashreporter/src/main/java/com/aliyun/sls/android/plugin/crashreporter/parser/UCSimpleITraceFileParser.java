@@ -126,7 +126,7 @@ public class UCSimpleITraceFileParser implements ITraceFileParser {
         }
 
         final Context context = config.context;
-        final Tracer tracer = SLSTracePlugin.getInstance().getTelemetrySdk().getTracer("crash_reporter");
+        final Tracer tracer = SLSTracePlugin.getInstance().getSLSTelemetry().getTracer("crash_reporter");
         Span span = tracer.spanBuilder("crash_reporter")
                 .setParent(io.opentelemetry.context.Context.current())
                 .startSpan()

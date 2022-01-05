@@ -1,4 +1,4 @@
-package com.aliyun.sls.android.plugin.trace;
+package com.aliyun.sls.android.plugin.trace.utils;
 
 import java.util.Map;
 
@@ -10,6 +10,13 @@ import io.opentelemetry.api.common.Attributes;
  * @date 2021/08/02
  */
 public final class TraceTranslator {
+
+    /**
+     * Export {@link Attributes} value as string.
+     * @param attrs {@link Attributes}
+     * @param key key for value.
+     * @return string value.
+     */
     public static String attrsValueToString(Attributes attrs, String key) {
         if (null == attrs || null == attrs.asMap()) {
             return null;
