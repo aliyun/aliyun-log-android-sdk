@@ -43,7 +43,7 @@ public class HttpTool {
         void onComplete(Response response);
     }
 
-    private static SLSTelemetry traceSdk = SLSTracePlugin.getInstance().getSLSTelemetry();
+    private static SLSTelemetry traceSdk = SLSTelemetry.getInstance();
     private static Tracer tracer = traceSdk.getTracer("HttpTool");
 
     private HttpTool() {
