@@ -1,10 +1,15 @@
 package com.aliyun.sls.android.plugin.trace;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.text.TextUtils;
-
 import com.aliyun.sls.android.JsonUtil;
 import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.SLSLog;
@@ -15,17 +20,6 @@ import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.TraceState;
@@ -36,6 +30,11 @@ import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import static android.content.Context.ACTIVITY_SERVICE;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * @author gordon
@@ -66,10 +65,16 @@ public class SLSSpanExporter implements SpanExporter, ISender {
         }
 
         try {
-            this.client = new LogProducerClient(config);
+            this.client = new LogProducerClient(config,
+                (resultCode, reqId, errorMessage, logBytes, compressedBytes) -> SLSLog.v(TAG, "onCall. result: " + LogProducerResult.fromInt(resultCode) + ", error: " + errorMessage));
         } catch (LogProducerException e) {
             SLSLog.e(TAG, "new LogProducerClient() case error. e: " + e);
         }
+    }
+
+    private int getLimitMem(Context context) {
+        ActivityManager am = (ActivityManager)context.getSystemService(ACTIVITY_SERVICE);
+        return am.getMemoryClass();
     }
 
     private LogProducerConfig createConfig() {
@@ -77,7 +82,7 @@ public class SLSSpanExporter implements SpanExporter, ISender {
         String endpoint;
         String logProject;
         String logStore;
-        if (TextUtils.isEmpty(slsConfig.pluginTraceEndpoint)) {
+        if (!TextUtils.isEmpty(slsConfig.pluginTraceEndpoint)) {
             endpoint = slsConfig.pluginTraceEndpoint;
         } else {
             endpoint = slsConfig.endpoint;
@@ -100,20 +105,20 @@ public class SLSSpanExporter implements SpanExporter, ISender {
         String securityToken = slsConfig.securityToken;
         LogProducerConfig config;
         try {
-            config = new LogProducerConfig(context, endpoint, logProject, logStore, accessKeyId, accessKeySecret, securityToken);
+            config = new LogProducerConfig(context, endpoint, logProject, logStore, accessKeyId, accessKeySecret,
+                securityToken);
         } catch (LogProducerException e) {
             return null;
         }
 
         config.setTopic("trace_android");
-        config.setPacketLogBytes(1024 * 1024 * 5);
-        // 每个缓存的日志包中包含日志数量的最大值，取值为1~4096，默认为1024
+        config.setPacketLogBytes(1024 * 1024);
         config.setPacketLogCount(4096);
-        // 被缓存日志的发送超时时间，如果缓存超时，则会被立即发送，单位为毫秒，默认为3000
-        config.setPacketTimeout(3000);
-        // 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败
-        // 默认为64 * 1024 * 1024
-        config.setMaxBufferLimit(200 * 1024 * 1024);
+        config.setPacketTimeout(2000);
+        // 最大内存限制为当前 app 最大heap内存的 50%
+        final int maxBufferLimit = (int)(getLimitMem(context) / 2f + 0.5f) * 1024 * 1024;
+        SLSLog.d(TAG, "max buffer limit: " + maxBufferLimit);
+        config.setMaxBufferLimit(maxBufferLimit);
         // 发送线程数，默认为1
         config.setSendThreadCount(1);
 
@@ -140,7 +145,6 @@ public class SLSSpanExporter implements SpanExporter, ISender {
 
         return config;
     }
-
 
     @Override
     public boolean send(Log data) {
@@ -286,7 +290,6 @@ public class SLSSpanExporter implements SpanExporter, ISender {
         }
         return object.toString();
     }
-
 
     private Log spanToLog(SpanData span) {
         Log log = new Log();
