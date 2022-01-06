@@ -31,6 +31,5 @@ dependencies {
     implementation 'io.opentelemetry:opentelemetry-bom:1.9.1'
     implementation 'io.opentelemetry:opentelemetry-sdk'
     api 'io.opentelemetry:opentelemetry-api'
-
     api("io.opentelemetry:opentelemetry-semconv")
 }

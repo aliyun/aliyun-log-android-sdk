@@ -7,6 +7,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.aliyun.sls.android.SLSConfig;
+import com.aliyun.sls.android.SLSLog;
 import com.aliyun.sls.android.plugin.trace.processor.SLSAutoEndParentSpanProcessor;
 import com.aliyun.sls.android.plugin.trace.processor.SLSSpanProcessor;
 import com.aliyun.sls.android.utdid.Utdid;
@@ -28,7 +29,9 @@ import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
  * @date 2021/07/29
  */
 public class SLSTelemetry {
+    private static final String TAG = "SLSTelemetry";
 
+    private static SLSTelemetry INSTANCE;
     private final OpenTelemetrySdk telemetrySdk;
 
     SLSTelemetry(SLSConfig config, SLSSpanExporter spanExporter) {
@@ -65,9 +68,9 @@ public class SLSTelemetry {
                                                 .put("host.name", Build.HOST)
                                                 .put("host.type", Build.TYPE)
                                                 .put("host.arch", Build.CPU_ABI + (TextUtils.isEmpty(Build.CPU_ABI2) ? "" : (", " + Build.CPU_ABI2)))
-                                                // span.setAttribute("host.image.name", Build.VERSION.SDK_INT);
-                                                // span.setAttribute("host.image.id", Build.VERSION.SDK_INT);
-                                                // span.setAttribute("host.image.version", Build.VERSION.SDK_INT);
+                                                .put("sls.sdk.language", "Android")
+                                                .put("sls.sdk.name", "tracesdk")
+                                                .put("sls.sdk.version", BuildConfig.VERSION_NAME)
                                                 .build()
                                 )
                         ))
@@ -77,6 +80,16 @@ public class SLSTelemetry {
                 .setTracerProvider(sdkTracerProvider)
                 .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
                 .build();
+        INSTANCE = this;
+    }
+
+    public static SLSTelemetry getInstance() {
+        if (null == INSTANCE) {
+            SLSLog.e(TAG, "INSTANCE is null. You should init SLSTracePlugin first.");
+            return null;
+        }
+
+        return INSTANCE;
     }
 
     public Tracer getTracer(String name) {
