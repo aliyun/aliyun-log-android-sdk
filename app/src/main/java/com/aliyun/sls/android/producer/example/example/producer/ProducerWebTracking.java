@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.aliyun.sls.android.JsonUtil;
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
@@ -13,6 +14,8 @@ import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
 
+import org.json.JSONObject;
+
 import java.io.File;
 
 /**
@@ -20,7 +23,7 @@ import java.io.File;
  * @author gordon
  * @date 2021/08/18
  */
-public class ProducerExample extends BaseActivity {
+public class ProducerWebTracking extends BaseActivity {
     private static final String TAG = "ProducerExample";
 
     private LogProducerClient client = null;
@@ -114,6 +117,7 @@ public class ProducerExample extends BaseActivity {
             config.setPersistentMaxFileSize(1024 * 1024);
             // 本地最多缓存的日志数，不建议超过1M，通常设置为65536即可
             config.setPersistentMaxLogCount(65536);
+            config.setUseWebtracking(true);
             config.logProducerDebug();
 
             /**
@@ -147,19 +151,34 @@ public class ProducerExample extends BaseActivity {
 
     private com.aliyun.sls.android.producer.Log oneLog() {
         com.aliyun.sls.android.producer.Log log = new com.aliyun.sls.android.producer.Log();
-        log.putContent("content_key_1", "1abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
+//        log.putContent("content_key_1", "1abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("content_key_2", "2abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_3", "3abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_4", "4abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_5", "5abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_6", "6abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_7", "7abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_8", "8abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_9", "9abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
+//        log.putContent("content_key_3", "3abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
+//        log.putContent("content_key_4", "4abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
+//        log.putContent("content_key_5", "5abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
+//        log.putContent("content_key_6", "6abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
+//        log.putContent("content_key_7", "7abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
+//        log.putContent("content_key_8", "8abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
+//        log.putContent("content_key_9", "9abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("random", String.valueOf(Math.random()));
         log.putContent("content", "中文️");
         log.putContent(null, "null");
         log.putContent("null", null);
+
+        JSONObject jsonObject = new JSONObject();
+        JsonUtil.putOpt(jsonObject, "key_1", "value_1");
+        JsonUtil.putOpt(jsonObject, "key_2", "中文");
+        JsonUtil.putOpt(jsonObject, "key_3", "9abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
+        JsonUtil.putOpt(jsonObject, "key_4", "\\");
+        JsonUtil.putOpt(jsonObject, "key_5", "\b");
+        JsonUtil.putOpt(jsonObject, "key_6", "\f");
+        JsonUtil.putOpt(jsonObject, "key_7", "\n");
+        JsonUtil.putOpt(jsonObject, "key_8", "\r");
+        JsonUtil.putOpt(jsonObject, "key_9", "\t");
+        JsonUtil.putOpt(jsonObject, "中文 key", "中文value");
+        log.putContent("json", jsonObject.toString());
+
+
         return log;
     }
 }

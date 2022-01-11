@@ -20,9 +20,14 @@
             <Button android:text="销毁实例" android:padding="8dp" android:id="@+id/main_producer_destroy"/>
         </TableRow>
 
+        <TableRow>
+            <Button android:text="WebTracking" android:padding="8dp" android:id="@+id/main_producer_webtracking"/>
+        </TableRow>
+
         <TableRow android:layout_marginTop="24dp">
             <Button android:text="崩溃监控" android:padding="8dp" android:id="@+id/main_apm_crash"/>
             <Button android:text="Trace" android:padding="8dp" android:id="@+id/main_trace"/>
+            <Button android:text="网络分析" android:padding="8dp" android:id="@+id/main_network_diagnosis"/>
         </TableRow>
 
     </TableLayout>
