@@ -12,7 +12,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.aliyun.sls.android.producer.example.example.crash.CrashExampleActivity;
+import com.aliyun.sls.android.producer.example.example.network.NetworkExample;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerExample;
+import com.aliyun.sls.android.producer.example.example.producer.ProducerWebTracking;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithDestroy;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithDynamicConfig;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithImmediately;
@@ -37,8 +39,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.main_producer_multi_clients).setOnClickListener(this);
         findViewById(R.id.main_producer_immediately).setOnClickListener(this);
         findViewById(R.id.main_producer_destroy).setOnClickListener(this);
+        findViewById(R.id.main_producer_webtracking).setOnClickListener(this);
         findViewById(R.id.main_apm_crash).setOnClickListener(this);
         findViewById(R.id.main_trace).setOnClickListener(this);
+        findViewById(R.id.main_network_diagnosis).setOnClickListener(this);
 
     }
 
@@ -62,12 +66,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (R.id.main_producer_destroy == v.getId()) {
             // 销毁LogProducerClient
             startActivity(ProducerWithDestroy.class);
+        } else if (R.id.main_producer_webtracking == v.getId()) {
+            // 销毁LogProducerClient
+            startActivity(ProducerWebTracking.class);
         } else if (R.id.main_apm_crash == v.getId()) {
             // 崩溃监控
             startActivity(CrashExampleActivity.class);
         } else if (R.id.main_trace == v.getId()) {
             // trace
             startActivity(TraceActivity.class);
+        } else if (R.id.main_network_diagnosis == v.getId()) {
+            // 网络探测
+            startActivity(NetworkExample.class);
         }
     }
 
