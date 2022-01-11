@@ -2,9 +2,11 @@ package com.aliyun.sls.android.producer;
 
 import android.content.Context;
 import android.text.TextUtils;
+
 import com.aliyun.sls.android.producer.utils.SoLoader;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 
+@SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
 public class LogProducerConfig {
 
     private static boolean hasSoLoaded = false;
@@ -95,7 +97,7 @@ public class LogProducerConfig {
 
     private static native void log_producer_config_set_access_key(long config, String accessKeySecret);
 
-    private static native void log_producer_config_reset_security_token(long config, String accessKeyID,String accessKeySecret, String securityToken);
+    private static native void log_producer_config_reset_security_token(long config, String accessKeyID, String accessKeySecret, String securityToken);
 
     private static native void log_producer_config_set_topic(long config, String topic);
 
@@ -147,13 +149,15 @@ public class LogProducerConfig {
 
     private static native void log_producer_config_set_drop_unauthorized_log(long config, int num);
 
-    private static native void log_producer_config_set_callback_from_sender_thread(long config ,int num);
+    private static native void log_producer_config_set_callback_from_sender_thread(long config, int num);
 
     private static native void log_producer_config_set_source(long config, String source);
 
     private static native int log_producer_config_is_valid(long config);
 
     private static native int log_producer_persistent_config_is_enabled(long config);
+
+    private static native void log_producer_config_set_use_webtracking(long config, int use);
 
     public Context getContext() {
         return context;
@@ -304,6 +308,10 @@ public class LogProducerConfig {
 
     public void resetSecurityToken(String accessKeyID, String accessKeySecret, String securityToken) {
         log_producer_config_reset_security_token(config, accessKeyID, accessKeySecret, securityToken);
+    }
+
+    public void setUseWebtracking(boolean enable) {
+        log_producer_config_set_use_webtracking(config, enable ? 1 : 0);
     }
 
     public void logProducerDebug() {
