@@ -9,6 +9,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import androidx.multidex.MultiDexApplication;
 import com.aliyun.sls.android.SLSAdapter;
 import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.plugin.crashreporter.SLSCrashReporterPlugin;
@@ -23,7 +24,7 @@ import io.opentelemetry.context.Scope;
  * @author gordon
  * @date 2021/08/31
  */
-public class SLSDemoApplication extends Application {
+public class SLSDemoApplication extends MultiDexApplication {
 
     @Override
     public void onCreate() {
