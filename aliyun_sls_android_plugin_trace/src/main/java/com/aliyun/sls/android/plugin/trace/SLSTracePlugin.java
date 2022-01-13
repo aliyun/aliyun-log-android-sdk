@@ -61,6 +61,7 @@ public class SLSTracePlugin extends AbstractPlugin {
     @Override
     public void updateConfig(SLSConfig config) {
         super.updateConfig(config);
+        spanExporter.updateConfig(config);
     }
 }
 

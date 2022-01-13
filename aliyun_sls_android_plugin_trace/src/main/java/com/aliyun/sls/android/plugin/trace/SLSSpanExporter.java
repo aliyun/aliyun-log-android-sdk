@@ -9,7 +9,6 @@ import java.util.Map;
 
 import android.app.ActivityManager;
 import android.content.Context;
-import android.text.TextUtils;
 import com.aliyun.sls.android.JsonUtil;
 import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.SLSLog;
@@ -66,7 +65,8 @@ public class SLSSpanExporter implements SpanExporter, ISender {
 
         try {
             this.client = new LogProducerClient(config,
-                (resultCode, reqId, errorMessage, logBytes, compressedBytes) -> SLSLog.v(TAG, "onCall. result: " + LogProducerResult.fromInt(resultCode) + ", error: " + errorMessage));
+                (resultCode, reqId, errorMessage, logBytes, compressedBytes) -> SLSLog
+                    .v(TAG, "onCall. result: " + LogProducerResult.fromInt(resultCode) + ", error: " + errorMessage));
         } catch (LogProducerException e) {
             SLSLog.e(TAG, "new LogProducerClient() case error. e: " + e);
         }
@@ -79,33 +79,13 @@ public class SLSSpanExporter implements SpanExporter, ISender {
 
     private LogProducerConfig createConfig() {
         Context context = slsConfig.context;
-        String endpoint;
-        String logProject;
-        String logStore;
-        if (!TextUtils.isEmpty(slsConfig.pluginTraceEndpoint)) {
-            endpoint = slsConfig.pluginTraceEndpoint;
-        } else {
-            endpoint = slsConfig.endpoint;
-        }
-
-        if (!TextUtils.isEmpty(slsConfig.pluginTraceLogProject)) {
-            logProject = slsConfig.pluginTraceLogProject;
-        } else {
-            logProject = slsConfig.pluginLogproject;
-        }
-
-        if (!TextUtils.isEmpty(slsConfig.pluginTraceLogStore)) {
-            logStore = slsConfig.pluginTraceLogStore;
-        } else {
-            logStore = slsConfig.pluginLogStore;
-        }
-
         String accessKeyId = slsConfig.accessKeyId;
         String accessKeySecret = slsConfig.accessKeySecret;
         String securityToken = slsConfig.securityToken;
         LogProducerConfig config;
         try {
-            config = new LogProducerConfig(context, endpoint, logProject, logStore, accessKeyId, accessKeySecret,
+            config = new LogProducerConfig(context, slsConfig.pluginTraceEndpoint, slsConfig.pluginTraceLogProject,
+                slsConfig.pluginTraceLogStore, accessKeyId, accessKeySecret,
                 securityToken);
         } catch (LogProducerException e) {
             return null;
@@ -164,10 +144,24 @@ public class SLSSpanExporter implements SpanExporter, ISender {
     }
 
     @Override
-    public void resetProject(String endpoint, String project, String logstore) {
-        this.config.setEndpoint(endpoint);
-        this.config.setProject(project);
-        this.config.setLogstore(logstore);
+    public void resetProject(String newEndpoint, String newProject, String newLogstore) {
+        // ignore, trace span exporter use updateConfig method update the project configuration.
+    }
+
+    @Override
+    public void updateConfig(SLSConfig config) {
+        if (null == config) {
+            SLSLog.d(TAG, "updateConfig. invalid config");
+            return;
+        }
+
+        this.config.setEndpoint(config.pluginTraceEndpoint);
+        this.config.setProject(config.pluginTraceLogProject);
+        this.config.setLogstore(config.pluginTraceLogStore);
+        if (slsConfig.debuggable) {
+            SLSLog.v(TAG, "updateConfig, new endpoint: " + config.pluginTraceEndpoint + ", new project: "
+                + config.pluginTraceLogProject + ", new logstore: " + config.pluginTraceLogStore);
+        }
     }
 
     @Override
@@ -252,12 +246,12 @@ public class SLSSpanExporter implements SpanExporter, ISender {
     private String linksToLog(List<LinkData> linkDataList) {
         JSONArray array = new JSONArray();
         for (LinkData linkData : linkDataList) {
-//            JSONObject object = new JSONObject();
+            //            JSONObject object = new JSONObject();
             if (null != linkData.getAttributes()) {
                 array.put(attributesToLog(linkData.getAttributes().asMap()));
             }
-//            JsonUtil.putOpt(object, "totalAttributeCount", linkData.getTotalAttributeCount());
-//            JsonUtil.putOpt(linkDataJSON, "", linkData.getSpanContext());
+            //            JsonUtil.putOpt(object, "totalAttributeCount", linkData.getTotalAttributeCount());
+            //            JsonUtil.putOpt(linkDataJSON, "", linkData.getSpanContext());
         }
 
         return array.toString();
@@ -333,29 +327,31 @@ public class SLSSpanExporter implements SpanExporter, ISender {
         put(log, "statusCode", span.getStatus().getStatusCode().name());
         put(log, "statusMessage", span.getStatus().getDescription());
 
-//
-//
-//        if (null != span.getInstrumentationLibraryInfo()) {
-//            put(log, "instrumentationLibraryInfo", instrumentationLibraryInfoToJSON(span.getInstrumentationLibraryInfo()));
-//        }
-//
-//        if (null != span.getInstrumentationLibraryInfo()) {
-//            put(log, "instrumentationLibraryInfo", instrumentationLibraryInfoToJSON(span.getInstrumentationLibraryInfo()));
-//        }
-//
-//        if (null != span.getParentSpanContext()) {
-//            put(log, "parentSpanContext", spanContextToJSON(span.getParentSpanContext()));
-//        }
-//
-//
-//        if (null != span.getSpanContext()) {
-//            put(log, "spanContext", spanContextToJSON(span.getSpanContext()));
-//        }
-//
-//
-//        put(log, "totalAttributeCount", String.valueOf(span.getTotalAttributeCount()));
-//        put(log, "totalRecordedEvents", String.valueOf(span.getTotalRecordedEvents()));
-//        put(log, "totalRecordedLinks", String.valueOf(span.getTotalRecordedLinks()));
+        //
+        //
+        //        if (null != span.getInstrumentationLibraryInfo()) {
+        //            put(log, "instrumentationLibraryInfo", instrumentationLibraryInfoToJSON(span
+        //            .getInstrumentationLibraryInfo()));
+        //        }
+        //
+        //        if (null != span.getInstrumentationLibraryInfo()) {
+        //            put(log, "instrumentationLibraryInfo", instrumentationLibraryInfoToJSON(span
+        //            .getInstrumentationLibraryInfo()));
+        //        }
+        //
+        //        if (null != span.getParentSpanContext()) {
+        //            put(log, "parentSpanContext", spanContextToJSON(span.getParentSpanContext()));
+        //        }
+        //
+        //
+        //        if (null != span.getSpanContext()) {
+        //            put(log, "spanContext", spanContextToJSON(span.getSpanContext()));
+        //        }
+        //
+        //
+        //        put(log, "totalAttributeCount", String.valueOf(span.getTotalAttributeCount()));
+        //        put(log, "totalRecordedEvents", String.valueOf(span.getTotalRecordedEvents()));
+        //        put(log, "totalRecordedLinks", String.valueOf(span.getTotalRecordedLinks()));
 
         return log;
     }

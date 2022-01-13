@@ -11,6 +11,8 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        multiDexEnabled true
+
         buildConfigField "boolean", "CONFIG_ENABLE", project.hasProperty("CONFIG_ENABLE") ? "${CONFIG_ENABLE}" : "false"
         buildConfigField "String", "PLUGIN_APPID", project.hasProperty("PLUGIN_APPID") ? "\"${PLUGIN_APPID}\"" : "\"\""
         buildConfigField "String", "END_POINT", project.hasProperty("END_POINT") ? "\"${END_POINT}\"" : "\"\""
@@ -42,6 +44,7 @@ android {
 //}
 
 dependencies {
+    implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
     implementation project(':aliyun_sls_android_producer')
