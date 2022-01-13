@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">SLSAndroidDemo</string>
+    <string name="title_activity_trace">TraceActivity</string>
+    <string name="title_home">首页</string>
+    <string name="title_dashboard">分类</string>
+    <string name="title_notifications">购物车</string>
+    <string name="title_mine">我的</string>
 </resources>

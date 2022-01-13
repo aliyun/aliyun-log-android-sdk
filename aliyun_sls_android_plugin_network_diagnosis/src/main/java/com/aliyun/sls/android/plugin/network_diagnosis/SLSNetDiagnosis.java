@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.plugin.network_diagnosis;
 
+import java.util.Map;
+
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,6 +16,7 @@ import com.aliyun.sls.android.JsonUtil;
 import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.SLSLog;
 import com.aliyun.sls.android.plugin.ISender;
+import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.scheme.Scheme;
 
 import org.json.JSONArray;
@@ -115,7 +118,11 @@ public class SLSNetDiagnosis {
         }
         scheme.reserves = reserves.toString();
 
-        sender.send(scheme);
+        Log log = new Log();
+        for (Map.Entry<String,String> entry : scheme.toMap().entrySet()) {
+            log.putContent(entry.getKey(), entry.getValue());
+        }
+        sender.send(log);
 
         if (null != callback) {
             handler.post(() -> callback.onComplete(result));

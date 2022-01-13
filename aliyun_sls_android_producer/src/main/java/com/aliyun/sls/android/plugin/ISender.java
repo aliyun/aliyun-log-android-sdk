@@ -1,7 +1,7 @@
 package com.aliyun.sls.android.plugin;
 
 import com.aliyun.sls.android.SLSConfig;
-import com.aliyun.sls.android.scheme.Scheme;
+import com.aliyun.sls.android.producer.Log;
 
 /**
  * @author gordon
@@ -14,7 +14,7 @@ public interface ISender {
     /**
      * send report data to remote server.
      */
-    boolean send(Scheme data);
+    boolean send(Log data);
 
     /**
      * reset security token
@@ -31,5 +31,7 @@ public interface ISender {
      * @param logstore logstore name
      */
     void resetProject(String endpoint, String project, String logstore);
+
+    void updateConfig(SLSConfig config);
 
 }

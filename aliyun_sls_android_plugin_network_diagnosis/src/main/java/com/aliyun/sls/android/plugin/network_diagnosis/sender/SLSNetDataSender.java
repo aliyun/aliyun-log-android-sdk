@@ -10,10 +10,8 @@ import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
-import com.aliyun.sls.android.scheme.Scheme;
 
 import java.io.File;
-import java.util.Map;
 
 /**
  * @author gordon
@@ -112,20 +110,15 @@ public class SLSNetDataSender implements ISender {
     }
 
     @Override
-    public boolean send(Scheme data) {
+    public boolean send(Log log) {
         if (null == producerClient) {
             SLSLog.e(TAG, "LogProducerClient is not init or exception caused.");
             return false;
         }
 
-        if(null == data) {
+        if(null == log) {
             SLSLog.e(TAG, "TCData must not be null.");
             return false;
-        }
-
-        Log log = new Log();
-        for (Map.Entry<String,String> entry : data.toMap().entrySet()) {
-            log.putContent(entry.getKey(), entry.getValue());
         }
 
         TimeUtils.fixTime(log);
@@ -146,4 +139,7 @@ public class SLSNetDataSender implements ISender {
     public void resetProject(String endpoint, String project, String logstore) {
 
     }
-}
+
+    @Override public void updateConfig(SLSConfig config) {
+
+    }}
