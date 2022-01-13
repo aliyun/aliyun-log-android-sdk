@@ -33,3 +33,11 @@ dependencies {
     api 'io.opentelemetry:opentelemetry-api'
     api("io.opentelemetry:opentelemetry-semconv")
 }
+
+ext {
+    moduleVersion = android.defaultConfig.versionName
+    moduleName = 'alysls-android-trace'
+}
+
+//====以下是将android library上传到jcenter的脚本
+apply from: "${project.rootProject.file('maven-publish.gradle')}"
