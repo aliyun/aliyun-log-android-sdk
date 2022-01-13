@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:orientation="horizontal">
+
+    <com.aliyun.sls.android.producer.example.example.trace.widget.PriceTextView
+        android:id="@+id/cart_purchase_total_price"
+        style="@style/Text.Price"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="24dp"
+        android:layout_weight="1"
+        android:gravity="left|center_vertical"
+        android:text="15.6"
+        app:prefixText="总计：" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/cart_purchase_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="去结算"
+        android:textSize="16dp" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
