@@ -12,6 +12,13 @@ import com.aliyun.sls.android.plugin.network_diagnosis.sender.SLSNetDataSender;
 public class SLSNetDiagnosisPlugin extends AbstractPlugin {
     private static final String TAG = "SLSNetDiagnosisPlugin";
 
+    private ISender sender;
+    private SLSNetDiagnosis netDiagnosis;
+
+    public SLSNetDiagnosisPlugin() {
+        netDiagnosis = SLSNetDiagnosis.getInstance();
+    }
+
     @Override
     public String name() {
         return "network_diagnosis";
@@ -24,8 +31,14 @@ public class SLSNetDiagnosisPlugin extends AbstractPlugin {
 
     @Override
     public void init(SLSConfig config) {
-        ISender sender = new SLSNetDataSender();
+        sender = new SLSNetDataSender();
         sender.init(config);
-        SLSNetDiagnosis.getInstance().init(config, sender);
+        netDiagnosis.init(config, sender);
+    }
+
+    @Override
+    public void updateConfig(SLSConfig config) {
+        super.updateConfig(config);
+        netDiagnosis.updateConfig(config);
     }
 }

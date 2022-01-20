@@ -86,6 +86,10 @@ public class Scheme {
     public String spanId;
 
     public Map<String, String> toMap() {
+        return toMap(false);
+    }
+
+    public Map<String, String> toMap(boolean ignoreExt) {
         Map<String, String> fields = new LinkedHashMap<>();
 
         putIfNotNull(fields, "app_id", app_id);
@@ -150,6 +154,10 @@ public class Scheme {
         putIfNotNull(fields, "traceId", traceId);
         putIfNotNull(fields, "spanId", spanId);
 
+        if (ignoreExt) {
+            return fields;
+        }
+
         if (null != ext && !ext.isEmpty()) {
             for (Entry<String, String> entry : ext.entrySet()) {
                 put(fields, entry.getKey(), entry.getValue());
@@ -158,6 +166,7 @@ public class Scheme {
 
         return fields;
     }
+
 
     public static String returnDashIfNull(String value) {
         if (TextUtils.isEmpty(value)) {

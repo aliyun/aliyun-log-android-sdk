@@ -132,14 +132,15 @@ public class SLSNetDataSender implements ISender {
 
     @Override
     public void resetSecurityToken(String accessKeyId, String accessKeySecret, String securityToken) {
-
+        // ignore
     }
 
     @Override
     public void resetProject(String endpoint, String project, String logstore) {
-
+        // ignore
     }
 
-    @Override public void updateConfig(SLSConfig config) {
-
+    @Override
+    public void updateConfig(SLSConfig config) {
+        // ignore
     }}

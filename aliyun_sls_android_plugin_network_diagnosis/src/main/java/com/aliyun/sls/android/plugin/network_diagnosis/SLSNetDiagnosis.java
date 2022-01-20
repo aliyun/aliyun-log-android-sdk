@@ -1,6 +1,7 @@
 package com.aliyun.sls.android.plugin.network_diagnosis;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.annotation.SuppressLint;
 import android.os.Handler;
@@ -116,16 +117,51 @@ public class SLSNetDiagnosis {
         } else {
             JsonUtil.putOpt(reserves, "method", "UNKNOWN");
         }
+
+        // put ext fields to reserves
+        if (null != config.getExt()) {
+            for (Entry<String, String> entry : config.getExt().entrySet()) {
+                JsonUtil.putOpt(reserves, entry.getKey(), entry.getValue());
+            }
+        }
         scheme.reserves = reserves.toString();
 
         Log log = new Log();
-        for (Map.Entry<String,String> entry : scheme.toMap().entrySet()) {
+        // ignore ext fields
+        for (Map.Entry<String,String> entry : scheme.toMap(true).entrySet()) {
             log.putContent(entry.getKey(), entry.getValue());
         }
         sender.send(log);
 
         if (null != callback) {
             handler.post(() -> callback.onComplete(result));
+        }
+    }
+
+    public void updateConfig(SLSConfig config) {
+        if (!TextUtils.isEmpty(config.channel)) {
+            this.config.channel = config.channel;
+        }
+        if (!TextUtils.isEmpty(config.channelName)) {
+            this.config.channelName = config.channelName;
+        }
+        if (!TextUtils.isEmpty(config.userNick)) {
+            this.config.userNick = config.userNick;
+        }
+        if (!TextUtils.isEmpty(config.longLoginNick)) {
+            this.config.longLoginNick = config.longLoginNick;
+        }
+        if (!TextUtils.isEmpty(config.userId)) {
+            this.config.userId = config.userId;
+        }
+        if (!TextUtils.isEmpty(config.longLoginUserId)) {
+            this.config.longLoginUserId = config.longLoginUserId;
+        }
+        if (!TextUtils.isEmpty(config.loginType)) {
+            this.config.loginType = config.loginType;
+        }
+        if (null != config.getExt()) {
+            this.config.setExt(config.getExt());
         }
     }
 
