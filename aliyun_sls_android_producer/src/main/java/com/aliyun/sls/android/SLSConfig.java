@@ -61,4 +61,8 @@ public final class SLSConfig {
     public Map<String, String> getExt() {
         return ext;
     }
+
+    public void setExt(Map<String, String> ext) {
+        this.ext = ext;
+    }
 }

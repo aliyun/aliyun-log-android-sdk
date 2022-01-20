@@ -34,6 +34,12 @@ public class NetworkExample extends BaseActivity {
         config.endpoint = this.endpoint;
         config.accessKeyId = this.accessKeyId;
         config.accessKeySecret = this.accessKeySecret;
+
+        config.userId = "test_user_id";
+        config.userNick = "test_nick";
+        config.addCustom("custom_key", "custom_value");
+        config.addCustom("custom_key2", "custom_value2");
+
         config.debuggable = true;
 
         adapter.init(config);
