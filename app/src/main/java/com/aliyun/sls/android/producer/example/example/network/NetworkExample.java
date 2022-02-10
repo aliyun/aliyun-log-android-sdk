@@ -1,5 +1,8 @@
 package com.aliyun.sls.android.producer.example.example.network;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.os.Bundle;
 import android.view.View;
 
@@ -19,6 +22,39 @@ import com.aliyun.sls.android.producer.example.R;
  */
 public class NetworkExample extends BaseActivity {
     private static final String TAG = "NetworkExample";
+    private List<String> endpoints = new ArrayList<String>() {
+        {
+            add("cn-hangzhou.log.aliyuncs.com");
+            add("cn-hangzhou-finance.log.aliyuncs.com");
+            add("cn-shanghai.log.aliyuncs.com");
+            add("cn-shanghai-finance-1.log.aliyuncs.com");
+            add("cn-qingdao.log.aliyuncs.com");
+            add("cn-beijing.log.aliyuncs.com");
+            add("cn-north-2-gov-1.log.aliyuncs.com");
+            add("cn-zhangjiakou.log.aliyuncs.com");
+            add("cn-huhehaote.log.aliyuncs.com");
+            add("cn-wulanchabu.log.aliyuncs.com");
+            add("cn-shenzhen.log.aliyuncs.com");
+            add("cn-shenzhen-finance.log.aliyuncs.com");
+            add("cn-heyuan.log.aliyuncs.com");
+            add("cn-guangzhou.log.aliyuncs.com");
+            add("cn-chengdu.log.aliyuncs.com");
+            add("cn-hongkong.log.aliyuncs.com");
+            add("ap-northeast-1.log.aliyuncs.com");
+            add("ap-southeast-1.log.aliyuncs.com");
+            add("ap-southeast-2.log.aliyuncs.com");
+            add("ap-southeast-3.log.aliyuncs.com");
+            add("ap-southeast-6.log.aliyuncs.com");
+            add("ap-southeast-5.log.aliyuncs.com");
+            add("me-east-1.log.aliyuncs.com");
+            add("us-west-1.log.aliyuncs.com");
+            add("eu-central-1.log.aliyuncs.com");
+            add("us-east-1.log.aliyuncs.com");
+            add("ap-south-1.log.aliyuncs.com");
+            add("eu-west-1.log.aliyuncs.com");
+        }
+    };
+    private int index = 0;
 
 
     @Override
@@ -80,14 +116,21 @@ public class NetworkExample extends BaseActivity {
     }
 
     private void auto(View v) {
-        printStatus("start auto...");
+        printStatus("start auto. index: " + index);
 
-        SLSNetDiagnosis.getInstance().ping("www.aliyun.com");
-        SLSNetDiagnosis.getInstance().http("https://www.aliyun.com");
-        SLSNetDiagnosis.getInstance().tcpPing("www.aliyun.com", 80);
-        SLSNetDiagnosis.getInstance().mtr("www.aliyun.com");
+        final String domain = endpoints.get(index);
+        final String url = "https://" + domain;
+        SLSNetDiagnosis.getInstance().ping(domain);
+        SLSNetDiagnosis.getInstance().http(url);
+        SLSNetDiagnosis.getInstance().tcpPing(domain, 80);
+        SLSNetDiagnosis.getInstance().mtr(domain);
 
-        v.postDelayed(() -> auto(v), 30000);
+        index += 1;
+        if (index >= endpoints.size()) {
+            index = 0;
+        }
+
+        v.postDelayed(() -> auto(v), 5000);
     }
 
 
