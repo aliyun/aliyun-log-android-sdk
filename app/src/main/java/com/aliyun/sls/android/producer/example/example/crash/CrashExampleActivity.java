@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.aliyun.sls.android.SLSAdapter;
 import com.aliyun.sls.android.SLSConfig;
+import com.aliyun.sls.android.plugin.crashreporter.JNICrash;
 import com.aliyun.sls.android.plugin.crashreporter.SLSCrashReporterPlugin;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
@@ -149,7 +150,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void nativeCrash(int type) {
-//        JNIBridge.nativeCrash(type, 0);
+        JNICrash.nativeCrash(type);
     }
 
     private void crashInJavaNull() {
