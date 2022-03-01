@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.plugin;
 
+import java.util.Map;
+
 import com.aliyun.sls.android.SLSConfig;
 
 /**
@@ -21,4 +23,6 @@ public interface IPlugin {
     void resetProject(String endpoint, String project, String logstore);
 
     void updateConfig(SLSConfig config);
+
+    boolean reportCustomEvent(final String eventId, final Map<String, String> properties);
 }

@@ -2,6 +2,7 @@ package com.aliyun.sls.android;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.aliyun.sls.android.plugin.IPlugin;
 import com.aliyun.sls.android.producer.HttpConfigProxy;
@@ -106,6 +107,21 @@ public class SLSAdapter {
 
         this.plugins.add(plugin);
         return this;
+    }
+
+    /**
+     * 上报自定义数据
+     *
+     * @param eventKey 自定义数据 key
+     * @param properties 自定义数据 properties
+     */
+    public void reportCustomEvent(final String eventKey, final Map<String, String> properties) {
+        for (IPlugin plugin : plugins) {
+            if (null != plugin && "crash_reporter".equals(plugin.name())) {
+                plugin.reportCustomEvent(eventKey, properties);
+                break;
+            }
+        }
     }
 
     private boolean checkConfig(SLSConfig config) {

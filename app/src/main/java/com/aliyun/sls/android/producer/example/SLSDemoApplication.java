@@ -50,6 +50,8 @@ public class SLSDemoApplication extends MultiDexApplication {
         config.pluginTraceLogProject = "qs-demos";
         config.pluginTraceLogStore = "sls-mall-traces";
 
+        config.addCustom("custom_key", "custom_value");
+
         SLSAdapter adapter = SLSAdapter.getInstance();
         adapter.addPlugin(new SLSCrashReporterPlugin());
         adapter.addPlugin(SLSTracePlugin.getInstance());

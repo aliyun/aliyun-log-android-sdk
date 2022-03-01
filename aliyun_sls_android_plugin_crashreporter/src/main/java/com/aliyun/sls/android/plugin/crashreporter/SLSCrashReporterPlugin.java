@@ -1,6 +1,8 @@
 package com.aliyun.sls.android.plugin.crashreporter;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.app.Application;
@@ -18,6 +20,7 @@ import com.aliyun.sls.android.scheme.Scheme;
 import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.ICrashClient;
 import org.json.JSONObject;
+
 import static com.aliyun.sls.android.plugin.crashreporter.BuildConfig.VERSION_NAME;
 
 /**
@@ -185,6 +188,46 @@ public class SLSCrashReporterPlugin extends AbstractPlugin implements ICrashClie
         crashApi.setForeground(true);
 
         initActivityLifecycleCallback();
+    }
+
+    @Override
+    public boolean reportCustomEvent(String eventId, Map<String, String> properties) {
+        super.reportCustomEvent(eventId, properties);
+        if (TextUtils.isEmpty(eventId)) {
+            SLSLog.w(TAG, "eventId is null or empty.");
+            return false;
+        }
+
+        if (null == properties) {
+            SLSLog.w(TAG, "properties is null.");
+            return false;
+        }
+
+        Scheme data = Scheme.createDefaultScheme(config);
+        data.event_id = "99999";
+        data.app_version = Scheme.returnDashIfNull(config.appVersion);
+        data.app_name = Scheme.returnDashIfNull(config.appName);
+
+        if (null == data.ext) {
+            data.ext = new HashMap<>();
+        }
+        JSONObject json;
+        try {
+             json = new JSONObject(properties);
+        } catch (Exception e) {
+            SLSLog.w(TAG, "properties convert to JSONObject error. e: " + e.getMessage());
+            return false;
+        }
+        data.ext.put(eventId, json.toString());
+
+        final boolean succ = reportSender.send(data);
+        if (succ && config.debuggable) {
+            SLSLog.v(TAG, "send custom event success.");
+        } else {
+            SLSLog.w(TAG, "send custom event failed");
+        }
+
+        return succ;
     }
 
     private void scanAndReport(File logFolder) {

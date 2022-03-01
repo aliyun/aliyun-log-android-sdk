@@ -6,7 +6,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
         versionName "1.0.1"
@@ -19,12 +19,14 @@ android {
         }
     }
     compileOptions {
+//        coreLibraryDesugaringEnabled = true
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
 }
 
 dependencies {
+//    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
     implementation project(":aliyun_sls_android_producer")
 
     // https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-bom
