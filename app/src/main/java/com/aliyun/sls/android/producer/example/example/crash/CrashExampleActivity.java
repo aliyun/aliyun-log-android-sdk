@@ -8,21 +8,18 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.aliyun.sls.android.SLSAdapter;
-import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.plugin.crashreporter.JNICrash;
-import com.aliyun.sls.android.plugin.crashreporter.SLSCrashReporterPlugin;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
-import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
-//import com.uc.crashsdk.JNIBridge;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author gordon
@@ -50,7 +47,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 R.id.java_class_cast, R.id.java_number_format, R.id.java_out_of_bounds,
                 R.id.native_crash, R.id.native_heap_corruption, R.id.native_fd_leak,
                 R.id.native_abort, R.id.native_stack_overflow, R.id.native_oom,
-                R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr,
+                R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr, R.id.custom_log
         };
         for (int btnId : btnIds) {
             findViewById(btnId).setOnClickListener(this);
@@ -131,6 +128,13 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                         e.printStackTrace();
                     }
                 }
+            case R.id.custom_log: {
+                Map<String, String> properties = new HashMap<>();
+                properties.put("view_pos", String.valueOf(1));
+                properties.put("view_text", "click test");
+                SLSAdapter.getInstance().reportCustomEvent("Clicked", properties);
+                break;
+            }
 
             default:
                 break;

@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.plugin;
 
+import java.util.Map;
+
 import com.aliyun.sls.android.SLSConfig;
 
 /**
@@ -27,5 +29,10 @@ public abstract class AbstractPlugin implements IPlugin {
     @Override
     public void updateConfig(SLSConfig config) {
 
+    }
+
+    @Override
+    public boolean reportCustomEvent(String eventId, Map<String, String> properties) {
+        return false;
     }
 }
