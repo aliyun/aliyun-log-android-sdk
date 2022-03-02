@@ -11,6 +11,7 @@ import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
+import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 import com.aliyun.sls.android.scheme.Scheme;
 
@@ -162,12 +163,13 @@ public class SLSReportSender implements IReportSender {
         }
 
         TimeUtils.fixTime(log);
-        final boolean res =  producerClient.addLog(log).isLogProducerResultOk();
-        if (slsConfig.debuggable) {
+        final LogProducerResult res =  producerClient.addLog(log);
+        if (res.isLogProducerResultOk() && slsConfig.debuggable) {
             SLSLog.v(TAG, "send log success.");
+        } else {
+            SLSLog.e(TAG, "send log failed. res: " + res);
         }
 
-        return res;
-        //return true;
+        return res.isLogProducerResultOk();
     }
 }
