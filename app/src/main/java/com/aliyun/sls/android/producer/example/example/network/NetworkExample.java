@@ -3,6 +3,7 @@ package com.aliyun.sls.android.producer.example.example.network;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -113,6 +114,10 @@ public class NetworkExample extends BaseActivity {
         });
 
         findViewById(R.id.example_send_auto_text).setOnClickListener(this::auto);
+
+        findViewById(R.id.example_policy_text).setOnClickListener(v -> {
+            startActivity(new Intent(NetworkExample.this, NetworkWithPolicy.class));
+        });
     }
 
     private void auto(View v) {

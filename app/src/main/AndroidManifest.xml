@@ -40,6 +40,7 @@
 
         <activity android:name=".example.crash.CrashExampleActivity"/>
         <activity android:name=".example.network.NetworkExample"/>
+        <activity android:name=".example.network.NetworkWithPolicy"/>
     </application>
 
 </manifest>
