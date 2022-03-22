@@ -1,25 +1,30 @@
 package com.aliyun.sls.android.plugin.network_diagnosis;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.alibaba.netspeed.network.Diagnosis;
+import com.alibaba.netspeed.network.HttpConfig;
+import com.alibaba.netspeed.network.Logger;
+import com.alibaba.netspeed.network.MtrConfig;
+import com.alibaba.netspeed.network.PingConfig;
+import com.alibaba.netspeed.network.TcpPingConfig;
 
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-
-import com.alibaba.netspeed.network.Diagnosis;
-import com.alibaba.netspeed.network.HttpConfig;
-import com.alibaba.netspeed.network.MtrConfig;
-import com.alibaba.netspeed.network.PingConfig;
-import com.alibaba.netspeed.network.TcpPingConfig;
 import com.aliyun.sls.android.JsonUtil;
 import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.SLSLog;
 import com.aliyun.sls.android.plugin.ISender;
+import com.aliyun.sls.android.plugin.network_diagnosis.SLSNetPolicy.Destination;
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.scheme.Scheme;
-
+import com.aliyun.sls.android.utdid.Utdid;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,23 +41,46 @@ public class SLSNetDiagnosis {
     @SuppressWarnings("PointlessArithmeticExpression")
     private static final int DEFAULT_TIMEOUT = 1 * 1000;
 
-    private enum Type {
+    public enum Type {
         /**
          * PING
          */
-        PING,
+        PING("PING"),
         /**
          * TCPPING
          */
-        TCPPING,
+        TCPPING("TCPPING"),
         /**
          * MTR
          */
-        MTR,
+        MTR("MTR"),
         /**
          * HTTP
          */
-        HTTP
+        HTTP("HTTP");
+
+        private final static Map<String, Type> sTypeMap = new HashMap<String, Type>() {
+            {
+                put(PING.type, PING);
+                put(TCPPING.type, TCPPING);
+                put(MTR.type, MTR);
+                put(HTTP.type, HTTP);
+            }
+        };
+
+        public final String type;
+
+        Type(String type) {
+            this.type = type;
+        }
+
+        public static Type typeOf(String type) {
+            if (TextUtils.isEmpty(type)) {
+                return null;
+            }
+
+            return sTypeMap.get(type.toUpperCase());
+        }
     }
 
     private ISender sender;
@@ -61,12 +89,18 @@ public class SLSNetDiagnosis {
 
     private final Handler handler;
 
+    private final List<Callback2> callbacks = new ArrayList<>();
+
     private static class Holder {
         private final static SLSNetDiagnosis INSTANCE = new SLSNetDiagnosis();
     }
 
     public interface Callback {
         void onComplete(String result);
+    }
+
+    public interface Callback2 {
+        void onComplete2(Type type, String result);
     }
 
     private static class TaskIdGenerator {
@@ -88,11 +122,78 @@ public class SLSNetDiagnosis {
     void init(SLSConfig config, ISender sender) {
         this.config = config;
         this.sender = sender;
+        Diagnosis.init(config.pluginAppId, Utdid.getInstance().getUtdid(config.context), "public");
     }
 
     private SLSNetDiagnosis() {
         //no instance
         handler = new Handler(Looper.getMainLooper());
+        Diagnosis.registerLogger(this, new Logger() {
+            @Override
+            public void debug(String tag, String msg) {
+                if (null != config && config.debuggable) {
+                    SLSLog.v(tag, "debug. tag: " + tag + ", msg: " + msg);
+                }
+            }
+
+            @Override
+            public void info(String tag, String msg) {
+                if (null != config && config.debuggable) {
+                    SLSLog.d(tag, "info. tag: " + tag + ", msg: " + msg);
+                }
+            }
+
+            @Override
+            public void warm(String tag, String msg) {
+                SLSLog.w(tag, "warm. tag: " + tag + ", msg: " + msg);
+            }
+
+            @Override
+            public void error(String tag, String msg) {
+                SLSLog.e(tag, "error. tag: " + tag + ", msg: " + msg);
+            }
+
+            @Override
+            public void report(Object context, String msg) {
+                if (context == SLSNetDiagnosis.this) {
+                    // ignore
+                    return;
+                }
+
+                if (null != config && config.debuggable) {
+                    SLSLog.v(TAG, "report. msg: " + msg);
+                }
+
+                if (TextUtils.isEmpty(msg)) {
+                    SLSLog.w(TAG, "report msg is null");
+                    return;
+                }
+
+                try {
+                    JSONObject object = new JSONObject(msg);
+                    final String method = object.optString("method");
+                    if (TextUtils.isEmpty(method)) {
+                        SLSLog.w(TAG, "report. not a valid method: " + method);
+                        return;
+                    }
+
+                    final Type type = Type.typeOf(method);
+                    if (null == type) {
+                        SLSLog.w(TAG, "report. type is null");
+                        return;
+                    }
+
+                    SLSNetDiagnosis.this.report(type, msg, result -> {
+                        for (Callback2 callback : callbacks) {
+                            callback.onComplete2(type, result);
+                        }
+                    });
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    SLSLog.w(TAG, "report. exception: " + e.getLocalizedMessage());
+                }
+            }
+        });
     }
 
     private void report(Type type, String result, Callback callback) {
@@ -128,7 +229,7 @@ public class SLSNetDiagnosis {
 
         Log log = new Log();
         // ignore ext fields
-        for (Map.Entry<String,String> entry : scheme.toMap(true).entrySet()) {
+        for (Map.Entry<String, String> entry : scheme.toMap(true).entrySet()) {
             log.putContent(entry.getKey(), entry.getValue());
         }
         sender.send(log);
@@ -163,6 +264,94 @@ public class SLSNetDiagnosis {
         if (null != config.getExt()) {
             this.config.setExt(config.getExt());
         }
+    }
+
+    /**
+     * 注册全局回调。仅当注册了策略时，该回调才会被触发。
+     *
+     * @param callback
+     */
+    public void registerCallback(Callback2 callback) {
+        this.callbacks.add(callback);
+    }
+
+    /**
+     * 移除全局回调。
+     * @param callback
+     */
+    public void removeCallback(Callback2 callback) {
+        this.callbacks.remove(callback);
+    }
+
+    /**
+     * 清空全局回调。
+     */
+    public void clearCallback() {
+        this.callbacks.clear();
+    }
+
+    /**
+     * 注册策略.
+     * @param policy json格式的策略描述
+     */
+    public void registerPolicy(String policy) {
+        Diagnosis.handleMessage(this, null, policy);
+    }
+
+    /**
+     * 注册策略。
+     *
+     * @param builder {@link SLSNetPolicyBuilder}
+     */
+    public void registerPolicy(SLSNetPolicyBuilder builder) {
+        SLSNetPolicy policy = builder.create();
+
+        JSONObject object = new JSONObject();
+        try {
+            object.put("switch", policy.enable ? "on" : "off");
+            object.put("type", "policy_" + policy.type);
+            object.put("version", policy.version);
+            object.put("periodicity", policy.periodicity);
+            object.put("interval", policy.interval);
+            object.put("expiration", policy.expiration);
+            object.put("ratio", policy.ratio);
+            object.put("whitelist", listToArray(policy.whitelist));
+            object.put("methods", listToArray(policy.methods));
+
+            JSONArray array = new JSONArray();
+            for (Destination destination : policy.destination) {
+                JSONObject obj = new JSONObject();
+                obj.put("siteId", destination.siteId);
+                //obj.put("az", destination.az);
+                obj.put("ips", listToArray(destination.ips));
+                obj.put("urls", listToArray(destination.urls));
+                array.put(obj);
+            }
+            object.put("destination", array);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            SLSLog.e(TAG, "register policy error. e: " + e.getLocalizedMessage());
+            return;
+        }
+
+        if (config.debuggable) {
+            SLSLog.v(TAG, "registerPolicy, policy: " + object);
+        }
+
+        registerPolicy(object.toString());
+    }
+
+    private static JSONArray listToArray(List<String> list) {
+        JSONArray array = new JSONArray();
+
+        if (null == list) {
+            return array;
+        }
+
+        for (String s : list) {
+            array.put(s);
+        }
+        return array;
     }
 
     /**
@@ -218,10 +407,11 @@ public class SLSNetDiagnosis {
      * @param callback 回调 callback
      */
     public void tcpPing(String domain, int port, int maxTimes, int timeout, Callback callback) {
-        Diagnosis.startTcpPing(new TcpPingConfig(taskIdGenerator.generate(), domain, port, maxTimes, timeout, (context, result) -> {
-            report(Type.TCPPING, result, callback);
-            return 0;
-        }, this));
+        Diagnosis.startTcpPing(
+            new TcpPingConfig(taskIdGenerator.generate(), domain, port, maxTimes, timeout, (context, result) -> {
+                report(Type.TCPPING, result, callback);
+                return 0;
+            }, this));
     }
 
     /**
@@ -248,20 +438,21 @@ public class SLSNetDiagnosis {
      * @param callback 回调 callback
      */
     public void mtr(String domain, int maxTtl, int maxPath, int maxTimes, int timeout, Callback callback) {
-        MtrConfig config = new MtrConfig(taskIdGenerator.generate(), domain, maxTtl, maxPath, maxTimes, timeout, (context, result) -> {
-            if (!TextUtils.isEmpty(result)) {
-                try {
-                    JSONArray array = new JSONArray(result);
-                    final int size = array.length();
-                    for (int i = 0; i < size; i++) {
-                        report(Type.MTR, array.getJSONObject(i).toString(), i == size - 1 ? callback : null);
+        MtrConfig config = new MtrConfig(taskIdGenerator.generate(), domain, maxTtl, maxPath, maxTimes, timeout,
+            (context, result) -> {
+                if (!TextUtils.isEmpty(result)) {
+                    try {
+                        JSONArray array = new JSONArray(result);
+                        final int size = array.length();
+                        for (int i = 0; i < size; i++) {
+                            report(Type.MTR, array.getJSONObject(i).toString(), i == size - 1 ? callback : null);
+                        }
+                    } catch (JSONException e) {
+                        report(Type.MTR, result, callback);
                     }
-                } catch (JSONException e) {
-                    report(Type.MTR, result, callback);
                 }
-            }
-            return 0;
-        }, this);
+                return 0;
+            }, this);
         config.setCombineCallback(true);
         Diagnosis.startMtr(config);
     }
@@ -276,50 +467,4 @@ public class SLSNetDiagnosis {
     public void http(String httpUrl) {
         this.http(httpUrl, null);
     }
-
-//    public void autoPing(String domain) {
-//        if (TextUtils.isEmpty(domain)) {
-//            return;
-//        }
-//
-//        Data input = new Data.Builder().putString("domain", domain).build();
-//
-//        final String workName = String.format("%s_%s", "domain", domain);
-//
-//        WorkManager.getInstance(config.context.getApplicationContext())
-//                .enqueueUniquePeriodicWork(workName, ExistingPeriodicWorkPolicy.REPLACE,
-//                        new PeriodicWorkRequest.Builder(AutoPingWorker.class, PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS, PeriodicWorkRequest.MIN_PERIODIC_FLEX_MILLIS, TimeUnit.MILLISECONDS)
-//                                .setInputData(input)
-//                                .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-//                                .build()
-//                );
-//    }
-//
-//    public void cancelAutoPing(String domain) {
-//        final String workName = String.format("%s_%s", "domain", domain);
-//        WorkManager.getInstance(config.context.getApplicationContext())
-//                .getWorkInfosForUniqueWork(workName)
-//                .cancel(false);
-//    }
-//
-//    public void autoTcpPing(String domain, int port, int interval, Callback callback) {
-////        this.tcpPing(domain,);
-//    }
-//
-//    public static class AutoPingWorker extends Worker {
-//
-//        public AutoPingWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
-//            super(context, workerParams);
-//        }
-//
-//        @NonNull
-//        @Override
-//        public Result doWork() {
-//            SLSLog.v(TAG, "start ping in background ...");
-//            Data input = getInputData();
-//            final String domain = input.getString("domain");
-//            SLSNetDiagnosis.getInstance().ping(domain, result -> SLSLog.v(TAG, "ping in background success. result: " + result));
-//            return Result.success();
-//        }
-//    }
 }
