@@ -369,6 +369,11 @@ public class SLSNetDiagnosis {
         this.ping(domain, 64, callback);
     }
 
+    /**
+     * @param domain 目标host，如 www.aliyun.com
+     * @param size ping包大小，如 64
+     * @param callback 回调callback
+     */
     public  void ping(String domain, int size, Callback callback) {
         this.ping(domain, size, DEFAULT_TIMEOUT, callback);
     }
@@ -383,6 +388,13 @@ public class SLSNetDiagnosis {
         this.ping(domain, 64, maxTimes, timeout, callback);
     }
 
+    /**
+     * @param domain 目标host，如： www.aliyun.com
+     * @param size ping包大小，如：64
+     * @param maxTimes 探测的次数
+     * @param timeout 单次探测的超时时间
+     * @param callback 回调callback
+     */
     public void ping(String domain, int size, int maxTimes, int timeout, Callback callback) {
         Diagnosis.startPing(new PingConfig(taskIdGenerator.generate(), domain, size, maxTimes, timeout, (context, result) -> {
             report(Type.PING, result, callback);
