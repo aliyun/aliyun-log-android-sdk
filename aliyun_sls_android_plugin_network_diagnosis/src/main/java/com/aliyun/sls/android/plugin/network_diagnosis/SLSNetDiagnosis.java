@@ -366,7 +366,11 @@ public class SLSNetDiagnosis {
      * @param callback 回调 callback
      */
     public void ping(String domain, Callback callback) {
-        this.ping(domain, 10, DEFAULT_TIMEOUT, callback);
+        this.ping(domain, 64, callback);
+    }
+
+    public  void ping(String domain, int size, Callback callback) {
+        this.ping(domain, size, DEFAULT_TIMEOUT, callback);
     }
 
     /**
@@ -376,7 +380,11 @@ public class SLSNetDiagnosis {
      * @param callback 回调 callback
      */
     public void ping(String domain, int maxTimes, int timeout, Callback callback) {
-        Diagnosis.startPing(new PingConfig(taskIdGenerator.generate(), domain, maxTimes, timeout, (context, result) -> {
+        this.ping(domain, 64, maxTimes, timeout, callback);
+    }
+
+    public void ping(String domain, int size, int maxTimes, int timeout, Callback callback) {
+        Diagnosis.startPing(new PingConfig(taskIdGenerator.generate(), domain, size, maxTimes, timeout, (context, result) -> {
             report(Type.PING, result, callback);
             return 0;
         }, this));
