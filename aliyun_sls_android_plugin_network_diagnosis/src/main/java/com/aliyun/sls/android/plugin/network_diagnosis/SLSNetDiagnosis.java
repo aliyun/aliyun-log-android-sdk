@@ -375,7 +375,7 @@ public class SLSNetDiagnosis {
      * @param callback 回调callback
      */
     public  void ping(String domain, int size, Callback callback) {
-        this.ping(domain, size, DEFAULT_TIMEOUT, callback);
+        this.ping(domain, size, 10 , DEFAULT_TIMEOUT, callback);
     }
 
     /**
