@@ -35,6 +35,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
 
     private List<FileInputStream> mFiles = new ArrayList<FileInputStream>();
     private List<byte[]> mMems = new ArrayList<byte[]>(4096);
+    private int customIndex = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -130,9 +131,15 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 }
             case R.id.custom_log: {
                 Map<String, String> properties = new HashMap<>();
-                properties.put("view_pos", String.valueOf(1));
+                properties.put("view_pos", String.valueOf(customIndex));
                 properties.put("view_text", "click test");
                 SLSAdapter.getInstance().reportCustomEvent("Clicked", properties);
+
+                properties = new HashMap<>();
+                properties.put("view_pos", String.valueOf(customIndex));
+                properties.put("view_text", "click test2");
+                SLSAdapter.getInstance().reportCustomEvent("Clicked2", properties);
+                customIndex += 1;
                 break;
             }
 

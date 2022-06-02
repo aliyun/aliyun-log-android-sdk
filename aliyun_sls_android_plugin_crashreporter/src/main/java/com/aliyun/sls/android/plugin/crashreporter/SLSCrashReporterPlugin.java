@@ -208,9 +208,6 @@ public class SLSCrashReporterPlugin extends AbstractPlugin implements ICrashClie
         data.app_version = Scheme.returnDashIfNull(config.appVersion);
         data.app_name = Scheme.returnDashIfNull(config.appName);
 
-        if (null == data.ext) {
-            data.ext = new HashMap<>();
-        }
         JSONObject json;
         try {
              json = new JSONObject(properties);

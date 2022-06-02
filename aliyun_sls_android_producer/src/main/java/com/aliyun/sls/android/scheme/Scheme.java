@@ -2,6 +2,7 @@ package com.aliyun.sls.android.scheme;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class Scheme {
     public String province;
     public String city;
     public String district;
-    public Map<String, String> ext;
+    public final Map<String, String> ext = new LinkedHashMap<>();
     public String traceId;
     public String spanId;
 
@@ -158,7 +159,7 @@ public class Scheme {
             return fields;
         }
 
-        if (null != ext && !ext.isEmpty()) {
+        if (!ext.isEmpty()) {
             for (Entry<String, String> entry : ext.entrySet()) {
                 put(fields, entry.getKey(), entry.getValue());
             }
@@ -239,7 +240,9 @@ public class Scheme {
         scheme.user_id = returnDashIfNull(config.userId);
         scheme.long_login_user_id = returnDashIfNull(config.longLoginUserId);
         scheme.logon_type = returnDashIfNull(config.loginType);
-        scheme.ext = config.getExt();
+        if (null != config.getExt()) {
+            scheme.ext.putAll(config.getExt());
+        }
 
         return scheme;
     }
