@@ -35,7 +35,6 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
 
     private List<FileInputStream> mFiles = new ArrayList<FileInputStream>();
     private List<byte[]> mMems = new ArrayList<byte[]>(4096);
-    private int customIndex = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -130,16 +129,20 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                     }
                 }
             case R.id.custom_log: {
-                Map<String, String> properties = new HashMap<>();
-                properties.put("view_pos", String.valueOf(customIndex));
-                properties.put("view_text", "click test");
-                SLSAdapter.getInstance().reportCustomEvent("Clicked", properties);
-
-                properties = new HashMap<>();
-                properties.put("view_pos", String.valueOf(customIndex));
-                properties.put("view_text", "click test2");
-                SLSAdapter.getInstance().reportCustomEvent("Clicked2", properties);
-                customIndex += 1;
+                Map<String, String> params = new HashMap<>();
+                params.put("position", "1");
+                Map<String, String> params2 = new HashMap<>();
+                params2.put("position", "2");
+                SLSAdapter.getInstance().reportCustomEvent("MyTest", params);
+                SLSAdapter.getInstance().reportCustomEvent("MyTest2", params2);
+                getWindow().getDecorView().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Map<String, String> params2 = new HashMap<>();
+                        params2.put("position", "3");
+                        SLSAdapter.getInstance().reportCustomEvent("MyTest3", params2);
+                    }
+                }, 1000);
                 break;
             }
 
