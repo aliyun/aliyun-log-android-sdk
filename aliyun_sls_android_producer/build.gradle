@@ -4,10 +4,15 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
         versionName "bricks_1.0.10"
+        ndk {
+            // Specifies the ABI configurations of your native
+            // libraries Gradle should build and package with your app.
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
     }
     buildTypes {
         release {
@@ -22,6 +27,7 @@ android {
     }
     productFlavors {
     }
+    ndkVersion "16.1.4479499" // e.g.,  ndkVersion "21.3.6528147"
 }
 
 dependencies {

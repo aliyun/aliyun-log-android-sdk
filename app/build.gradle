@@ -21,6 +21,11 @@ android {
         buildConfigField "String", "ACCESS_KEYID", project.hasProperty("ACCESS_KEYID") ? "\"${ACCESS_KEYID}\"" : "\"\""
         buildConfigField "String", "ACCESS_KEY_SECRET", project.hasProperty("ACCESS_KEY_SECRET") ? "\"${ACCESS_KEY_SECRET}\"" : "\"\""
         buildConfigField "String", "ACCESS_KEY_TOKEN", project.hasProperty("ACCESS_KEY_TOKEN") ? "\"${ACCESS_KEY_TOKEN}\"" : "\"\""
+        ndk {
+            // Specifies the ABI configurations of your native
+            // libraries Gradle should build and package with your app.
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
     }
     buildTypes {
         release {

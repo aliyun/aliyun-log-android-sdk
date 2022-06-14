@@ -146,8 +146,6 @@ static void init_main_looper_pipe()
 JNIEXPORT jlong JNICALL
 Java_com_aliyun_sls_android_producer_LogProducerClient_create_1log_1producer
         (JNIEnv *env, jclass obj, jlong config, jobject callback) {
-    aos_error_log("init client: %s", "test");
-
     if (callback == NULL) {
         return (jlong) create_log_producer((log_producer_config *) config, NULL, NULL);
     }
