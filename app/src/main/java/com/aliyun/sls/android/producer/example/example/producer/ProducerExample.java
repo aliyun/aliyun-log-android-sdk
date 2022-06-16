@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.aliyun.sls.android.SLSLog;
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
@@ -12,6 +13,9 @@ import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 
@@ -147,6 +151,31 @@ public class ProducerExample extends BaseActivity {
 
     private com.aliyun.sls.android.producer.Log oneLog() {
         com.aliyun.sls.android.producer.Log log = new com.aliyun.sls.android.producer.Log();
+        log.putContent("1int", 11);
+        log.putContent("1long", 12L);
+        log.putContent("1float", 13.0f);
+        log.putContent("1double", 14.44d);
+        log.putContent("1boolean", true);
+        log.putContent("1string", "string");
+        JSONObject object = new JSONObject();
+        try {
+            object.put("int", 22);
+            object.put("long", 32L);
+            object.put("float", 33.0f);
+            object.put("double", 43.33d);
+            object.put("string", "string");
+            object.put("boolean", true);
+            JSONObject nest = new JSONObject();
+            nest.put("kkk", "value");
+            object.put("nest", nest);
+            object.put("array", new JSONArray());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        log.putContent(object);
+        log.putContent("json", object);
+        log.putContent("array", new JSONArray());
         log.putContent("content_key_1", "1abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("content_key_2", "2abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("content_key_3", "3abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
@@ -159,7 +188,9 @@ public class ProducerExample extends BaseActivity {
         log.putContent("random", String.valueOf(Math.random()));
         log.putContent("content", "中文️");
         log.putContent(null, "null");
-        log.putContent("null", null);
+        log.putContent("null", (String) null);
+
+        SLSLog.d("[sender]", "click");
         return log;
     }
 }

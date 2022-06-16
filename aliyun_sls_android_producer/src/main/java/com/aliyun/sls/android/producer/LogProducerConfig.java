@@ -111,6 +111,10 @@ public class LogProducerConfig {
 
     private static native void log_producer_config_set_max_buffer_limit(long config, int num);
 
+    private static native void log_producer_config_set_flush_interval(long config, int interval);
+
+    private static native void log_producer_config_set_log_queue_interval(long config, int interval);
+
     private static native void log_producer_config_set_send_thread_count(long config, int num);
 
     private static native void log_producer_config_set_persistent(long config, int num);
@@ -220,6 +224,14 @@ public class LogProducerConfig {
 
     public void setMaxBufferLimit(int num) {
         log_producer_config_set_max_buffer_limit(config, num);
+    }
+
+    public void setFlushInterval(int interval) {
+        log_producer_config_set_flush_interval(config, interval);
+    }
+
+    public void setLogQueueInterval(int interval) {
+        log_producer_config_set_log_queue_interval(config, interval);
     }
 
     public void setSendThreadCount(int num) {

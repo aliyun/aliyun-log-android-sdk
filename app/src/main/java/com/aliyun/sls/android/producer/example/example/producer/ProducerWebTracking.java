@@ -163,7 +163,7 @@ public class ProducerWebTracking extends BaseActivity {
         log.putContent("random", String.valueOf(Math.random()));
         log.putContent("content", "中文️");
         log.putContent(null, "null");
-        log.putContent("null", null);
+        log.putContent("null", (String) null);
 
         JSONObject jsonObject = new JSONObject();
         JsonUtil.putOpt(jsonObject, "key_1", "value_1");
