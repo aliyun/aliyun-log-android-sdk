@@ -122,7 +122,11 @@ public class SLSNetDiagnosis {
     void init(SLSConfig config, ISender sender) {
         this.config = config;
         this.sender = sender;
-        Diagnosis.init(config.pluginAppId, Utdid.getInstance().getUtdid(config.context), "public");
+        String siteId = "public";
+        if (!TextUtils.isEmpty(config.siteId)) {
+            siteId = config.siteId;
+        }
+        Diagnosis.init(config.pluginAppId, Utdid.getInstance().getUtdid(config.context), siteId);
     }
 
     private SLSNetDiagnosis() {

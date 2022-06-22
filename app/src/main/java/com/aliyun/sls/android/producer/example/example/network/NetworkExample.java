@@ -71,6 +71,7 @@ public class NetworkExample extends BaseActivity {
         config.endpoint = this.endpoint;
         config.accessKeyId = this.accessKeyId;
         config.accessKeySecret = this.accessKeySecret;
+        //config.siteId = "cn";
 
         config.userId = "test_user_id";
         config.userNick = "test_nick";

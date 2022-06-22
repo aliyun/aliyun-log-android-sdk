@@ -38,6 +38,7 @@ public final class SLSConfig {
     public String userId;
     public String longLoginUserId;
     public String loginType;
+    public String siteId;
 
     private Map<String, String> ext = new LinkedHashMap<>();
 
