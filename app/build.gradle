@@ -68,7 +68,7 @@ dependencies {
 //    // sls android trace plugin
 //    implementation 'com.aliyun.openservices:alysls-android-trace:1.0.3'
 //    // sls android network diagnosis plugin
-//    implementation 'com.aliyun.openservices:alysls-android-network_diagnosis:1.0.5'
+//    implementation 'com.aliyun.openservices:alysls-android-network_diagnosis:1.0.6'
 
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
