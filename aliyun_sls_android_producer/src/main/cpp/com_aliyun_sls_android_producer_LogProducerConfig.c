@@ -29,7 +29,7 @@ Java_com_aliyun_sls_android_producer_LogProducerConfig_create_1log_1producer_1co
  */
 JNIEXPORT void JNICALL Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1debug
         (JNIEnv *env, jclass obj) {
-    aos_log_set_level(AOS_LOG_DEBUG);
+    aos_log_set_level(AOS_LOG_TRACE);
 }
 
 /*
@@ -217,18 +217,6 @@ JNIEXPORT void JNICALL
 Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1max_1buffer_1limit
         (JNIEnv *env, jclass obj, jlong config, jint num) {
     log_producer_config_set_max_buffer_limit((log_producer_config *) config, num);
-}
-
-JNIEXPORT void JNICALL
-Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1flush_1interval
-        (JNIEnv *env, jclass clazz, jlong config, jint interval) {
-    log_producer_config_set_flush_interval((log_producer_config *)config, interval);
-}
-
-JNIEXPORT void JNICALL
-Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1log_1queue_1interval
-(JNIEnv *env, jclass clazz, jlong config, jint interval) {
-    log_producer_config_set_log_queue_interval((log_producer_config *)config, interval);
 }
 
 /*
