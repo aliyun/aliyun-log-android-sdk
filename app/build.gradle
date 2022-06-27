@@ -49,5 +49,5 @@ dependencies {
     implementation project(':aliyun_sls_android_producer')
 
     // sls android sdk lite version
-    // implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.2'
+//     implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.5.1'
 }
