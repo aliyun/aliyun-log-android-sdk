@@ -203,12 +203,25 @@ public class SLSNetPolicyBuilder {
      * @param urls Url地址列表。仅当探测方式为http时生效。
      * @return {@link SLSNetPolicyBuilder}
      */
-    public  SLSNetPolicyBuilder addDestination(List<String> ips, List<String> urls) {
+    public SLSNetPolicyBuilder addDestination(List<String> ips, List<String> urls) {
+        return this.addDestination("public", "", ips, urls);
+    }
+
+    /**
+     * 增加目的地信息。{@link #setDestination(List)}。
+     * @param siteId
+     * @param az
+     * @param ips IP地址列表，可以为域名。如：10.10.0.2:443/80/8080，表示tcp探测时会同时探测443/80/8080这三个端口。
+     * @param urls Url地址列表。仅当探测方式为http时生效。
+     * @return {@link SLSNetPolicyBuilder}
+     */
+    public SLSNetPolicyBuilder addDestination(String siteId, String az, List<String> ips, List<String> urls) {
         Destination destination = new Destination();
-        //destination.siteId = siteId;
-        //destination.az = az;
+        destination.siteId = siteId;
+        destination.az = az;
         destination.ips = ips;
         destination.urls = urls;
+
         policy.destination.add(destination);
         return this;
     }

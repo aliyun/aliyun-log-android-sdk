@@ -58,7 +58,7 @@ public class SLSNetPolicy implements Serializable {
         /**
          * SDK初始化需要传入siteId字段，用于区分用户所在地域，public所有地域都探测，其他值则需要和用户所在地匹配才进行探测
          */
-        public final String siteId = "public";
+        public String siteId = "public";
         /**
          * 服务器所在的az，可忽略
          */
