@@ -207,7 +207,7 @@ public class Scheme {
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.getDefault());
         scheme.local_timestamp = String.valueOf(date.getTime());
         scheme.local_time = dateFormat.format(date);
-        scheme.local_timestamp_fixed = String.valueOf(TimeUtils.getTimeInMillis() + scheme.local_timestamp.substring(10));
+        scheme.local_timestamp_fixed = String.valueOf(TimeUtils.getTimeInMillis() + ((scheme.local_timestamp.length() >= 13) ? scheme.local_timestamp.substring(10, 13) : "000"));
         date.setTime(Long.valueOf(scheme.local_timestamp_fixed));
         scheme.local_time_fixed = dateFormat.format(date);
 
