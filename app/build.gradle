@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.0"
+    buildToolsVersion "29.0.3"
     defaultConfig {
         applicationId "com.aliyun.sls.android.producer.example"
         minSdkVersion 14
@@ -19,6 +19,11 @@ android {
         buildConfigField "String", "ACCESS_KEYID", project.hasProperty("ACCESS_KEYID") ? "\"${ACCESS_KEYID}\"" : "\"\""
         buildConfigField "String", "ACCESS_KEY_SECRET", project.hasProperty("ACCESS_KEY_SECRET") ? "\"${ACCESS_KEY_SECRET}\"" : "\"\""
         buildConfigField "String", "ACCESS_KEY_TOKEN", project.hasProperty("ACCESS_KEY_TOKEN") ? "\"${ACCESS_KEY_TOKEN}\"" : "\"\""
+        ndk {
+            // Specifies the ABI configurations of your native
+            // libraries Gradle should build and package with your app.
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
     }
     buildTypes {
         release {
@@ -39,16 +44,10 @@ android {
 //}
 
 dependencies {
-    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.preference:preference:1.2.0'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
-//    implementation project(':aliyun_sls_android_producer')
+    implementation project(':aliyun_sls_android_producer')
 
     // sls android sdk lite version
     // implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.2'
-
-    // sls android sdk bricks version
-    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:bricks_1.0.5'
-
-    // sls android crashreporter plugin
-    implementation 'com.aliyun.openservices:alysls-android-crashreporter:1.1.1'
 }
