@@ -1,6 +1,7 @@
 package com.aliyun.sls.android.producer.example.example.producer;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -25,7 +26,6 @@ public class ProducerWithDynamicConfig extends BaseActivity {
 
     private LogProducerConfig config = null;
     private LogProducerClient client = null;
-    private int index = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -147,16 +147,14 @@ public class ProducerWithDynamicConfig extends BaseActivity {
                     android.util.Log.e(TAG, String.format("resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", resultCode, reqId, errorMessage, logBytes, compressedBytes));
                     printStatus(String.format("send log resultCode: %s, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
 
-
-                    if (LogProducerResult.fromInt(resultCode) == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
-                        updateConfig();
+                    LogProducerResult logProducerResult = LogProducerResult.fromInt(resultCode);
+                    if (logProducerResult == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
+                        // LogProducerClient 初始化参数不正确。
+                        // 需要检查endpoint、project、logstore、accessKeyId、accessKeySecret、accessKeyToken是否无效
+                        // errorMessage 也会有对应的说明:
+                        // Invalid producer config destination params，表示：endpoint、project、logstore的配置可能有问题
+                        // Invalid producer config authority params，表示：accessKeyId、accessKeySecret、accessKeyToken的配置可能有问题
                     }
-
-                    if (index % 9 == 0 && LogProducerResult.fromInt(resultCode) == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
-                        updateAK();
-                    }
-
-                    index += 1;
                 }
             };
             // 需要关注日志的发送成功或失败状态时, 第二个参数需要传入一个 callbak
@@ -182,8 +180,12 @@ public class ProducerWithDynamicConfig extends BaseActivity {
         final String accessKeySecret = this.accessKeySecret;
         final String accessKeyToken = this.accessKeyToken;
 
-        config.setAccessKeyId(accessKeyId);
-        config.setAccessKeySecret(accessKeySecret);
+        if (TextUtils.isEmpty(accessKeyToken)) {
+            config.setAccessKeyId(accessKeyId);
+            config.setAccessKeySecret(accessKeySecret);
+        } else {
+            config.resetSecurityToken(accessKeyId, accessKeySecret, accessKeyToken);
+        }
     }
 
     private void reset() {
