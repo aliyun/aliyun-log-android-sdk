@@ -34,7 +34,6 @@ public class TimeUtils {
 
         final String host = endpoint.contains("http") ? endpoint.substring(endpoint.indexOf("://") + 3) : endpoint;
         final String url = "https://" + project + "." + host + "/servertime";
-        //final String url = "http://cn-shanghai-staging-share.sls.aliyuncs.com/servertime";
         final String[] headers = new String[] {"x-log-apiversion", "0.6.0"};
         ThreadUtils.exec(new Runnable() {
             @Override

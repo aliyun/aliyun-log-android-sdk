@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
  * @date 2021/06/08
  */
 public class ThreadUtils {
-    private static ExecutorService SINGLE_THREAD_EXECUTOR = Executors.newCachedThreadPool();
+    private static final ExecutorService SINGLE_THREAD_EXECUTOR = Executors.newCachedThreadPool();
 
     private ThreadUtils() {
         //no instance
