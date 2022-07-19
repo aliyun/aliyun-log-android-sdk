@@ -3,7 +3,9 @@ package com.aliyun.sls.android.crashreporter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.app.Activity;
 import android.app.Application;
@@ -55,6 +57,7 @@ public class CrashReporterFeature extends SdkFeature {
     @Override
     protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
         this.initCrashApi(context, credentials, configuration);
+        CrashReporter.setCrashReporterFeature(this);
     }
 
     @Override
@@ -75,6 +78,34 @@ public class CrashReporterFeature extends SdkFeature {
     @Override
     public void addCustom(String eventId, Map<String, String> properties) {
         super.addCustom(eventId, properties);
+        if (TextUtils.isEmpty(eventId)) {
+            SLSLog.w(TAG, "eventId is empty.");
+            return;
+        }
+
+        SpanBuilder builder = newSpanBuilder("custom_error");
+        builder.addAttribute(
+            Attribute.of(
+                Pair.create("t", "error"),
+                Pair.create("ex.type", "custom"),
+                Pair.create("ex.event_id", eventId)
+            )
+        );
+
+        if (null != properties) {
+            properties = new LinkedHashMap<>(properties);
+            for (Entry<String, String> entry : properties.entrySet()) {
+                final String k = entry.getKey();
+                final String v = entry.getValue();
+                if (TextUtils.isEmpty(k) || TextUtils.isEmpty(v)) {
+                    continue;
+                }
+
+                builder.addAttribute(Attribute.of("ex." + k, v));
+            }
+        }
+
+        builder.build().end();
     }
 
     private void initCrashApi(Context context, Credentials credentials, Configuration configuration) {

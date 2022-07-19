@@ -7,11 +7,21 @@ import java.util.Map;
  * @date 2022/7/19
  */
 public class CrashReporter {
+    private static CrashReporterFeature crashReporterFeature;
+
     private CrashReporter() {
         //no instance
     }
 
+    static void setCrashReporterFeature(CrashReporterFeature crashReporterFeature) {
+        CrashReporter.crashReporterFeature = crashReporterFeature;
+    }
+
     public static void addCustomError(final String eventId, final Map<String, String> properties) {
-        //todo
+        if (null == crashReporterFeature) {
+            return;
+        }
+
+        crashReporterFeature.addCustom(eventId, properties);
     }
 }

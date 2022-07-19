@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.aliyun.sls.android.SLSAdapter;
 //import com.aliyun.sls.android.plugin.crashreporter.JNICrash;
+import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
@@ -134,14 +135,14 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 params.put("position", "1");
                 Map<String, String> params2 = new HashMap<>();
                 params2.put("position", "2");
-                SLSAdapter.getInstance().reportCustomEvent("MyTest", params);
-                SLSAdapter.getInstance().reportCustomEvent("MyTest2", params2);
+                CrashReporter.addCustomError("MyTest", params);
+                CrashReporter.addCustomError("MyTest2", params2);
                 getWindow().getDecorView().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         Map<String, String> params2 = new HashMap<>();
                         params2.put("position", "3");
-                        SLSAdapter.getInstance().reportCustomEvent("MyTest3", params2);
+                        CrashReporter.addCustomError("MyTest3", params2);
                     }
                 }, 1000);
                 break;
