@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import android.app.Activity;
 import android.app.Application;
@@ -25,6 +24,7 @@ import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.SpanBuilder;
 import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.ICrashClient;
+import org.json.JSONObject;
 
 /**
  * @author gordon
@@ -94,15 +94,8 @@ public class CrashReporterFeature extends SdkFeature {
 
         if (null != properties) {
             properties = new LinkedHashMap<>(properties);
-            for (Entry<String, String> entry : properties.entrySet()) {
-                final String k = entry.getKey();
-                final String v = entry.getValue();
-                if (TextUtils.isEmpty(k) || TextUtils.isEmpty(v)) {
-                    continue;
-                }
-
-                builder.addAttribute(Attribute.of("ex." + k, v));
-            }
+            JSONObject object = new JSONObject(properties);
+            builder.addAttribute(Attribute.of("ex.custom", object));
         }
 
         builder.build().end();
