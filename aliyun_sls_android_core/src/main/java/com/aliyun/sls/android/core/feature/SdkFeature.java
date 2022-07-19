@@ -14,7 +14,7 @@ import com.aliyun.sls.android.ot.SpanBuilder;
  */
 public abstract class SdkFeature extends NoOpFeature {
 
-    private AtomicBoolean hasInitialize = new AtomicBoolean(false);
+    private final AtomicBoolean hasInitialize = new AtomicBoolean(false);
     protected Context context;
     protected Configuration configuration;
 
@@ -74,7 +74,7 @@ public abstract class SdkFeature extends NoOpFeature {
     }
 
     @Override
-    public final void updateCredentials(Credentials credentials) {
+    public void setCredentials(Credentials credentials) {
 
     }
 

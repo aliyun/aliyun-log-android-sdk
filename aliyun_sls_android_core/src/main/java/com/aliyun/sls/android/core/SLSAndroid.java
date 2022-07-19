@@ -1,5 +1,6 @@
 package com.aliyun.sls.android.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,6 +13,7 @@ import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.core.feature.Feature;
 import com.aliyun.sls.android.core.sender.SdkSender;
+import com.aliyun.sls.android.core.sender.Sender;
 import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.core.utils.AppUtils;
 import com.aliyun.sls.android.core.utils.DeviceUtils;
@@ -26,6 +28,8 @@ import com.aliyun.sls.android.ot.Resource;
 public final class SLSAndroid {
     private static final String TAG = "SLSAndroid";
     private static Configuration configuration;
+    private static Credentials credentials;
+    private static final List<Feature> features = new ArrayList<>();
 
     // region initialize
     private final static AtomicBoolean hasInitialized = new AtomicBoolean(false);
@@ -45,10 +49,12 @@ public final class SLSAndroid {
             return false;
         }
 
-        configuration = new Configuration();
+        SLSAndroid.credentials = credentials;
+        configuration = new Configuration(new SdkSender(context));
         optionConfiguration.onConfiguration(configuration);
-        initializeDefaultSpanProvider(credentials, context);
-        initializeDefaultSpanProcessor(context, credentials, configuration);
+
+        initializeDefaultSpanProvider(context);
+        initializeSdkSender(context);
 
         initCrashReporterFeature(context, credentials, configuration);
 
@@ -58,10 +64,7 @@ public final class SLSAndroid {
         return true;
     }
 
-    private static void initializeDefaultSpanProvider(
-        final Credentials credentials,
-        final Context context
-    ) {
+    private static void initializeDefaultSpanProvider(final Context context) {
         final ISpanProvider userSpanProvider = configuration.spanProvider;
         configuration.spanProvider = new ISpanProvider() {
             @Override
@@ -132,14 +135,9 @@ public final class SLSAndroid {
         };
     }
 
-    private static void initializeDefaultSpanProcessor(
-        final Context context,
-        final Credentials credentials,
-        final Configuration configuration
-    ) {
-        final SdkSender spanProcessor = new SdkSender(context);
+    private static void initializeSdkSender(final Context context) {
+        final SdkSender spanProcessor = (SdkSender)configuration.spanProcessor;
         spanProcessor.initialize(credentials);
-        configuration.spanProcessor = spanProcessor;
     }
 
     private static void initCrashReporterFeature(
@@ -156,6 +154,8 @@ public final class SLSAndroid {
                 .forName("com.aliyun.sls.android.crashreporter.CrashReporterFeature")
                 .newInstance();
             feature.initialize(context, credentials, configuration);
+
+            features.add(feature);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
@@ -182,7 +182,38 @@ public final class SLSAndroid {
     }
 
     public static void setCredentials(Credentials credentials) {
+        if (null == credentials) {
+            return;
+        }
 
+        // set credentials field if not empty
+        if (!TextUtils.isEmpty(credentials.instanceId)) {
+            SLSAndroid.credentials.instanceId = credentials.instanceId;
+        }
+        if (null != credentials.endpoint) {
+            SLSAndroid.credentials.endpoint = credentials.endpoint;
+        }
+        if (!TextUtils.isEmpty(credentials.project)) {
+            SLSAndroid.credentials.project = credentials.project;
+        }
+        if (!TextUtils.isEmpty(credentials.accessKeyId)
+            || !TextUtils.isEmpty(credentials.accessKeySecret)
+            || !TextUtils.isEmpty(credentials.securityToken)
+        ) {
+            SLSAndroid.credentials.accessKeyId = credentials.accessKeyId;
+            SLSAndroid.credentials.accessKeySecret = credentials.accessKeySecret;
+            SLSAndroid.credentials.securityToken = credentials.securityToken;
+        }
+
+        // set default sender's credentials
+        if (configuration.spanProcessor instanceof Sender) {
+            ((Sender)configuration.spanProcessor).setCredentials(credentials);
+        }
+
+        // set all Feature's credentials
+        for (Feature feature : features) {
+            feature.setCredentials(credentials);
+        }
     }
 
     public static void setUserInfo(UserInfo info) {

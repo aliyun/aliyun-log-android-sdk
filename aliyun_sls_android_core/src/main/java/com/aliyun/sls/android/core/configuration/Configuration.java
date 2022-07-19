@@ -13,8 +13,12 @@ public class Configuration {
     public Boolean enableCrashReporter = Boolean.TRUE;
 
     public String env;
-    public ISpanProcessor spanProcessor;
+    public final ISpanProcessor spanProcessor;
     public ISpanProvider spanProvider;
 
     public UserInfo userInfo;
+
+    public Configuration(ISpanProcessor spanProcessor) {
+        this.spanProcessor = spanProcessor;
+    }
 }

@@ -12,11 +12,14 @@ import androidx.annotation.Nullable;
 import com.aliyun.sls.android.SLSAdapter;
 //import com.aliyun.sls.android.plugin.crashreporter.JNICrash;
 import com.aliyun.sls.android.core.SLSAndroid;
+import com.aliyun.sls.android.core.configuration.Credentials;
+import com.aliyun.sls.android.core.configuration.Credentials.Endpoint;
 import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -133,6 +136,13 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                     }
                 }
             case R.id.custom_log: {
+                Credentials credentials = new Credentials();
+                credentials.instanceId = "yuanbo-test-1111";
+                credentials.accessKeyId = PreferenceUtils.getAccessKeyId(this);
+                credentials.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
+                credentials.securityToken = PreferenceUtils.getAccessKeyToken(this);
+                SLSAndroid.setCredentials(credentials);
+
                 UserInfo info = new UserInfo();
                 info.uid = "11111111";
                 info.channel = "beta";

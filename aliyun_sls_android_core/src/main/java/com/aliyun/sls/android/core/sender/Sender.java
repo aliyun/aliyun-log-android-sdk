@@ -16,6 +16,6 @@ public interface Sender {
      */
     boolean send(Log data);
 
-    void updateCredentials(Credentials credentials);
+    void setCredentials(Credentials credentials);
 
 }

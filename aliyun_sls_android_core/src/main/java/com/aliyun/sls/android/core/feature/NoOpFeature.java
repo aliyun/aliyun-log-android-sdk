@@ -37,7 +37,7 @@ public class NoOpFeature implements Feature {
     }
 
     @Override
-    public void updateCredentials(Credentials credentials) {
+    public void setCredentials(Credentials credentials) {
 
     }
 

@@ -22,7 +22,7 @@ public interface Feature {
 
     void stop();
 
-    void updateCredentials(Credentials credentials);
+    void setCredentials(Credentials credentials);
 
     void addCustom(final String eventId, final Map<String, String> properties);
 }

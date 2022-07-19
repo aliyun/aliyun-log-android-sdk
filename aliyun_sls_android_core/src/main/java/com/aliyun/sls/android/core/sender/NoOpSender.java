@@ -19,7 +19,7 @@ public class NoOpSender implements Sender {
     }
 
     @Override
-    public void updateCredentials(Credentials credentials) {
+    public void setCredentials(Credentials credentials) {
 
     }
 }

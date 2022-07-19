@@ -23,6 +23,7 @@ import com.aliyun.sls.android.crashreporter.utils.IOUtils;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.SpanBuilder;
 import com.uc.crashsdk.export.CrashApi;
+import com.uc.crashsdk.export.CustomInfo;
 import com.uc.crashsdk.export.ICrashClient;
 import org.json.JSONObject;
 
@@ -73,6 +74,17 @@ public class CrashReporterFeature extends SdkFeature {
     @Override
     protected void onPostStop(Context context) {
 
+    }
+
+    @Override
+    public void setCredentials(Credentials credentials) {
+        super.setCredentials(credentials);
+        if (null == credentials || null == crashApi) {
+            return;
+        }
+
+        CustomInfo customInfo = new CustomInfo(credentials.instanceId);
+        crashApi.updateCustomInfo(customInfo);
     }
 
     @Override

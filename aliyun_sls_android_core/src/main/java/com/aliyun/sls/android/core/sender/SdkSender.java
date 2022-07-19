@@ -108,6 +108,10 @@ public class SdkSender implements Sender, ISpanProcessor {
     }
 
     private String getLogstoreByInstanceId(String instanceId) {
+        if (TextUtils.isEmpty(instanceId)) {
+            return "";
+        }
+        
         return String.format("%s-track-raw", instanceId);
     }
 
@@ -121,7 +125,7 @@ public class SdkSender implements Sender, ISpanProcessor {
     }
 
     @Override
-    public void updateCredentials(Credentials credentials) {
+    public void setCredentials(Credentials credentials) {
         if (null == credentials || null == config) {
             return;
         }
