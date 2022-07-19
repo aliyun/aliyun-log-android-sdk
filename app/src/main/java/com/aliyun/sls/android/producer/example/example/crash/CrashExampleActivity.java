@@ -10,7 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.aliyun.sls.android.SLSAdapter;
-import com.aliyun.sls.android.plugin.crashreporter.JNICrash;
+//import com.aliyun.sls.android.plugin.crashreporter.JNICrash;
+import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
 

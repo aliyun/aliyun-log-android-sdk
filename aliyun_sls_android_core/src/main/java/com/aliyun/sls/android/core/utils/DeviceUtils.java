@@ -3,7 +3,7 @@
 // (powered by Fernflower decompiler)
 //
 
-package com.aliyun.sls.android.scheme;
+package com.aliyun.sls.android.core.utils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,11 +12,9 @@ import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import com.aliyun.sls.android.SLSLog;
 import com.aliyun.sls.android.utdid.Utdid;
@@ -27,7 +25,7 @@ import com.aliyun.sls.android.utdid.Utdid;
  * @author gordon
  * @date 2021/04/19
  */
-class DeviceUtils {
+public class DeviceUtils {
     private static final String TAG = "DeviceUtils";
 
     public static final String NETWORK_CLASS_WIFI = "Wi-Fi";
@@ -107,7 +105,7 @@ class DeviceUtils {
         return NETWORK_INFO_DEFAULT[1];
     }
 
-    @SuppressLint({"WrongConstant"})
+    @SuppressLint({"WrongConstant", "MissingPermission"})
     public static String[] getNetworkType(Context context) {
         if (context == null) {
             return NETWORK_INFO_DEFAULT;
@@ -221,22 +219,7 @@ class DeviceUtils {
         }
     }
 
-    @SuppressLint({"MissingPermission", "HardwareIds"})
-    public static String getImsi(Context context) {
-        if (imsi != null) {
-            return imsi;
-        } else {
-            imsi = Utdid.getImsi(context);
-            return imsi;
-        }
-    }
-
-    public static String getImei(Context context) {
-        if (imei != null) {
-            return imei;
-        } else {
-            imei = Utdid.getImei(context);
-            return imei;
-        }
+    public static boolean isRoot() {
+        return RootUtil.isDeviceRooted();
     }
 }

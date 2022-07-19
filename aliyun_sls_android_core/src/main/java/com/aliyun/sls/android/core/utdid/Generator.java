@@ -1,13 +1,6 @@
-package com.aliyun.sls.android.utdid;
+package com.aliyun.sls.android.core.utdid;
 
 import java.security.MessageDigest;
-
-import android.Manifest;
-import android.content.Context;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
 
 /**
  * @author gordon
@@ -15,17 +8,10 @@ import android.telephony.TelephonyManager;
  */
 class Generator {
 
-    public static String getImei(Context context) {
-        return "";
-    }
-
-    public static String getImsi(Context context) {
-        return "";
-    }
-
     public static String md5(String code) {
         try {
-            byte[] bytes= MessageDigest.getInstance("MD5").digest(code.getBytes("UTF-8"));
+            @SuppressWarnings("CharsetObjectCanBeUsed")
+            byte[] bytes = MessageDigest.getInstance("MD5").digest(code.getBytes("UTF-8"));
             return bytes2Hex(bytes);
         } catch (Throwable e) {
             e.printStackTrace();
@@ -34,6 +20,7 @@ class Generator {
     }
 
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+
     private static String bytes2Hex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
