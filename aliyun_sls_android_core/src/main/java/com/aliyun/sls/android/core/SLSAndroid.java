@@ -25,6 +25,7 @@ import com.aliyun.sls.android.ot.Resource;
  */
 public final class SLSAndroid {
     private static final String TAG = "SLSAndroid";
+    private static Configuration configuration;
 
     // region initialize
     private final static AtomicBoolean hasInitialized = new AtomicBoolean(false);
@@ -44,9 +45,9 @@ public final class SLSAndroid {
             return false;
         }
 
-        Configuration configuration = new Configuration();
+        configuration = new Configuration();
         optionConfiguration.onConfiguration(configuration);
-        initializeDefaultSpanProvider(configuration, credentials, context);
+        initializeDefaultSpanProvider(credentials, context);
         initializeDefaultSpanProcessor(context, credentials, configuration);
 
         initCrashReporterFeature(context, credentials, configuration);
@@ -57,8 +58,10 @@ public final class SLSAndroid {
         return true;
     }
 
-    private static void initializeDefaultSpanProvider(final Configuration configuration, final Credentials credentials,
-        final Context context) {
+    private static void initializeDefaultSpanProvider(
+        final Credentials credentials,
+        final Context context
+    ) {
         final ISpanProvider userSpanProvider = configuration.spanProvider;
         configuration.spanProvider = new ISpanProvider() {
             @Override
@@ -165,6 +168,8 @@ public final class SLSAndroid {
 
     // endregion
 
+    // region setter
+
     /**
      * Sets this library log level
      *
@@ -172,7 +177,7 @@ public final class SLSAndroid {
      *              ({@link android.util.Log#VERBOSE}, {@link android.util.Log#DEBUG}, {@link android.util.Log#INFO},
      *              {@link android.util.Log#WARN}, {@link android.util.Log#ERROR}, {@link android.util.Log#ASSERT}).
      */
-    public void setLogLevel(int level) {
+    public static void setLogLevel(int level) {
         SLSLog.setLevel(level);
     }
 
@@ -180,9 +185,20 @@ public final class SLSAndroid {
 
     }
 
+    public static void setUserInfo(UserInfo info) {
+        if (null == configuration) {
+            return;
+        }
+
+        configuration.userInfo = info;
+    }
+    // endregion
+
+    // region stop
     public static void stop() {
 
     }
+    // endregion
 
     public interface OptionConfiguration {
         void onConfiguration(Configuration configuration);

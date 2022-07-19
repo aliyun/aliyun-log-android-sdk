@@ -11,6 +11,8 @@ import androidx.annotation.Nullable;
 
 import com.aliyun.sls.android.SLSAdapter;
 //import com.aliyun.sls.android.plugin.crashreporter.JNICrash;
+import com.aliyun.sls.android.core.SLSAndroid;
+import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
@@ -131,6 +133,12 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                     }
                 }
             case R.id.custom_log: {
+                UserInfo info = new UserInfo();
+                info.uid = "11111111";
+                info.channel = "beta";
+                info.addExt("tt", "vv");
+                SLSAndroid.setUserInfo(info);
+
                 Map<String, String> params = new HashMap<>();
                 params.put("position", "1");
                 Map<String, String> params2 = new HashMap<>();
