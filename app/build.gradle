@@ -60,6 +60,7 @@ dependencies {
     implementation project(':aliyun_sls_android_core')
     implementation project(':aliyun_sls_android_ot')
     implementation project(':aliyun_sls_android_crashreporter')
+    implementation project(':aliyun_sls_android_blockdetection')
 
     // sls android sdk lite version
 //     implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.4'

@@ -11,6 +11,7 @@ public class Configuration {
     private static final String TAG = "Configuration";
 
     public Boolean enableCrashReporter = Boolean.TRUE;
+    public Boolean enableBlockDetection = Boolean.TRUE;
 
     public String env;
     public final ISpanProcessor spanProcessor;

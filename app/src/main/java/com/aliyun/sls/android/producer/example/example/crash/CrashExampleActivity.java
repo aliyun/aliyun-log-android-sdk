@@ -54,7 +54,8 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 R.id.java_class_cast, R.id.java_number_format, R.id.java_out_of_bounds,
                 R.id.native_crash, R.id.native_heap_corruption, R.id.native_fd_leak,
                 R.id.native_abort, R.id.native_stack_overflow, R.id.native_oom,
-                R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr, R.id.custom_log
+                R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr, R.id.custom_log,
+                R.id.jank
         };
         for (int btnId : btnIds) {
             findViewById(btnId).setOnClickListener(this);
@@ -163,6 +164,14 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                         CrashReporter.addCustomError("MyTest3", params2);
                     }
                 }, 1000);
+                break;
+            }
+            case R.id.jank: {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 break;
             }
 

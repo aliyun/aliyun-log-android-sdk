@@ -57,6 +57,7 @@ public final class SLSAndroid {
         initializeSdkSender(context);
 
         initCrashReporterFeature(context, credentials, configuration);
+        initBlockDetectionFeature(context, credentials, configuration);
 
         hasInitialized.set(true);
 
@@ -149,21 +150,39 @@ public final class SLSAndroid {
             return;
         }
 
-        try {
-            Feature feature = (Feature)Class
-                .forName("com.aliyun.sls.android.crashreporter.CrashReporterFeature")
-                .newInstance();
-            feature.initialize(context, credentials, configuration);
+        initFeature(context, credentials, configuration, "com.aliyun.sls.android.crashreporter.CrashReporterFeature");
+    }
 
-            features.add(feature);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+    private static void initBlockDetectionFeature(
+        final Context context,
+        final Credentials credentials,
+        final Configuration configuration
+    ) {
+        if (!configuration.enableBlockDetection) {
+            return;
         }
 
+        initFeature(context, credentials, configuration, "com.aliyun.sls.android.blockdetection.JankDetectionFeature");
+    }
+
+    private static boolean initFeature(
+        final Context context,
+        final Credentials credentials,
+        final Configuration configuration,
+        final String clazzName
+    ) {
+        try {
+            Feature feature = (Feature)Class.forName(clazzName).newInstance();
+            if (null == feature) {
+                return false;
+            }
+            feature.initialize(context, credentials, configuration);
+            features.add(feature);
+            return true;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     // endregion
