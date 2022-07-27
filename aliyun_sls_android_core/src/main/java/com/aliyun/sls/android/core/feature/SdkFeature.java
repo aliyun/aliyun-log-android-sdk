@@ -28,7 +28,7 @@ public abstract class SdkFeature extends NoOpFeature {
         return null;
     }
 
-    protected SpanBuilder newSpanBuilder(String spanName) {
+    public SpanBuilder newSpanBuilder(String spanName) {
         return new SpanBuilder(spanName, configuration.spanProcessor, configuration.spanProvider);
     }
 

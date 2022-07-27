@@ -57,7 +57,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="TCPPING" />
+            android:text="TCP" />
 
         <Button
             android:id="@+id/example_send_mtr_text"
@@ -65,6 +65,13 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="MTR" />
+
+        <Button
+            android:id="@+id/example_send_dns_text"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="DNS" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.LinearLayoutCompat

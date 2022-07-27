@@ -9,8 +9,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import androidx.annotation.Nullable;
-import com.aliyun.sls.android.plugin.network_diagnosis.SLSNetDiagnosis;
-import com.aliyun.sls.android.plugin.network_diagnosis.SLSNetPolicyBuilder;
+//import com.aliyun.sls.android.plugin.network_diagnosis.SLSNetDiagnosis;
+//import com.aliyun.sls.android.plugin.network_diagnosis.SLSNetPolicyBuilder;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
 
@@ -59,33 +59,33 @@ public class NetworkWithPolicy extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network_with_policy_example);
         findViewById(R.id.example_network_policy_setup_text).setOnClickListener(v -> setup());
-        SLSNetDiagnosis.getInstance().registerCallback(
-            (type, result) -> printStatus(String.format("type: %s, result: %s", type.type, result))
-        );
+        //SLSNetDiagnosis.getInstance().registerCallback(
+        //    (type, result) -> printStatus(String.format("type: %s, result: %s", type.type, result))
+        //);
     }
 
     private void setup() {
-        SLSNetPolicyBuilder builder = new SLSNetPolicyBuilder();
-        // 默认开启
-        builder.setEnable(getBooleanFromEdit(R.id.example_network_policy_enable_edit, true));
-        // 默认为 ""
-        builder.setType(getStringFromEdit(R.id.example_network_policy_type_edit, ""));
-        // 默认为1
-        builder.setVersion(getIntFromEdit(R.id.example_network_policy_version_edit, 1));
-        // 默认为true，周期性策略
-        builder.setPeriodicity(getBooleanFromEdit(R.id.example_network_policy_periodicity_edit, true));
-        // 默认3分钟
-        builder.setInterval(getIntFromEdit(R.id.example_network_policy_interval_edit, 30));
-        // 默认7天
-        builder.setExpiration(getLongFromEdit(R.id.example_network_policy_expiration_edit, System.currentTimeMillis() / 1000 + 300));
-        // 默认1000，即全量
-        builder.setRatio(getIntFromEdit(R.id.example_network_policy_ratio_edit, 1000));
-        String whiteList = getStringFromEdit(R.id.example_network_policy_whitelist_edit, "");
-        if (!TextUtils.isEmpty(whiteList)) {
-            builder.setWhiteList(Arrays.asList(whiteList.split(",")));
-        }
-        String methods = getStringFromEdit(R.id.example_network_policy_method_edit, "mtr,ping,tcpping,http");
-        builder.setMethods(Arrays.asList(methods.split(",")));
+        //SLSNetPolicyBuilder builder = new SLSNetPolicyBuilder();
+        //// 默认开启
+        //builder.setEnable(getBooleanFromEdit(R.id.example_network_policy_enable_edit, true));
+        //// 默认为 ""
+        //builder.setType(getStringFromEdit(R.id.example_network_policy_type_edit, ""));
+        //// 默认为1
+        //builder.setVersion(getIntFromEdit(R.id.example_network_policy_version_edit, 1));
+        //// 默认为true，周期性策略
+        //builder.setPeriodicity(getBooleanFromEdit(R.id.example_network_policy_periodicity_edit, true));
+        //// 默认3分钟
+        //builder.setInterval(getIntFromEdit(R.id.example_network_policy_interval_edit, 30));
+        //// 默认7天
+        //builder.setExpiration(getLongFromEdit(R.id.example_network_policy_expiration_edit, System.currentTimeMillis() / 1000 + 300));
+        //// 默认1000，即全量
+        //builder.setRatio(getIntFromEdit(R.id.example_network_policy_ratio_edit, 1000));
+        //String whiteList = getStringFromEdit(R.id.example_network_policy_whitelist_edit, "");
+        //if (!TextUtils.isEmpty(whiteList)) {
+        //    builder.setWhiteList(Arrays.asList(whiteList.split(",")));
+        //}
+        //String methods = getStringFromEdit(R.id.example_network_policy_method_edit, "mtr,ping,tcpping,http");
+        //builder.setMethods(Arrays.asList(methods.split(",")));
 
         String ips = getStringFromEdit(R.id.example_network_policy_ips_edit, "");
         String urls = getStringFromEdit(R.id.example_network_policy_url_edit, "");
@@ -97,9 +97,9 @@ public class NetworkWithPolicy extends BaseActivity {
             }
             urls = urlsBuilder.toString();
         }
-        builder.addDestination(TextUtils.isEmpty(ips) ? endpoints : Arrays.asList(ips.split(",")), Arrays.asList(urls.split(",")));
-
-        SLSNetDiagnosis.getInstance().registerPolicy(builder);
+        //builder.addDestination(TextUtils.isEmpty(ips) ? endpoints : Arrays.asList(ips.split(",")), Arrays.asList(urls.split(",")));
+        //
+        //SLSNetDiagnosis.getInstance().registerPolicy(builder);
         printStatus("setup policy");
     }
 

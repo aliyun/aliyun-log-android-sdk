@@ -2,6 +2,7 @@ package com.aliyun.sls.android.core.sender;
 
 import java.io.File;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -21,8 +22,9 @@ import com.aliyun.sls.android.producer.LogProducerResult;
  * @date 2022/7/19
  */
 public class SdkSender implements Sender, ISpanProcessor {
-    private static final String TAG = "SdkSender";
+    protected static String TAG = "SdkSender";
 
+    private final AtomicBoolean hasInitialize = new AtomicBoolean(false);
     private final Context context;
     private LogProducerConfig config;
     private LogProducerClient client;
@@ -32,18 +34,52 @@ public class SdkSender implements Sender, ISpanProcessor {
     }
 
     @Override
-    public void initialize(Credentials credentials) {
-        initLogProducer(credentials);
+    public final void initialize(Credentials credentials) {
+        if (hasInitialize.get()) {
+            return;
+        }
+
+        initLogProducer(credentials, this.provideLogFileName());
+
+        hasInitialize.set(true);
     }
 
-    private void initLogProducer(Credentials credentials) {
-        final String accessKeyId = credentials.accessKeyId;
-        final String accessKeySecret = credentials.accessKeySecret;
-        final String accessToken = credentials.securityToken;
+    protected String provideLogFileName() {
+        return "data.dat";
+    }
 
-        final String endpoint = null != credentials.endpoint ? credentials.endpoint.endpoint : "";
-        final String project = credentials.project;
-        final String logstore = getLogstoreByInstanceId(credentials.instanceId);
+    protected String provideEndpoint(Credentials credentials) {
+        return null != credentials.endpoint ? credentials.endpoint.endpoint : "";
+    }
+
+    protected String provideProjectName(Credentials credentials) {
+        return credentials.project;
+    }
+
+    protected String provideLogstoreName(Credentials credentials) {
+        return getLogstoreByInstanceId(credentials.instanceId);
+    }
+
+    protected String provideAccessKeyId(Credentials credentials) {
+        return credentials.accessKeyId;
+    }
+
+    protected String provideAccessKeySecret(Credentials credentials) {
+        return credentials.accessKeySecret;
+    }
+
+    protected String provideSecurityToken(Credentials credentials) {
+        return credentials.securityToken;
+    }
+
+    protected void initLogProducer(Credentials credentials, final String fileName) {
+        final String accessKeyId = provideAccessKeyId(credentials);
+        final String accessKeySecret = provideAccessKeySecret(credentials);
+        final String accessToken = provideSecurityToken(credentials);
+
+        final String endpoint = provideEndpoint(credentials);
+        final String project = provideProjectName(credentials);
+        final String logstore = provideLogstoreName(credentials);
 
         try {
             config = new LogProducerConfig(
@@ -77,7 +113,7 @@ public class SdkSender implements Sender, ISpanProcessor {
         if (!rootPath.exists()) {
             rootPath.mkdirs();
         }
-        config.setPersistentFilePath(rootPath + File.separator + "data.dat");
+        config.setPersistentFilePath(rootPath + File.separator + fileName);
         // 是否每次AddLog强制刷新，高可靠性场景建议打开
         config.setPersistentForceFlush(0);
         // 持久化文件滚动个数，建议设置成10。
@@ -111,7 +147,7 @@ public class SdkSender implements Sender, ISpanProcessor {
         if (TextUtils.isEmpty(instanceId)) {
             return "";
         }
-        
+
         return String.format("%s-track-raw", instanceId);
     }
 

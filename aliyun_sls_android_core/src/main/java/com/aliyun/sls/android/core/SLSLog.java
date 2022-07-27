@@ -26,6 +26,12 @@ public final class SLSLog {
         }
     }
 
+    public static void i(String module, Object msg) {
+        if (level >= Log.INFO) {
+            Log.i(TAG, format(module, msg));
+        }
+    }
+
     public static void w(String module, Object msg) {
         if (level >= Log.WARN) {
             Log.w(TAG, format(module, msg));

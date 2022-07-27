@@ -54,10 +54,13 @@ public final class SLSAndroid {
         optionConfiguration.onConfiguration(configuration);
 
         initializeDefaultSpanProvider(context);
-        initializeSdkSender(context);
+        if (configuration.enableCrashReporter || configuration.enableBlockDetection) {
+            initializeSdkSender(context);
+        }
 
         initCrashReporterFeature(context, credentials, configuration);
         initBlockDetectionFeature(context, credentials, configuration);
+        initNetworkDiagnosisFeature(context, credentials, configuration);
 
         hasInitialized.set(true);
 
@@ -162,7 +165,19 @@ public final class SLSAndroid {
             return;
         }
 
-        initFeature(context, credentials, configuration, "com.aliyun.sls.android.blockdetection.JankDetectionFeature");
+        initFeature(context, credentials, configuration, "com.aliyun.sls.android.blockdetection.BlockDetectionFeature");
+    }
+
+    private static void initNetworkDiagnosisFeature(
+        final Context context,
+        final Credentials credentials,
+        final Configuration configuration
+    ) {
+        if (!configuration.enableNetworkDiagnosis) {
+            return;
+        }
+
+        initFeature(context, credentials, configuration, "com.aliyun.sls.android.network_diagnosis.NetworkDiagnosisFeature");
     }
 
     private static boolean initFeature(

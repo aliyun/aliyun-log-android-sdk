@@ -20,7 +20,7 @@ import com.efs.sdk.pa.config.PackageLevel;
  * @date 2022/7/21
  */
 public class BlockDetectionFeature extends SdkFeature {
-    private static final String TAG = "JankDetectionFeature";
+    private static final String TAG = "BlockDetectionFeature";
 
     @Override
     protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
@@ -29,17 +29,17 @@ public class BlockDetectionFeature extends SdkFeature {
             .uid(configuration.userInfo.uid)
             .debug(true)
             .printLogDetail(true)
-            .enableSendLog(false)
+            //.enableSendLog(false)
             .build();
 
-        reporter.getWPKReporter().addLogListener(new IWPKLogListener() {
-            @Override
-            public void onLogGenerate(ILogProtocol iLogProtocol) {
-                SLSLog.v(TAG, "jank type: " + iLogProtocol.getLogType() + ", file path: " + iLogProtocol.getFilePath()
-                    + ", jank log: " + iLogProtocol.generateString());
-                // TODO: 2022/7/22 report to sls
-            }
-        });
+        //reporter.getWPKReporter().addLogListener(new IWPKLogListener() {
+        //    @Override
+        //    public void onLogGenerate(ILogProtocol iLogProtocol) {
+        //        SLSLog.v(TAG, "jank type: " + iLogProtocol.getLogType() + ", file path: " + iLogProtocol.getFilePath()
+        //            + ", jank log: " + iLogProtocol.generateString());
+        //        // TODO: 2022/7/22 report to sls
+        //    }
+        //});
 
         PAFactory.Builder builder = new Builder(context, new IWPKReporter() {
             @Override

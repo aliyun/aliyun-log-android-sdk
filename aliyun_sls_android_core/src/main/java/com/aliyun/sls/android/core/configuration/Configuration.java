@@ -10,8 +10,9 @@ import com.aliyun.sls.android.ot.ISpanProvider;
 public class Configuration {
     private static final String TAG = "Configuration";
 
-    public Boolean enableCrashReporter = Boolean.TRUE;
-    public Boolean enableBlockDetection = Boolean.TRUE;
+    public Boolean enableCrashReporter = Boolean.FALSE;
+    public Boolean enableBlockDetection = Boolean.FALSE;
+    public Boolean enableNetworkDiagnosis = Boolean.FALSE;
 
     public String env;
     public final ISpanProcessor spanProcessor;
