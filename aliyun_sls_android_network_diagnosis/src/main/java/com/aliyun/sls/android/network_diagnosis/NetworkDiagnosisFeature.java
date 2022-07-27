@@ -330,6 +330,11 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         }
 
         @Override
+        public void setCredentials(Credentials credentials) {
+            super.setCredentials(credentials.networkDiagnosisCredentials);
+        }
+
+        @Override
         public void debug(String tag, String msg) {
             SLSLog.d(tag, msg);
         }
