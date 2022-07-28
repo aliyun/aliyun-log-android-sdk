@@ -271,7 +271,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
 
     private static class NetworkDiagnosisSender extends SdkSender implements Logger, ISpanProcessor {
-        static {
+        {
             TAG = "NetworkDiagnosisSender";
         }
 

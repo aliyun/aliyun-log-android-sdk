@@ -22,7 +22,7 @@ import com.aliyun.sls.android.producer.LogProducerResult;
  * @date 2022/7/19
  */
 public class SdkSender implements Sender, ISpanProcessor {
-    protected static String TAG = "SdkSender";
+    protected String TAG = "SdkSender";
 
     private final AtomicBoolean hasInitialize = new AtomicBoolean(false);
     private final Context context;

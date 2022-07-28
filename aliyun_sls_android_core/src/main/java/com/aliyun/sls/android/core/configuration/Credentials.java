@@ -56,7 +56,7 @@ public class Credentials {
 
     public static class NetworkDiagnosisCredentials extends LogstoreCredentials {
         public String secretKey;
-        public String siteId = "public";
+        public String siteId = null;
         public final Map<String, String> extension = new LinkedHashMap<>();
 
         private NetworkDiagnosisCredentials(Credentials credentials) {
