@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.network_diagnosis;
 
+import java.nio.charset.Charset;
+
 import com.alibaba.netspeed.network.DetectCallback;
 import com.alibaba.netspeed.network.Diagnosis;
 import com.alibaba.netspeed.network.DnsConfig;
@@ -12,6 +14,7 @@ import com.alibaba.netspeed.network.TcpPingConfig;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Pair;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Configuration;
@@ -56,12 +59,34 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         super.onInitSender(context, credentials, configuration);
     }
 
+    private String getIPAIdBySecretKey(String secretKey) {
+        @SuppressWarnings("CharsetObjectCanBeUsed")
+        String decode = new String(
+            Base64.decode(
+                secretKey.getBytes(Charset.forName("UTF-8")),
+                Base64.DEFAULT
+            ),
+            Charset.forName("UTF-8")
+        );
+
+        try {
+            JSONObject object = new JSONObject(decode);
+            return object.optString("ipa_app_id").toLowerCase();
+        } catch (JSONException e) {
+            return "";
+        }
+    }
+
     @Override
     protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
         final NetworkDiagnosisCredentials networkDiagnosisCredentials = credentials.networkDiagnosisCredentials;
         if (null == networkDiagnosisCredentials) {
             SLSLog.w(TAG, "NetworkDiagnosisCredentials must not be null.");
             return;
+        }
+
+        if (!TextUtils.isEmpty(networkDiagnosisCredentials.secretKey)) {
+            networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(networkDiagnosisCredentials.secretKey);
         }
 
         Diagnosis.init(
@@ -274,7 +299,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
         @Override
         protected String provideLogstoreName(Credentials credentials) {
-            return credentials.networkDiagnosisCredentials.logstore;
+            return String.format("ipa-%s-raw", credentials.networkDiagnosisCredentials.instanceId);
         }
 
         @Override
