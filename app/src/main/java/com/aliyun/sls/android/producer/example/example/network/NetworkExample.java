@@ -6,15 +6,9 @@ import java.util.List;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-
 import androidx.annotation.Nullable;
-
-import com.aliyun.sls.android.SLSAdapter;
-import com.aliyun.sls.android.SLSConfig;
 import com.aliyun.sls.android.SLSLog;
 import com.aliyun.sls.android.network_diagnosis.NetworkDiagnosis;
-//import com.aliyun.sls.android.plugin.network_diagnosis.SLSNetDiagnosis;
-//import com.aliyun.sls.android.plugin.network_diagnosis.SLSNetDiagnosisPlugin;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
 
@@ -58,7 +52,6 @@ public class NetworkExample extends BaseActivity {
     };
     private int index = 0;
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,43 +78,42 @@ public class NetworkExample extends BaseActivity {
 
         findViewById(R.id.example_send_http_text).setOnClickListener(v -> {
             printStatus("start http...");
-            NetworkDiagnosis.getInstance().http("https://www.aliyun.com");
-            //SLSNetDiagnosis.getInstance().http("https://www.aliyun.com", result -> {
-            //    SLSLog.d(TAG, String.format("http result: %s", result));
-            //    printStatus(String.format("http result: %s", result));
-            //});
+            NetworkDiagnosis.getInstance().http("https://www.aliyun.com", (type, ret) -> {
+                SLSLog.d(TAG, String.format("http result: %s", ret));
+                printStatus(String.format("http result: %s", ret));
+            });
         });
 
         findViewById(R.id.example_send_ping_text).setOnClickListener(v -> {
             printStatus("start ping...");
-            NetworkDiagnosis.getInstance().ping("www.aliyun.com");
-            //SLSNetDiagnosis.getInstance().ping("www.aliyun.com", result -> {
-            //    SLSLog.d(TAG, String.format("ping result: %s", result));
-            //    printStatus(String.format("ping result: %s", result));
-            //});
+            NetworkDiagnosis.getInstance().ping("www.aliyun.com", (type, ret) -> {
+                SLSLog.d(TAG, String.format("ping result: %s", ret));
+                printStatus(String.format("ping result: %s", ret));
+            });
         });
 
         findViewById(R.id.example_send_tcpping_text).setOnClickListener(v -> {
             printStatus("start tcp ping...");
-            NetworkDiagnosis.getInstance().tcpPing("www.aliyun.com", 80);
-            //SLSNetDiagnosis.getInstance().tcpPing("www.aliyun.com", 80,result -> {
-            //    SLSLog.d(TAG, String.format("tcp ping result: %s", result));
-            //    printStatus(String.format("tcp ping result: %s", result));
-            //});
+            NetworkDiagnosis.getInstance().tcpPing("www.aliyun.com", 80, (type, ret) -> {
+                SLSLog.d(TAG, String.format("tcp ping result: %s", ret));
+                printStatus(String.format("tcp ping result: %s", ret));
+            });
         });
 
         findViewById(R.id.example_send_mtr_text).setOnClickListener(v -> {
             printStatus("start mtr...");
-            NetworkDiagnosis.getInstance().mtr("www.aliyun.com");
-            //SLSNetDiagnosis.getInstance().mtr("www.aliyun.com", result -> {
-            //    SLSLog.d(TAG, String.format("mtr result: %s", result));
-            //    printStatus(String.format("mtr result: %s", result));
-            //});
+            NetworkDiagnosis.getInstance().mtr("www.aliyun.com", (type, ret) -> {
+                SLSLog.d(TAG, String.format("mtr result: %s", ret));
+                printStatus(String.format("mtr result: %s", ret));
+            });
         });
 
         findViewById(R.id.example_send_dns_text).setOnClickListener(v -> {
             printStatus("start dns...");
-            NetworkDiagnosis.getInstance().dns("223.5.5.5", "www.aliyun.com");
+            NetworkDiagnosis.getInstance().dns("www.aliyun.com", (type, ret) -> {
+                SLSLog.d(TAG, String.format("dns result: %s", ret));
+                printStatus(String.format("dns result: %s", ret));
+            });
         });
 
         findViewById(R.id.example_send_auto_text).setOnClickListener(this::auto);
@@ -148,6 +140,5 @@ public class NetworkExample extends BaseActivity {
 
         v.postDelayed(() -> auto(v), 5000);
     }
-
 
 }

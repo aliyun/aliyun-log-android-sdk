@@ -2,7 +2,6 @@ package com.aliyun.sls.android.network_diagnosis;
 
 import java.nio.charset.Charset;
 
-import com.alibaba.netspeed.network.DetectCallback;
 import com.alibaba.netspeed.network.Diagnosis;
 import com.alibaba.netspeed.network.DnsConfig;
 import com.alibaba.netspeed.network.HttpConfig;
@@ -54,6 +53,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         return new SpanBuilder(spanName, networkDiagnosisSender, configuration.spanProvider);
     }
 
+    // region init
     @Override
     protected void onInitSender(Context context, Credentials credentials, Configuration configuration) {
         super.onInitSender(context, credentials, configuration);
@@ -118,7 +118,9 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     protected void onPostStop(Context context) {
 
     }
+    // endregion
 
+    // region setter
     @Override
     public void setCredentials(Credentials credentials) {
         super.setCredentials(credentials);
@@ -142,35 +144,54 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     public void disableExNetworkInfo() {
         Diagnosis.disableExNetworkInfo();
     }
+    // endregion
 
+    // region http
+    @Override
     public void http(String url) {
+        this.http(url, null);
+    }
+
+    public void http(String url, Callback callback) {
         Diagnosis.startHttpPing(
             new HttpConfig(
                 TASK_ID_GENERATOR.generate(),
                 url,
-                (DetectCallback)null,
+                (context, result) -> {
+                    if (null != callback) {
+                        callback.onComplete(Type.HTTP, result);
+                    }
+                    return 0;
+                },
                 this
             )
         );
     }
+    // endregion
 
+    // region ping
     @Override
     public void ping(String domain) {
-        this.ping(domain, DEFAULT_PING_SIZE);
+        this.ping(domain, null);
     }
 
     @Override
-    public void ping(String domain, int size) {
-        this.ping(domain, size, DEFAULT_MAX_TIMES, DEFAULT_TIMEOUT);
+    public void ping(String domain, Callback callback) {
+        this.ping(domain, DEFAULT_PING_SIZE, callback);
     }
 
     @Override
-    public void ping(String domain, int maxTimes, int timeout) {
-        this.ping(domain, DEFAULT_PING_SIZE, maxTimes, timeout);
+    public void ping(String domain, int size, Callback callback) {
+        this.ping(domain, size, DEFAULT_MAX_TIMES, DEFAULT_TIMEOUT, callback);
     }
 
     @Override
-    public void ping(String domain, int size, int maxTimes, int timeout) {
+    public void ping(String domain, int maxTimes, int timeout, Callback callback) {
+        this.ping(domain, DEFAULT_PING_SIZE, maxTimes, timeout, callback);
+    }
+
+    @Override
+    public void ping(String domain, int size, int maxTimes, int timeout, Callback callback) {
         Diagnosis.startPing(
             new PingConfig(
                 TASK_ID_GENERATOR.generate(),
@@ -178,24 +199,36 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 size,
                 maxTimes,
                 timeout,
-                null,
+                (context, result) -> {
+                    if (null != callback) {
+                        callback.onComplete(Type.PING, result);
+                    }
+                    return 0;
+                },
                 this
             )
         );
     }
+    // endregion
 
+    // region tcp ping
     @Override
     public void tcpPing(String domain, int port) {
-        this.tcpPing(domain, port, DEFAULT_MAX_TIMES);
+        this.tcpPing(domain, port, null);
     }
 
     @Override
-    public void tcpPing(String domain, int port, int maxTimes) {
-        this.tcpPing(domain, port, maxTimes, DEFAULT_TIMEOUT);
+    public void tcpPing(String domain, int port, Callback callback) {
+        this.tcpPing(domain, port, DEFAULT_MAX_TIMES, callback);
     }
 
     @Override
-    public void tcpPing(String domain, int port, int maxTimes, int timeout) {
+    public void tcpPing(String domain, int port, int maxTimes, Callback callback) {
+        this.tcpPing(domain, port, maxTimes, DEFAULT_TIMEOUT, callback);
+    }
+
+    @Override
+    public void tcpPing(String domain, int port, int maxTimes, int timeout, Callback callback) {
         Diagnosis.startTcpPing(
             new TcpPingConfig(
                 TASK_ID_GENERATOR.generate(),
@@ -203,34 +236,46 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 port,
                 maxTimes,
                 timeout,
-                null,
+                (context, result) -> {
+                    if (null != callback) {
+                        callback.onComplete(Type.TCPPING, result);
+                    }
+                    return 0;
+                },
                 this
             )
         );
     }
+    // endregion
 
+    // region mtr
     @Override
     public void mtr(String domain) {
-        this.mtr(domain, DEFAULT_MTR_MAX_TTL);
+        this.mtr(domain, null);
     }
 
     @Override
-    public void mtr(String domain, int maxTTL) {
-        this.mtr(domain, maxTTL, DEFAULT_MTR_MAX_PATH);
+    public void mtr(String domain, Callback callback) {
+        this.mtr(domain, DEFAULT_MTR_MAX_TTL, callback);
     }
 
     @Override
-    public void mtr(String domain, int maxTTL, int maxPaths) {
-        this.mtr(domain, maxTTL, maxPaths, DEFAULT_MAX_TIMES);
+    public void mtr(String domain, int maxTTL, Callback callback) {
+        this.mtr(domain, maxTTL, DEFAULT_MTR_MAX_PATH, callback);
     }
 
     @Override
-    public void mtr(String domain, int maxTTL, int maxPaths, int maxTimes) {
-        this.mtr(domain, maxTTL, maxPaths, maxTimes, DEFAULT_TIMEOUT);
+    public void mtr(String domain, int maxTTL, int maxPaths, Callback callback) {
+        this.mtr(domain, maxTTL, maxPaths, DEFAULT_MAX_TIMES, callback);
     }
 
     @Override
-    public void mtr(String domain, int maxTTL, int maxPaths, int maxTimes, int timeout) {
+    public void mtr(String domain, int maxTTL, int maxPaths, int maxTimes, Callback callback) {
+        this.mtr(domain, maxTTL, maxPaths, maxTimes, DEFAULT_TIMEOUT, callback);
+    }
+
+    @Override
+    public void mtr(String domain, int maxTTL, int maxPaths, int maxTimes, int timeout, Callback callback) {
         Diagnosis.startMtr(
             new MtrConfig(
                 TASK_ID_GENERATOR.generate(),
@@ -239,24 +284,41 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 maxPaths,
                 maxTimes,
                 timeout,
-                null,
+                (context, result) -> {
+                    if (null != callback) {
+                        callback.onComplete(Type.MTR, result);
+                    }
+                    return 0;
+                },
                 this
             )
         );
     }
+    // endregion
 
+    // region
     @Override
-    public void dns(String nameServer, String domain) {
-        this.dns(nameServer, domain, DNS_TYPE_IPv4);
+    public void dns(String domain) {
+        this.dns(domain, null);
     }
 
     @Override
-    public void dns(String nameServer, String domain, String type) {
-        this.dns(nameServer, domain, type, DEFAULT_TIMEOUT);
+    public void dns(String domain, Callback callback) {
+        this.dns(null, domain, callback);
     }
 
     @Override
-    public void dns(String nameServer, String domain, String type, int timeout) {
+    public void dns(String nameServer, String domain, Callback callback) {
+        this.dns(nameServer, domain, DNS_TYPE_IPv4, callback);
+    }
+
+    @Override
+    public void dns(String nameServer, String domain, String type, Callback callback) {
+        this.dns(nameServer, domain, type, DEFAULT_TIMEOUT, callback);
+    }
+
+    @Override
+    public void dns(String nameServer, String domain, String type, int timeout, Callback callback) {
         Diagnosis.startDns(
             new DnsConfig(
                 TASK_ID_GENERATOR.generate(),
@@ -264,21 +326,25 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 domain,
                 type,
                 timeout,
-                null,
+                (context, result) -> {
+                    if (null != callback) {
+                        callback.onComplete(Type.DNS, result);
+                    }
+                    return 0;
+                },
                 this
             )
         );
     }
+    // endregion
 
     private static class NetworkDiagnosisSender extends SdkSender implements Logger, ISpanProcessor {
-        {
-            TAG = "NetworkDiagnosisSender";
-        }
 
         private final SdkFeature feature;
 
         public NetworkDiagnosisSender(Context context, SdkFeature feature) {
             super(context);
+            TAG = "NetworkDiagnosisSender";
             this.feature = feature;
         }
 

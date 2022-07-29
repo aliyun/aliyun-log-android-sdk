@@ -24,6 +24,7 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
         return null != this.networkDiagnosis;
     }
 
+    // region
     @Override
     public void disableExNetworkInfo() {
         if (checkNetworkDiagnosis()) {
@@ -37,7 +38,9 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
             networkDiagnosis.setPolicyDomain(domain);
         }
     }
+    // endregion
 
+    // region http
     @Override
     public void http(String url) {
         if (checkNetworkDiagnosis()) {
@@ -46,6 +49,15 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
     }
 
     @Override
+    public void http(String url, Callback callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.http(url, callback);
+        }
+    }
+    // endregion
+
+    // region ping
+    @Override
     public void ping(String domain) {
         if (checkNetworkDiagnosis()) {
             networkDiagnosis.ping(domain);
@@ -53,26 +65,35 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
     }
 
     @Override
-    public void ping(String domain, int size) {
+    public void ping(String domain, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.ping(domain, size);
+            networkDiagnosis.ping(domain, callback);
         }
     }
 
     @Override
-    public void ping(String domain, int maxTimes, int timeout) {
+    public void ping(String domain, int size, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.ping(domain, maxTimes, timeout);
+            networkDiagnosis.ping(domain, size, callback);
         }
     }
 
     @Override
-    public void ping(String domain, int size, int maxTimes, int timeout) {
+    public void ping(String domain, int maxTimes, int timeout, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.ping(domain, size, maxTimes, timeout);
+            networkDiagnosis.ping(domain, maxTimes, timeout, callback);
         }
     }
 
+    @Override
+    public void ping(String domain, int size, int maxTimes, int timeout, Callback callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.ping(domain, size, maxTimes, timeout, callback);
+        }
+    }
+    // endregion
+
+    // region tcp ping
     @Override
     public void tcpPing(String domain, int port) {
         if (checkNetworkDiagnosis()) {
@@ -81,19 +102,28 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
     }
 
     @Override
-    public void tcpPing(String domain, int port, int maxTimes) {
+    public void tcpPing(String domain, int port, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.tcpPing(domain, port, maxTimes);
+            networkDiagnosis.tcpPing(domain, port, callback);
         }
     }
 
     @Override
-    public void tcpPing(String domain, int port, int maxTimes, int timeout) {
+    public void tcpPing(String domain, int port, int maxTimes, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.tcpPing(domain, port, maxTimes, timeout);
+            networkDiagnosis.tcpPing(domain, port, maxTimes, callback);
         }
     }
 
+    @Override
+    public void tcpPing(String domain, int port, int maxTimes, int timeout, Callback callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.tcpPing(domain, port, maxTimes, timeout, callback);
+        }
+    }
+    // endregion
+
+    // region mtr
     @Override
     public void mtr(String domain) {
         if (checkNetworkDiagnosis()) {
@@ -102,51 +132,75 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
     }
 
     @Override
-    public void mtr(String domain, int maxTTL) {
+    public void mtr(String domain, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.mtr(domain, maxTTL);
+            networkDiagnosis.mtr(domain, callback);
         }
     }
 
     @Override
-    public void mtr(String domain, int maxTTL, int maxPaths) {
+    public void mtr(String domain, int maxTTL, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.mtr(domain, maxTTL, maxPaths);
+            networkDiagnosis.mtr(domain, maxTTL, callback);
         }
     }
 
     @Override
-    public void mtr(String domain, int maxTTL, int maxPaths, int maxTimes) {
+    public void mtr(String domain, int maxTTL, int maxPaths, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.mtr(domain, maxTTL, maxPaths, maxTimes);
+            networkDiagnosis.mtr(domain, maxTTL, maxPaths, callback);
         }
     }
 
     @Override
-    public void mtr(String domain, int maxTTL, int maxPaths, int maxTimes, int timeout) {
+    public void mtr(String domain, int maxTTL, int maxPaths, int maxTimes, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.mtr(domain, maxTTL, maxPaths, maxTimes, timeout);
+            networkDiagnosis.mtr(domain, maxTTL, maxPaths, maxTimes, callback);
         }
     }
 
     @Override
-    public void dns(String nameServer, String domain) {
+    public void mtr(String domain, int maxTTL, int maxPaths, int maxTimes, int timeout, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.dns(nameServer, domain);
+            networkDiagnosis.mtr(domain, maxTTL, maxPaths, maxTimes, timeout, callback);
+        }
+    }
+    // endregion
+
+    // region dns
+    @Override
+    public void dns(String domain) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.dns(domain);
         }
     }
 
     @Override
-    public void dns(String nameServer, String domain, String type) {
+    public void dns(String domain, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.dns(nameServer, domain, type);
+            networkDiagnosis.dns(domain, callback);
         }
     }
 
     @Override
-    public void dns(String nameServer, String domain, String type, int timeout) {
+    public void dns(String nameServer, String domain, Callback callback) {
         if (checkNetworkDiagnosis()) {
-            networkDiagnosis.dns(nameServer, domain, type, timeout);
+            networkDiagnosis.dns(nameServer, domain, callback);
         }
     }
+
+    @Override
+    public void dns(String nameServer, String domain, String type, Callback callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.dns(nameServer, domain, type, callback);
+        }
+    }
+
+    @Override
+    public void dns(String nameServer, String domain, String type, int timeout, Callback callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.dns(nameServer, domain, type, timeout, callback);
+        }
+    }
+    // endregion
 }

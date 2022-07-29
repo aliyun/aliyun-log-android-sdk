@@ -63,10 +63,10 @@ dependencies {
     implementation project(':aliyun_sls_android_network_diagnosis')
 
     // sls android sdk lite version
-//     implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.4'
-//    implementation 'com.aliyun.openservices:alysls-android-core:1.0.0-SNAPSHOT'
+//     implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.5.1'
+//    implementation 'com.aliyun.openservices:alysls-android-core:1.0.1-SNAPSHOT'
 //    implementation 'com.aliyun.openservices:alysls-android-ot:1.0.0-SNAPSHOT'
-//    implementation 'com.aliyun.openservices:alysls-android-network_diagnosis:2.0.0-SNAPSHOT'
+//    implementation 'com.aliyun.openservices:alysls-android-network_diagnosis:2.0.1-SNAPSHOT'
 //    implementation 'com.aliyun.openservices:alysls-android-crashreporter:2.0.0-SNAPSHOT'
 //    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:bricks_1.0.13'
 //    implementation 'com.aliyun.openservices:alysls-android-trace:1.0.3'
