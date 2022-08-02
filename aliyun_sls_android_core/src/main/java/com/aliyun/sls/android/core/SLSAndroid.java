@@ -154,9 +154,9 @@ public final class SLSAndroid {
 
                 for (Entry<String, Object> entry : extras.entrySet()) {
                     if (entry.getValue() instanceof Map) {
-                        attributes.add(Attribute.of(entry.getKey(), JsonUtil.fromMap((Map)entry.getValue())));
+                        attributes.add(Attribute.of("extras." + entry.getKey(), JsonUtil.fromMap((Map)entry.getValue())));
                     } else {
-                        attributes.add(Attribute.of((String)entry.getValue(), entry.getValue().toString()));
+                        attributes.add(Attribute.of("extras." + entry.getKey(), entry.getValue().toString()));
                     }
                 }
             }
