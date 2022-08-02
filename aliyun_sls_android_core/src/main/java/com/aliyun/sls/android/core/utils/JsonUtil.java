@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.core.utils;
 
+import java.util.Map;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,5 +23,11 @@ public class JsonUtil {
             return false;
         }
         return true;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static String fromMap(Map map) {
+        JSONObject object = new JSONObject(map);
+        return object.toString();
     }
 }

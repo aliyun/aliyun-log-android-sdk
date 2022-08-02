@@ -1,7 +1,11 @@
 package com.aliyun.sls.android.core;
 
+import java.security.Key;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -17,6 +21,7 @@ import com.aliyun.sls.android.core.sender.Sender;
 import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.core.utils.AppUtils;
 import com.aliyun.sls.android.core.utils.DeviceUtils;
+import com.aliyun.sls.android.core.utils.JsonUtil;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
 import com.aliyun.sls.android.ot.Resource;
@@ -30,6 +35,7 @@ public final class SLSAndroid {
     private static Configuration configuration;
     private static Credentials credentials;
     private static final List<Feature> features = new ArrayList<>();
+    private static final ExtraProvider extraProvider = new ExtraProvider();
 
     // region initialize
     private final static AtomicBoolean hasInitialized = new AtomicBoolean(false);
@@ -108,6 +114,8 @@ public final class SLSAndroid {
                     provideUserInfo(attributes, configuration.userInfo);
                 }
 
+                provideExtras(attributes);
+
                 if (null != userSpanProvider) {
                     List<Attribute> userAttributes = userSpanProvider.provideAttribute();
                     if (null != userAttributes) {
@@ -133,6 +141,22 @@ public final class SLSAndroid {
                             continue;
                         }
                         attributes.add(Attribute.of("user." + k, v));
+                    }
+                }
+            }
+
+            @SuppressWarnings("rawtypes")
+            private void provideExtras(List<Attribute> attributes) {
+                final Map<String, Object> extras = new LinkedHashMap<>(extraProvider.extras);
+                if (extras.isEmpty()) {
+                    return;
+                }
+
+                for (Entry<String, Object> entry : extras.entrySet()) {
+                    if (entry.getValue() instanceof Map) {
+                        attributes.add(Attribute.of(entry.getKey(), JsonUtil.fromMap((Map)entry.getValue())));
+                    } else {
+                        attributes.add(Attribute.of((String)entry.getValue(), entry.getValue().toString()));
                     }
                 }
             }
@@ -257,6 +281,22 @@ public final class SLSAndroid {
 
         configuration.userInfo = info;
     }
+
+    public static void setExtra(String key, Map<String, String> values) {
+        extraProvider.setExtra(key, values);
+    }
+
+    public static void setExtra(String key, String value) {
+        extraProvider.setExtra(key, value);
+    }
+
+    public static void removeExtra(String key) {
+        extraProvider.removeExtra(key);
+    }
+
+    public static void clearExtra() {
+        extraProvider.clearExtra();
+    }
     // endregion
 
     // region stop
@@ -267,5 +307,39 @@ public final class SLSAndroid {
 
     public interface OptionConfiguration {
         void onConfiguration(Configuration configuration);
+    }
+
+    private static class ExtraProvider {
+        private final Map<String, Object> extras = new LinkedHashMap<>();
+
+        void setExtra(String key, Map<String, String> values) {
+            if (TextUtils.isEmpty(key) || null == values) {
+                return;
+            }
+
+            extras.put(key, new LinkedHashMap<>(values));
+        }
+
+        void setExtra(String key, String value) {
+            if (TextUtils.isEmpty(key)) {
+                return;
+            }
+
+            if (null == value) {
+                value = "null";
+            }
+            extras.put(key, value);
+        }
+
+        @SuppressWarnings("RedundantCollectionOperation")
+        void removeExtra(String key) {
+            if (extras.containsKey(key)) {
+                extras.remove(key);
+            }
+        }
+
+        void clearExtra() {
+            extras.clear();
+        }
     }
 }

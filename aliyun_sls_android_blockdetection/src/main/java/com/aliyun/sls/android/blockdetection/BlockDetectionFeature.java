@@ -1,11 +1,15 @@
 package com.aliyun.sls.android.blockdetection;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Pair;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.feature.SdkFeature;
 import com.aliyun.sls.android.core.utils.AppUtils;
+import com.aliyun.sls.android.ot.Attribute;
+import com.aliyun.sls.android.ot.SpanBuilder;
 import com.efs.sdk.base.EfsReporter;
 import com.efs.sdk.base.WPKReporter;
 import com.efs.sdk.base.listener.IWPKLogListener;
@@ -29,24 +33,32 @@ public class BlockDetectionFeature extends SdkFeature {
             .uid(configuration.userInfo.uid)
             .debug(true)
             .printLogDetail(true)
-            //.enableSendLog(false)
+            .enableSendLog(false)
             .build();
 
-        //reporter.getWPKReporter().addLogListener(new IWPKLogListener() {
-        //    @Override
-        //    public void onLogGenerate(ILogProtocol iLogProtocol) {
-        //        SLSLog.v(TAG, "jank type: " + iLogProtocol.getLogType() + ", file path: " + iLogProtocol.getFilePath()
-        //            + ", jank log: " + iLogProtocol.generateString());
-        //        // TODO: 2022/7/22 report to sls
-        //    }
-        //});
+        reporter.getWPKReporter().addLogListener(iLogProtocol -> {
+            SLSLog.v(TAG, "jank type: " + iLogProtocol.getLogType() + ", file path: " + iLogProtocol.getFilePath()
+                + ", jank log: " + iLogProtocol.generateString());
 
-        PAFactory.Builder builder = new Builder(context, new IWPKReporter() {
-            @Override
-            public WPKReporter getReporter() {
-                return reporter.getWPKReporter();
+            SpanBuilder builder = newSpanBuilder("block");
+
+            final String type = iLogProtocol.getLogType();
+            if (TextUtils.equals("patrace", type) || TextUtils.equals("patracepv", type)) {
+                builder.addAttribute(
+                  Attribute.of(
+                      Pair.create("t", "block"),
+                      Pair.create("ex.type", type),
+                      Pair.create("ex.origin", iLogProtocol.generateString())
+                  )
+                );
+            } else {
+                return;
             }
+
+            builder.build().end();
         });
+
+        PAFactory.Builder builder = new Builder(context, reporter::getWPKReporter);
         builder.packageLevel(PackageLevel.TRIAL);
         builder.serial(AppUtils.getAppVersion(context));
         builder.timeoutTime(1000);
