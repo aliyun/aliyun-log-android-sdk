@@ -154,7 +154,7 @@ public class CrashReporterFeature extends SdkFeature {
         // 防止 uc 计算 crc
         args.putString("mBuildId", AppUtils.getAppVersion(context));
 
-        crashApi = CrashApi.createInstanceEx(context, appId, false, args, new ICrashClient() {
+        crashApi = CrashApi.createInstanceEx(context, getAppIdByInstanceId(appId), false, args, new ICrashClient() {
             @Override
             public void onLogGenerated(File file, String logType) {
                 SLSLog.v(TAG,
@@ -207,6 +207,10 @@ public class CrashReporterFeature extends SdkFeature {
             return true;
         });
         initActivityLifecycleCallback(context);
+    }
+
+    private String getAppIdByInstanceId(String instanceId) {
+        return String.format("sls-%s", instanceId);
     }
 
     private void initActivityLifecycleCallback(Context context) {
@@ -284,7 +288,12 @@ public class CrashReporterFeature extends SdkFeature {
             Pair.create("ex.uuid", uuid)
         ));
 
-        spanBuilder.build().end();
+        final boolean ret = spanBuilder.build().end();
+        if (ret) {
+            SLSLog.v(TAG, "report dau stat success.");
+        } else {
+            SLSLog.w(TAG, "report dau stat fail.");
+        }
     }
 
     private void reportCrash() {
@@ -336,7 +345,14 @@ public class CrashReporterFeature extends SdkFeature {
                 Pair.create("ex.file", file.getName())
             )
         );
-        builder.build().end();
+        final boolean ret = builder.build().end();
+        if (ret) {
+            //noinspection ResultOfMethodCallIgnored
+            file.delete();
+            SLSLog.v(TAG, "report crash success.");
+        } else {
+            SLSLog.w(TAG, "report crash fail.");
+        }
     }
 
     private void parseCrashFile(final File file, final String type) {

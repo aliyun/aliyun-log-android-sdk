@@ -157,7 +157,13 @@ public class SdkSender implements Sender, ISpanProcessor {
             return false;
         }
 
-        return client.addLog(data) == LogProducerResult.LOG_PRODUCER_OK;
+        boolean ret = client.addLog(data) == LogProducerResult.LOG_PRODUCER_OK;
+        if (ret) {
+            SLSLog.v(TAG, "send log success.");
+        } else {
+            SLSLog.w(TAG, "send log fail.");
+        }
+        return ret;
     }
 
     @Override

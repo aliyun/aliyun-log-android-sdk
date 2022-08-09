@@ -71,6 +71,7 @@ public final class SLSAndroid {
         hasInitialized.set(true);
 
         Runtime.getRuntime().addShutdownHook(new Thread(SLSAndroid::stop, "SLS_ANDROID_SHUTDOWN"));
+        SLSLog.d(TAG, "SLS Android initialize success.");
         return true;
     }
 

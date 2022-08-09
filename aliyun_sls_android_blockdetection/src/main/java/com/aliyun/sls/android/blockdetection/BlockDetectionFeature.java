@@ -11,6 +11,7 @@ import com.aliyun.sls.android.core.utils.AppUtils;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.SpanBuilder;
 import com.efs.sdk.base.EfsReporter;
+import com.efs.sdk.base.IConfigRefreshAction;
 import com.efs.sdk.base.WPKReporter;
 import com.efs.sdk.base.listener.IWPKLogListener;
 import com.efs.sdk.base.protocol.ILogProtocol;
@@ -28,9 +29,8 @@ public class BlockDetectionFeature extends SdkFeature {
 
     @Override
     protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
-        final EfsReporter reporter = new EfsReporter.Builder(context, "sls-" + credentials.instanceId,
-            credentials.instanceId)
-            .uid(configuration.userInfo.uid)
+        final EfsReporter reporter = new EfsReporter.Builder(context, "sls-" + credentials.instanceId,  "0123456789112345")
+            //.uid(configuration.userInfo.uid)
             .debug(true)
             .printLogDetail(true)
             .enableSendLog(false)
@@ -56,6 +56,12 @@ public class BlockDetectionFeature extends SdkFeature {
             }
 
             builder.build().end();
+        });
+        reporter.getWPKReporter().setConfigRefreshAction(new IConfigRefreshAction() {
+            @Override
+            public String refresh() {
+                return null;
+            }
         });
 
         PAFactory.Builder builder = new Builder(context, reporter::getWPKReporter);

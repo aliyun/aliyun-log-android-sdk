@@ -35,8 +35,6 @@ public class Resource {
         DEFAULT.add("host.name", Build.HOST);
         DEFAULT.add("host.type", Build.TYPE);
         DEFAULT.add("host.arch", Build.CPU_ABI + (TextUtils.isEmpty(Build.CPU_ABI2) ? "" : (", " + Build.CPU_ABI2)));
-        DEFAULT.add("sls.sdk.language", "Android");
-        DEFAULT.add("sls.sdk.name", "rum");
         DEFAULT.add("sls.sdk.version", BuildConfig.VERSION_NAME);
     }
 
