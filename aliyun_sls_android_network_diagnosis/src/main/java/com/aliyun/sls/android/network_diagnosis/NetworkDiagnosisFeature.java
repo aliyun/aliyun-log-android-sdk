@@ -95,6 +95,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             networkDiagnosisCredentials.siteId,
             networkDiagnosisCredentials.extension
         );
+        Diagnosis.enableDebug(false);
 
         networkDiagnosisSender = new NetworkDiagnosisSender(context, this);
         networkDiagnosisSender.initialize(credentials);
