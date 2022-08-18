@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class Credentials {
     public String instanceId;
-    public Endpoint endpoint;
+    public String endpoint;
     public String project;
 
     public String accessKeyId;
@@ -27,18 +27,6 @@ public class Credentials {
             networkDiagnosisCredentials = new NetworkDiagnosisCredentials(this);
         }
         return networkDiagnosisCredentials;
-    }
-
-    public static class Endpoint {
-        public final String endpoint;
-
-        Endpoint(String endpoint) {
-            this.endpoint = endpoint;
-        }
-
-        public static Endpoint of(String endpoint) {
-            return new Endpoint(endpoint);
-        }
     }
 
     public static class LogstoreCredentials extends Credentials {

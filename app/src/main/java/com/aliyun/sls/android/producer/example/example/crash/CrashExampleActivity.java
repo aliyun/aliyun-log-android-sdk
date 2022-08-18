@@ -13,7 +13,6 @@ import com.aliyun.sls.android.SLSAdapter;
 //import com.aliyun.sls.android.plugin.crashreporter.JNICrash;
 import com.aliyun.sls.android.core.SLSAndroid;
 import com.aliyun.sls.android.core.configuration.Credentials;
-import com.aliyun.sls.android.core.configuration.Credentials.Endpoint;
 import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.crashreporter.JNICrash;

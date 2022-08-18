@@ -24,7 +24,7 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
         return null != this.networkDiagnosis;
     }
 
-    // region
+    // region configuration
     @Override
     public void disableExNetworkInfo() {
         if (checkNetworkDiagnosis()) {

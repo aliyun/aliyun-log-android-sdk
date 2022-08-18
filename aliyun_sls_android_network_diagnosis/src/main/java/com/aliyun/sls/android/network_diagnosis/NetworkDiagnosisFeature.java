@@ -296,7 +296,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
     // endregion
 
-    // region
+    // region dns
     @Override
     public void dns(String domain) {
         this.dns(domain, null);

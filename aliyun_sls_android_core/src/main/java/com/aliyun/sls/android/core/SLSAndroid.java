@@ -45,6 +45,7 @@ public final class SLSAndroid {
         final Credentials credentials,
         final OptionConfiguration optionConfiguration
     ) {
+        SLSLog.i(TAG, "start init SLS Android SDK.");
         if (null == optionConfiguration) {
             SLSLog.w(TAG, "OptionConfiguration must not be null.");
             return false;
@@ -71,7 +72,7 @@ public final class SLSAndroid {
         hasInitialized.set(true);
 
         Runtime.getRuntime().addShutdownHook(new Thread(SLSAndroid::stop, "SLS_ANDROID_SHUTDOWN"));
-        SLSLog.d(TAG, "SLS Android initialize success.");
+        SLSLog.i(TAG, "SLS Android initialize success.");
         return true;
     }
 
@@ -211,6 +212,7 @@ public final class SLSAndroid {
         final Configuration configuration,
         final String clazzName
     ) {
+        SLSLog.i(TAG, "start init feature: " + clazzName);
         try {
             Feature feature = (Feature)Class.forName(clazzName).newInstance();
             if (null == feature) {
@@ -218,9 +220,11 @@ public final class SLSAndroid {
             }
             feature.initialize(context, credentials, configuration);
             features.add(feature);
+            SLSLog.i(TAG, "init feature success, feature: " + clazzName);
             return true;
         } catch (Throwable e) {
             e.printStackTrace();
+            SLSLog.w(TAG, "init feature error. feature: " + clazzName + ", error: " + e.getMessage());
             return false;
         }
     }

@@ -49,7 +49,7 @@ public class SdkSender implements Sender, ISpanProcessor {
     }
 
     protected String provideEndpoint(Credentials credentials) {
-        return null != credentials.endpoint ? credentials.endpoint.endpoint : "";
+        return !TextUtils.isEmpty(credentials.endpoint) ? credentials.endpoint : "";
     }
 
     protected String provideProjectName(Credentials credentials) {
@@ -135,7 +135,7 @@ public class SdkSender implements Sender, ISpanProcessor {
                     int logBytes,
                     int compressedBytes
                 ) {
-                    SLSLog.v(TAG, "resultCode: " + resultCode + ", errorMessage: " + errorMessage);
+                    SLSLog.d(TAG, "resultCode: " + resultCode + ", errorMessage: " + errorMessage);
                 }
             });
         } catch (LogProducerException e) {
@@ -159,9 +159,9 @@ public class SdkSender implements Sender, ISpanProcessor {
 
         boolean ret = client.addLog(data) == LogProducerResult.LOG_PRODUCER_OK;
         if (ret) {
-            SLSLog.v(TAG, "send log success.");
+            SLSLog.d(TAG, "add log success.");
         } else {
-            SLSLog.w(TAG, "send log fail.");
+            SLSLog.w(TAG, "add log fail. please check your configuration");
         }
         return ret;
     }
@@ -189,8 +189,8 @@ public class SdkSender implements Sender, ISpanProcessor {
         }
 
         // update endpoint, project, logstore
-        if (null != credentials.endpoint && !TextUtils.isEmpty(credentials.endpoint.endpoint)) {
-            config.setEndpoint(credentials.endpoint.endpoint);
+        if (null != credentials.endpoint && !TextUtils.isEmpty(credentials.endpoint)) {
+            config.setEndpoint(credentials.endpoint);
         }
         if (!TextUtils.isEmpty(credentials.project)) {
             config.setProject(credentials.project);
