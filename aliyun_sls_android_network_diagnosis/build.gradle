@@ -7,7 +7,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "2.0.2-SNAPSHOT"
+        versionName "2.0.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -39,7 +39,7 @@ dependencies {
 
 ext {
     moduleVersion = android.defaultConfig.versionName
-    moduleName = 'alysls-android-network_diagnosis'
+    moduleName = 'sls-android-network-diagnosis'
 }
 
 //====以下是将android library上传到jcenter的脚本

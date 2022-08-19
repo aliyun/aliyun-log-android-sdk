@@ -7,7 +7,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0.0-SNAPSHOT"
+        versionName "1.0.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -35,7 +35,7 @@ dependencies {
 
 ext {
     moduleVersion = android.defaultConfig.versionName
-    moduleName = 'alysls-android-ot'
+    moduleName = 'sls-android-ot'
 }
 
 //====以下是将android library上传到jcenter的脚本
