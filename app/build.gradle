@@ -54,20 +54,20 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
 
-//    implementation project(':aliyun_sls_android_producer')
-//    implementation project(':aliyun_sls_android_plugin_trace')
-//    implementation project(':aliyun_sls_android_core')
-//    implementation project(':aliyun_sls_android_ot')
-//    implementation project(':aliyun_sls_android_crashreporter')
+    implementation project(':aliyun_sls_android_producer')
+    implementation project(':aliyun_sls_android_plugin_trace')
+    implementation project(':aliyun_sls_android_core')
+    implementation project(':aliyun_sls_android_ot')
+    implementation project(':aliyun_sls_android_crashreporter')
     implementation project(':aliyun_sls_android_blockdetection')
-//    implementation project(':aliyun_sls_android_network_diagnosis')
+    implementation project(':aliyun_sls_android_network_diagnosis')
 
     // sls android sdk lite version
-    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:latest.release'
-    implementation 'com.aliyun.openservices:sls-android-core:latest.release'
-    implementation 'com.aliyun.openservices:sls-android-ot:latest.release'
-    implementation 'com.aliyun.openservices:sls-android-crashreporter:latest.release'
-    implementation 'com.aliyun.openservices:sls-android-network-diagnosis:latest.release'
+//    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:latest.release'
+//    implementation 'com.aliyun.openservices:sls-android-core:latest.release'
+//    implementation 'com.aliyun.openservices:sls-android-ot:latest.release'
+//    implementation 'com.aliyun.openservices:sls-android-crashreporter:latest.release'
+//    implementation 'com.aliyun.openservices:sls-android-network-diagnosis:latest.release'
 
 //    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.5.1'
 //    implementation 'com.aliyun.openservices:alysls-android-core:1.0.1-SNAPSHOT'

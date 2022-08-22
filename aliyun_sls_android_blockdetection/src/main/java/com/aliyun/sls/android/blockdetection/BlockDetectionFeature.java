@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.blockdetection;
 
+import java.util.Random;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -10,6 +12,7 @@ import com.aliyun.sls.android.core.feature.SdkFeature;
 import com.aliyun.sls.android.core.utils.AppUtils;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.SpanBuilder;
+import com.aliyun.sls.android.ot.utils.IdGenerator;
 import com.efs.sdk.base.EfsReporter;
 import com.efs.sdk.base.IConfigRefreshAction;
 import com.efs.sdk.base.WPKReporter;
@@ -48,7 +51,8 @@ public class BlockDetectionFeature extends SdkFeature {
                   Attribute.of(
                       Pair.create("t", "block"),
                       Pair.create("ex.type", type),
-                      Pair.create("ex.origin", iLogProtocol.generateString())
+                      Pair.create("ex.origin", iLogProtocol.generateString()),
+                      Pair.create("ex.seq", IdGenerator.generateSpanId())
                   )
                 );
             } else {
