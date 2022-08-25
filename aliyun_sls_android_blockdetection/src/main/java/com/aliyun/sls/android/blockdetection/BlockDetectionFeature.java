@@ -1,6 +1,6 @@
 package com.aliyun.sls.android.blockdetection;
 
-import java.util.Random;
+import java.io.UnsupportedEncodingException;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -14,25 +14,21 @@ import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.SpanBuilder;
 import com.aliyun.sls.android.ot.utils.IdGenerator;
 import com.efs.sdk.base.EfsReporter;
-import com.efs.sdk.base.IConfigRefreshAction;
-import com.efs.sdk.base.WPKReporter;
-import com.efs.sdk.base.listener.IWPKLogListener;
-import com.efs.sdk.base.protocol.ILogProtocol;
 import com.efs.sdk.pa.PAFactory;
 import com.efs.sdk.pa.PAFactory.Builder;
-import com.efs.sdk.pa.config.IWPKReporter;
 import com.efs.sdk.pa.config.PackageLevel;
 
 /**
  * @author gordon
  * @date 2022/7/21
  */
+@SuppressWarnings("unused")
 public class BlockDetectionFeature extends SdkFeature {
     private static final String TAG = "BlockDetectionFeature";
 
     @Override
     protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
-        final EfsReporter reporter = new EfsReporter.Builder(context, "sls-" + credentials.instanceId,  "0123456789112345")
+        final EfsReporter reporter = new EfsReporter.Builder(context, "sls-" + credentials.instanceId,  "a91b2c72c00bb50d")
             //.uid(configuration.userInfo.uid)
             .debug(true)
             .printLogDetail(true)
@@ -40,8 +36,18 @@ public class BlockDetectionFeature extends SdkFeature {
             .build();
 
         reporter.getWPKReporter().addLogListener(iLogProtocol -> {
-            SLSLog.v(TAG, "jank type: " + iLogProtocol.getLogType() + ", file path: " + iLogProtocol.getFilePath()
-                + ", jank log: " + iLogProtocol.generateString());
+            String data;
+            try {
+                data = new String(iLogProtocol.generate(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                return;
+            }
+
+            SLSLog.v(TAG,
+                "jank type: " + iLogProtocol.getLogType()
+                + ", file path: " + iLogProtocol.getFilePath()
+                + ", jank log: " + data
+            );
 
             SpanBuilder builder = newSpanBuilder("block");
 
@@ -49,9 +55,10 @@ public class BlockDetectionFeature extends SdkFeature {
             if (TextUtils.equals("patrace", type) || TextUtils.equals("patracepv", type)) {
                 builder.addAttribute(
                   Attribute.of(
-                      Pair.create("t", "block"),
-                      Pair.create("ex.type", type),
-                      Pair.create("ex.origin", iLogProtocol.generateString()),
+                      Pair.create("t", "error"),
+                      Pair.create("ex.type", "block"),
+                      Pair.create("ex.sub_type", type),
+                      Pair.create("ex.origin", data),
                       Pair.create("ex.seq", IdGenerator.generateSpanId())
                   )
                 );
@@ -61,12 +68,7 @@ public class BlockDetectionFeature extends SdkFeature {
 
             builder.build().end();
         });
-        reporter.getWPKReporter().setConfigRefreshAction(new IConfigRefreshAction() {
-            @Override
-            public String refresh() {
-                return null;
-            }
-        });
+        reporter.getWPKReporter().setConfigRefreshAction(() -> null);
 
         PAFactory.Builder builder = new Builder(context, reporter::getWPKReporter);
         builder.packageLevel(PackageLevel.TRIAL);
