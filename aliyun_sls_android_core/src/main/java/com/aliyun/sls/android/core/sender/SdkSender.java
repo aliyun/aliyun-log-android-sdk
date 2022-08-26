@@ -21,7 +21,7 @@ import com.aliyun.sls.android.producer.LogProducerResult;
  * @author gordon
  * @date 2022/7/19
  */
-public class SdkSender implements Sender, ISpanProcessor {
+public class SdkSender extends NoOpSender implements ISpanProcessor {
     protected String TAG = "SdkSender";
 
     private final AtomicBoolean hasInitialize = new AtomicBoolean(false);
@@ -35,6 +35,7 @@ public class SdkSender implements Sender, ISpanProcessor {
 
     @Override
     public final void initialize(Credentials credentials) {
+        super.initialize(credentials);
         if (hasInitialize.get()) {
             return;
         }
@@ -42,6 +43,10 @@ public class SdkSender implements Sender, ISpanProcessor {
         initLogProducer(credentials, this.provideLogFileName());
 
         hasInitialize.set(true);
+    }
+
+    protected String provideFeatureName() {
+        return "default";
     }
 
     protected String provideLogFileName() {
@@ -126,16 +131,10 @@ public class SdkSender implements Sender, ISpanProcessor {
         config.setDropUnauthorizedLog(0);
 
         try {
-            client = new LogProducerClient(config, new LogProducerCallback() {
-                @Override
-                public void onCall(
-                    int resultCode,
-                    String reqId,
-                    String errorMessage,
-                    int logBytes,
-                    int compressedBytes
-                ) {
-                    SLSLog.d(TAG, "resultCode: " + resultCode + ", errorMessage: " + errorMessage);
+            client = new LogProducerClient(config, (resultCode, reqId, errorMessage, logBytes, compressedBytes) -> {
+                SLSLog.d(TAG, "resultCode: " + resultCode + ", errorMessage: " + errorMessage);
+                if (null != callback) {
+                    callback.onCall(provideFeatureName(), LogProducerResult.fromInt(resultCode));
                 }
             });
         } catch (LogProducerException e) {
@@ -168,6 +167,7 @@ public class SdkSender implements Sender, ISpanProcessor {
 
     @Override
     public void setCredentials(Credentials credentials) {
+        super.setCredentials(credentials);
         if (null == credentials || null == config) {
             return;
         }

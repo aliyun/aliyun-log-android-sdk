@@ -20,12 +20,12 @@ public abstract class SdkFeature extends NoOpFeature {
 
     @Override
     public String name() {
-        return null;
+        return "";
     }
 
     @Override
     public String version() {
-        return null;
+        return "";
     }
 
     public SpanBuilder newSpanBuilder(String spanName) {

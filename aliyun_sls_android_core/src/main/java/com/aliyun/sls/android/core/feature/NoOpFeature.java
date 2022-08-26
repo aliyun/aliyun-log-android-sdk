@@ -5,12 +5,15 @@ import java.util.Map;
 import android.content.Context;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
+import com.aliyun.sls.android.core.sender.Sender.Callback;
+import com.aliyun.sls.android.producer.LogProducerResult;
 
 /**
  * @author gordon
  * @date 2022/7/19
  */
 public class NoOpFeature implements Feature {
+    protected Callback callback;
     @Override
     public String name() {
         return "";
@@ -44,5 +47,10 @@ public class NoOpFeature implements Feature {
     @Override
     public void addCustom(String eventId, Map<String, String> properties) {
 
+    }
+
+    @Override
+    public void setCallback(Callback callback) {
+        this.callback = callback;
     }
 }

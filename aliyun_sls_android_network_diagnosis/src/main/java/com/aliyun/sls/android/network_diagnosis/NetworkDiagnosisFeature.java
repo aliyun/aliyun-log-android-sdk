@@ -21,6 +21,8 @@ import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.configuration.Credentials.NetworkDiagnosisCredentials;
 import com.aliyun.sls.android.core.feature.SdkFeature;
 import com.aliyun.sls.android.core.sender.SdkSender;
+import com.aliyun.sls.android.core.sender.Sender;
+import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProcessor;
@@ -32,6 +34,7 @@ import org.json.JSONObject;
  * @author gordon
  * @date 2022/7/22
  */
+@SuppressWarnings("unused")
 public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagnosis {
     private static final String TAG = "NetworkDiagnosisFeature";
 
@@ -47,6 +50,16 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     private static final TaskIdGenerator TASK_ID_GENERATOR = new TaskIdGenerator();
     private NetworkDiagnosisSender networkDiagnosisSender;
+
+    @Override
+    public String name() {
+        return "network_diagnosis";
+    }
+
+    @Override
+    public String version() {
+        return BuildConfig.VERSION_NAME;
+    }
 
     @Override
     public SpanBuilder newSpanBuilder(String spanName) {
@@ -145,6 +158,15 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     public void disableExNetworkInfo() {
         Diagnosis.disableExNetworkInfo();
     }
+
+    @Override
+    public void setCallback(Sender.Callback callback) {
+        super.setCallback(callback);
+        if (null != networkDiagnosisSender) {
+            networkDiagnosisSender.setCallback(callback);
+        }
+    }
+
     // endregion
 
     // region http
@@ -347,6 +369,11 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             super(context);
             TAG = "NetworkDiagnosisSender";
             this.feature = feature;
+        }
+
+        @Override
+        protected String provideFeatureName() {
+            return feature.name();
         }
 
         @Override

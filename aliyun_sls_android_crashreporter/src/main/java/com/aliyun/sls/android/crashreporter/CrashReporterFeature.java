@@ -52,7 +52,7 @@ public class CrashReporterFeature extends SdkFeature {
 
     @Override
     public String version() {
-        return super.version();
+        return BuildConfig.VERSION_NAME;
     }
 
     @Override

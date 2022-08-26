@@ -1,8 +1,6 @@
 package com.aliyun.sls.android.core;
 
-import java.security.Key;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +16,7 @@ import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.core.feature.Feature;
 import com.aliyun.sls.android.core.sender.SdkSender;
 import com.aliyun.sls.android.core.sender.Sender;
+import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.core.utils.AppUtils;
 import com.aliyun.sls.android.core.utils.DeviceUtils;
@@ -276,6 +275,20 @@ public final class SLSAndroid {
         // set all Feature's credentials
         for (Feature feature : features) {
             feature.setCredentials(credentials);
+        }
+    }
+
+    public static void registerCredentialsCallback(Callback callback) {
+        if (null == callback) {
+            return;
+        }
+
+        if (configuration.spanProcessor instanceof Sender) {
+            ((Sender)configuration.spanProcessor).setCallback(callback);
+        }
+
+        for (Feature feature : features) {
+            feature.setCallback(callback);
         }
     }
 

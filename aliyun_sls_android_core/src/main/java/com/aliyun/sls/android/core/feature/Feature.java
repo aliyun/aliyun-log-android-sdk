@@ -5,6 +5,7 @@ import java.util.Map;
 import android.content.Context;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
+import com.aliyun.sls.android.core.sender.Sender.Callback;
 
 /**
  * @author gordon
@@ -25,4 +26,6 @@ public interface Feature {
     void setCredentials(Credentials credentials);
 
     void addCustom(final String eventId, final Map<String, String> properties);
+
+    void setCallback(Callback callback);
 }

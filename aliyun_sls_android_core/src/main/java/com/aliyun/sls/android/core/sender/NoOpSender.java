@@ -8,6 +8,8 @@ import com.aliyun.sls.android.producer.Log;
  * @date 2022/7/19
  */
 public class NoOpSender implements Sender {
+    protected Callback callback;
+
     @Override
     public void initialize(Credentials credentials) {
 
@@ -21,5 +23,10 @@ public class NoOpSender implements Sender {
     @Override
     public void setCredentials(Credentials credentials) {
 
+    }
+
+    @Override
+    public void setCallback(Callback callback) {
+        this.callback = callback;
     }
 }
