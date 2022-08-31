@@ -45,12 +45,17 @@ public class NoOpFeature implements Feature {
     }
 
     @Override
-    public void addCustom(String eventId, Map<String, String> properties) {
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
+    @Override
+    public void setFeatureEnabled(boolean enable) {
 
     }
 
     @Override
-    public void setCallback(Callback callback) {
-        this.callback = callback;
+    public boolean isFeatureEnabled() {
+        return true;
     }
 }

@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.Context;
+import android.nfc.cardemulation.CardEmulation;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -25,6 +26,7 @@ import com.aliyun.sls.android.ot.SpanBuilder;
 import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.CustomInfo;
 import com.uc.crashsdk.export.ICrashClient;
+import com.uc.crashsdk.export.LogType;
 import org.json.JSONObject;
 
 /**
@@ -88,29 +90,15 @@ public class CrashReporterFeature extends SdkFeature {
     }
 
     @Override
-    public void addCustom(String eventId, Map<String, String> properties) {
-        super.addCustom(eventId, properties);
-        if (TextUtils.isEmpty(eventId)) {
-            SLSLog.w(TAG, "eventId is empty.");
-            return;
+    public void setFeatureEnabled(boolean enable) {
+        super.setFeatureEnabled(enable);
+        if (!enable && null != crashApi) {
+            crashApi.disableLog(LogType.JAVA);
+            crashApi.disableLog(LogType.NATIVE);
+            crashApi.disableLog(LogType.ANR);
+            crashApi.disableLog(LogType.UNEXP);
+            SLSLog.d(TAG, "CrashReporterFeature disabled.");
         }
-
-        SpanBuilder builder = newSpanBuilder("custom_error");
-        builder.addAttribute(
-            Attribute.of(
-                Pair.create("t", "error"),
-                Pair.create("ex.type", "custom"),
-                Pair.create("ex.event_id", eventId)
-            )
-        );
-
-        if (null != properties) {
-            properties = new LinkedHashMap<>(properties);
-            JSONObject object = new JSONObject(properties);
-            builder.addAttribute(Attribute.of("ex.custom", object));
-        }
-
-        builder.build().end();
     }
 
     private void initCrashApi(Context context, Credentials credentials, Configuration configuration) {

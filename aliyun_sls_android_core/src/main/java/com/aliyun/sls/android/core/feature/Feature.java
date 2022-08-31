@@ -25,7 +25,9 @@ public interface Feature {
 
     void setCredentials(Credentials credentials);
 
-    void addCustom(final String eventId, final Map<String, String> properties);
-
     void setCallback(Callback callback);
+
+    void setFeatureEnabled(boolean enable);
+
+    boolean isFeatureEnabled();
 }

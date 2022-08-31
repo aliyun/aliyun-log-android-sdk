@@ -54,7 +54,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 R.id.native_crash, R.id.native_heap_corruption, R.id.native_fd_leak,
                 R.id.native_abort, R.id.native_stack_overflow, R.id.native_oom,
                 R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr, R.id.custom_log,
-                R.id.jank
+                R.id.jank, R.id.switchFeature
         };
         for (int btnId : btnIds) {
             findViewById(btnId).setOnClickListener(this);
@@ -136,33 +136,33 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                     }
                 }
             case R.id.custom_log: {
-                Credentials credentials = new Credentials();
-                credentials.instanceId = "yuanbo-test-1111";
-                credentials.accessKeyId = PreferenceUtils.getAccessKeyId(this);
-                credentials.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
-                credentials.securityToken = PreferenceUtils.getAccessKeyToken(this);
-                SLSAndroid.setCredentials(credentials);
-
-                UserInfo info = new UserInfo();
-                info.uid = "11111111";
-                info.channel = "beta";
-                info.addExt("tt", "vv");
-                SLSAndroid.setUserInfo(info);
-
-                Map<String, String> params = new HashMap<>();
-                params.put("position", "1");
-                Map<String, String> params2 = new HashMap<>();
-                params2.put("position", "2");
-                CrashReporter.addCustomError("MyTest", params);
-                CrashReporter.addCustomError("MyTest2", params2);
-                getWindow().getDecorView().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Map<String, String> params2 = new HashMap<>();
-                        params2.put("position", "3");
-                        CrashReporter.addCustomError("MyTest3", params2);
-                    }
-                }, 1000);
+                //Credentials credentials = new Credentials();
+                //credentials.instanceId = "yuanbo-test-1111";
+                //credentials.accessKeyId = PreferenceUtils.getAccessKeyId(this);
+                //credentials.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
+                //credentials.securityToken = PreferenceUtils.getAccessKeyToken(this);
+                //SLSAndroid.setCredentials(credentials);
+                //
+                //UserInfo info = new UserInfo();
+                //info.uid = "11111111";
+                //info.channel = "beta";
+                //info.addExt("tt", "vv");
+                //SLSAndroid.setUserInfo(info);
+                //
+                //Map<String, String> params = new HashMap<>();
+                //params.put("position", "1");
+                //Map<String, String> params2 = new HashMap<>();
+                //params2.put("position", "2");
+                //CrashReporter.addCustomError("MyTest", params);
+                //CrashReporter.addCustomError("MyTest2", params2);
+                //getWindow().getDecorView().postDelayed(new Runnable() {
+                //    @Override
+                //    public void run() {
+                //        Map<String, String> params2 = new HashMap<>();
+                //        params2.put("position", "3");
+                //        CrashReporter.addCustomError("MyTest3", params2);
+                //    }
+                //}, 1000);
                 break;
             }
             case R.id.jank: {
@@ -171,6 +171,10 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                break;
+            }
+            case R.id.switchFeature: {
+                CrashReporter.setEnabled(false);
                 break;
             }
 

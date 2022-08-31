@@ -77,9 +77,4 @@ public abstract class SdkFeature extends NoOpFeature {
     public void setCredentials(Credentials credentials) {
 
     }
-
-    @Override
-    public void addCustom(String eventId, Map<String, String> properties) {
-
-    }
 }

@@ -375,6 +375,19 @@
                         android:background="@drawable/button_background"
                         android:text="jank"
                         android:textAppearance="@style/TextAppearance.AppCompat"/>
+
+                    <Button
+                        android:id="@+id/switchFeature"
+                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginLeft="3dp"
+                        android:layout_marginRight="3dp"
+                        android:layout_weight="3"
+                        android:background="@drawable/button_background"
+                        android:text="关闭"
+                        android:textAppearance="@style/TextAppearance.AppCompat"/>
                 </TableRow>
 
             </TableLayout>
