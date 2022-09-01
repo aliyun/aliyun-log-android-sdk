@@ -1,16 +1,12 @@
 package com.aliyun.sls.android.producer.example.example.network;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.EditText;
 import androidx.annotation.Nullable;
-//import com.aliyun.sls.android.plugin.network_diagnosis.SLSNetDiagnosis;
-//import com.aliyun.sls.android.plugin.network_diagnosis.SLSNetPolicyBuilder;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
 

@@ -1,11 +1,11 @@
 package com.aliyun.sls.android.producer.example.example.producer;
 
+import java.io.File;
+
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-
 import androidx.annotation.Nullable;
-
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
@@ -13,8 +13,6 @@ import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
-
-import java.io.File;
 
 /**
  * 动态配置

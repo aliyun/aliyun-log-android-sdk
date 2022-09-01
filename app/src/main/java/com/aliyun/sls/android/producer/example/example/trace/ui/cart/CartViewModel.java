@@ -1,13 +1,12 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.cart;
 
-import android.widget.Toast;
+import java.util.List;
 
+import android.widget.Toast;
 import com.aliyun.sls.android.producer.example.SLSGlobal;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
-
-import java.util.List;
 
 /**
  * @author gordon

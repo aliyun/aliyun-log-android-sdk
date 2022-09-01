@@ -1,14 +1,13 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.mine;
 
-import androidx.lifecycle.MutableLiveData;
+import java.util.ArrayList;
+import java.util.List;
 
+import androidx.lifecycle.MutableLiveData;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.UserModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.utils.UserUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author gordon

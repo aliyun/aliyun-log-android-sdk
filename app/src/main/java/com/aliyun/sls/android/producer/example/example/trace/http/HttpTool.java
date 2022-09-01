@@ -1,15 +1,5 @@
 package com.aliyun.sls.android.producer.example.example.trace.http;
 
-import android.text.TextUtils;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
-import com.aliyun.sls.android.plugin.trace.SLSTelemetry;
-import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
-import com.aliyun.sls.android.producer.HttpConfigProxy;
-import com.aliyun.sls.android.producer.utils.ThreadUtils;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -23,6 +13,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import android.text.TextUtils;
+import android.util.Log;
+import androidx.annotation.NonNull;
+import com.aliyun.sls.android.plugin.trace.SLSTelemetry;
+import com.aliyun.sls.android.producer.HttpConfigProxy;
+import com.aliyun.sls.android.producer.utils.ThreadUtils;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;

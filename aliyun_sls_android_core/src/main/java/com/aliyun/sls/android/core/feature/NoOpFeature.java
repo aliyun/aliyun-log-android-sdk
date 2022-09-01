@@ -1,12 +1,9 @@
 package com.aliyun.sls.android.core.feature;
 
-import java.util.Map;
-
 import android.content.Context;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.sender.Sender.Callback;
-import com.aliyun.sls.android.producer.LogProducerResult;
 
 /**
  * @author gordon

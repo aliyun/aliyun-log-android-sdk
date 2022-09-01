@@ -1,17 +1,16 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.user;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
 import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.UserModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.trace.UITracer;
 import com.aliyun.sls.android.producer.example.example.trace.utils.UserUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author gordon

@@ -1,31 +1,21 @@
 package com.aliyun.sls.android.producer.example.example.crash;
 
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
-
-import com.aliyun.sls.android.SLSAdapter;
-//import com.aliyun.sls.android.plugin.crashreporter.JNICrash;
-import com.aliyun.sls.android.core.SLSAndroid;
-import com.aliyun.sls.android.core.configuration.Credentials;
-import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
-import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
-
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * @author gordon

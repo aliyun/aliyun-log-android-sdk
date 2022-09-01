@@ -1,13 +1,12 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.core.list;
 
+import java.util.List;
+
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
-
-import java.util.List;
 
 /**
  * @author gordon

@@ -1,12 +1,12 @@
 package com.aliyun.sls.android.producer.example.example.trace.http;
 
+import java.util.Arrays;
+import java.util.List;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author gordon

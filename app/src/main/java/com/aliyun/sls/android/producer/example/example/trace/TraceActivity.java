@@ -1,13 +1,11 @@
 package com.aliyun.sls.android.producer.example.example.trace;
 
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.databinding.ActivityTraceBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;

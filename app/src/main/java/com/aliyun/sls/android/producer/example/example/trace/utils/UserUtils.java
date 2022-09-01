@@ -2,7 +2,6 @@ package com.aliyun.sls.android.producer.example.example.trace.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
-
 import com.aliyun.sls.android.producer.example.SLSGlobal;
 import com.aliyun.sls.android.producer.example.example.trace.model.UserModel;
 

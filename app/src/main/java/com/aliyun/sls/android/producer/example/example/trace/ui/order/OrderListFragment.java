@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-
 import com.aliyun.sls.android.producer.example.databinding.TraceItemOrderLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;

@@ -3,12 +3,10 @@ package com.aliyun.sls.android.producer.example.example.trace.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.example.trace.ui.detail.DetailFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.order.OrderListFragment;

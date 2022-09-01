@@ -1,18 +1,15 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
 import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;

@@ -5,11 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.databinding.FragmentCartBinding;
 import com.aliyun.sls.android.producer.example.databinding.TraceItemCartLayoutBinding;
@@ -21,9 +19,6 @@ import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseLi
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseRecyclerAdapter;
 import com.aliyun.sls.android.producer.example.example.trace.utils.ImageUtils;
-
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 
 /**
  * @author gordon

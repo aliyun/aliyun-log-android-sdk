@@ -2,7 +2,6 @@ package com.aliyun.sls.android.producer.example.example.trace.ui.home;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-
 import com.aliyun.sls.android.producer.example.databinding.TraceItemLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.FragmentActivity;

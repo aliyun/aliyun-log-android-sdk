@@ -1,17 +1,15 @@
 package com.aliyun.sls.android.producer.example.settings;
 
+import java.util.Map;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
-
 import com.aliyun.sls.android.producer.example.R;
-
-import java.util.Map;
 
 /**
  * @author gordon

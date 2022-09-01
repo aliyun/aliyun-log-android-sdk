@@ -2,16 +2,11 @@ package com.aliyun.sls.android.producer.example.example.trace.ui.detail;
 
 import android.content.Context;
 import android.widget.Toast;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-
 import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
-
-import io.opentelemetry.api.trace.Span;
 
 public class DetailViewModel extends TraceViewModel {
 

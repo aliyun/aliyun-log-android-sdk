@@ -6,11 +6,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.aliyun.sls.android.producer.example.example.crash.CrashExampleActivity;
 import com.aliyun.sls.android.producer.example.example.network.NetworkExample;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerExample;
@@ -21,7 +19,6 @@ import com.aliyun.sls.android.producer.example.example.producer.ProducerWithImme
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithMultiClients;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerWithNoPersistent;
 import com.aliyun.sls.android.producer.example.example.trace.TraceActivity;
-import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
 
 /**
  * @author gordon

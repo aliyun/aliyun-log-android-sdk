@@ -1,13 +1,12 @@
 package com.aliyun.sls.android.producer.example.example.trace.model;
 
-import android.text.TextUtils;
+import java.util.ArrayList;
+import java.util.List;
 
+import android.text.TextUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author gordon

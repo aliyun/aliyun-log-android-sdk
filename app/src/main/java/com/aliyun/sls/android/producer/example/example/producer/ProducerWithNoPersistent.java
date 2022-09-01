@@ -2,9 +2,7 @@ package com.aliyun.sls.android.producer.example.example.producer;
 
 import android.os.Bundle;
 import android.view.View;
-
 import androidx.annotation.Nullable;
-
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;

@@ -1,13 +1,13 @@
 package com.aliyun.sls.android.crashreporter.utils;
 
-import android.content.Context;
-import android.text.TextUtils;
-
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
+import android.content.Context;
+import android.text.TextUtils;
 
 /**
  * @author gordon

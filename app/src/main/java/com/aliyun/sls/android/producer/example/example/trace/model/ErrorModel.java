@@ -1,7 +1,6 @@
 package com.aliyun.sls.android.producer.example.example.trace.model;
 
 import android.text.TextUtils;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 

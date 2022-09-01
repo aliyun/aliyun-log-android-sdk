@@ -1,12 +1,13 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.core.list;
 
+import java.lang.reflect.ParameterizedType;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
@@ -15,12 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
-
 import com.aliyun.sls.android.producer.example.databinding.BaseListContainerLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.trace.UITracer;
-
-import java.lang.reflect.ParameterizedType;
 
 /**
  * @author gordon

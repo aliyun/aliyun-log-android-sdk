@@ -1,10 +1,10 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.home;
 
+import java.util.List;
+
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListViewModel;
-
-import java.util.List;
 
 /**
  * @author gordon

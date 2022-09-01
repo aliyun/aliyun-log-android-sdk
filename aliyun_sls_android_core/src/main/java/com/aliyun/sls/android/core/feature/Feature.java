@@ -1,7 +1,5 @@
 package com.aliyun.sls.android.core.feature;
 
-import java.util.Map;
-
 import android.content.Context;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;

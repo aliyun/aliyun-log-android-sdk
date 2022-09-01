@@ -11,7 +11,6 @@ import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.ot.ISpanProcessor;
 import com.aliyun.sls.android.ot.Span;
 import com.aliyun.sls.android.producer.Log;
-import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;

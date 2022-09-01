@@ -1,12 +1,10 @@
 package com.aliyun.sls.android.producer.example.example.trace.utils;
 
 import android.widget.ImageView;
-
 import com.aliyun.sls.android.producer.example.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
 
 /**
  * @author gordon

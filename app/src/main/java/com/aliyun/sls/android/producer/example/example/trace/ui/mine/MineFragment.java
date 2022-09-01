@@ -5,10 +5,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.databinding.TraceMineItemLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.ui.FragmentActivity;

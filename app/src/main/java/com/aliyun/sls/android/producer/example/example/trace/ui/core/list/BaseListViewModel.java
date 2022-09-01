@@ -1,14 +1,11 @@
 package com.aliyun.sls.android.producer.example.example.trace.ui.core.list;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import io.opentelemetry.api.trace.Span;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import com.aliyun.sls.android.producer.example.example.trace.core.TraceViewModel;
 
 /**
  * @author gordon

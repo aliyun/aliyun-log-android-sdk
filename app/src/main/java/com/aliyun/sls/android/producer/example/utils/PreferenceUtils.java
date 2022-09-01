@@ -2,9 +2,7 @@ package com.aliyun.sls.android.producer.example.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import androidx.preference.PreferenceManager;
-
 import com.aliyun.sls.android.producer.example.BuildConfig;
 
 /**

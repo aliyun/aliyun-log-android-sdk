@@ -3,14 +3,11 @@ package com.aliyun.sls.android.crashreporter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.Context;
-import android.nfc.cardemulation.CardEmulation;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -27,7 +24,6 @@ import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.CustomInfo;
 import com.uc.crashsdk.export.ICrashClient;
 import com.uc.crashsdk.export.LogType;
-import org.json.JSONObject;
 
 /**
  * @author gordon

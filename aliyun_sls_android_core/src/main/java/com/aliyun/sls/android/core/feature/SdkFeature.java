@@ -1,6 +1,5 @@
 package com.aliyun.sls.android.core.feature;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;

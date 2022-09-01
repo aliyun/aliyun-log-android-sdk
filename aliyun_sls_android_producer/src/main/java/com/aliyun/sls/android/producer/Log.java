@@ -1,15 +1,15 @@
 package com.aliyun.sls.android.producer;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import android.text.TextUtils;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class Log {
 

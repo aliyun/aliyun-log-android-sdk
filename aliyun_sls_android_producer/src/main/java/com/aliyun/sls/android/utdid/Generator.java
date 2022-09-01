@@ -2,12 +2,7 @@ package com.aliyun.sls.android.utdid;
 
 import java.security.MessageDigest;
 
-import android.Manifest;
 import android.content.Context;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
 
 /**
  * @author gordon

@@ -1,14 +1,13 @@
 package com.aliyun.sls.android.producer;
 
-import android.util.Log;
-
-import com.aliyun.sls.android.producer.utils.TimeUtils;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import android.util.Log;
+import com.aliyun.sls.android.producer.utils.TimeUtils;
 
 public class LogProducerHttpTool {
     private static final String TAG = "LogProducerHttpTool";

@@ -22,7 +22,6 @@ import com.aliyun.sls.android.core.configuration.Credentials.NetworkDiagnosisCre
 import com.aliyun.sls.android.core.feature.SdkFeature;
 import com.aliyun.sls.android.core.sender.SdkSender;
 import com.aliyun.sls.android.core.sender.Sender;
-import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProcessor;

@@ -2,7 +2,6 @@ package com.aliyun.sls.android.producer;
 
 import android.content.Context;
 import android.text.TextUtils;
-
 import com.aliyun.sls.android.producer.utils.SoLoader;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 

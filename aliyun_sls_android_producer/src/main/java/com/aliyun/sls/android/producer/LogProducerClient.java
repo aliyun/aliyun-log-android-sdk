@@ -1,10 +1,9 @@
 package com.aliyun.sls.android.producer;
 
-import android.text.TextUtils;
-
 import java.util.Map;
 
 import android.content.Context;
+import android.text.TextUtils;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 import com.aliyun.sls.android.scheme.Scheme;

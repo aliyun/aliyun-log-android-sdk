@@ -1,17 +1,15 @@
 package com.aliyun.sls.android.producer.example.example.trace.widget;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
-
 import com.aliyun.sls.android.producer.example.R;
-
-import java.util.Locale;
 
 /**
  * @author gordon
