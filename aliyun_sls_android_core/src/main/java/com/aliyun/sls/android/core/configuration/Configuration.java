@@ -17,6 +17,7 @@ public class Configuration {
     public String env;
     public final ISpanProcessor spanProcessor;
     public ISpanProvider spanProvider;
+    public boolean debuggable = false;
 
     public UserInfo userInfo;
 

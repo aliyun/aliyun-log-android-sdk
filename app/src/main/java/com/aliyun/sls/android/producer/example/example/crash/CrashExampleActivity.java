@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
+import com.aliyun.sls.android.blockdetection.BlockDetection;
 import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
@@ -44,7 +45,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 R.id.native_crash, R.id.native_heap_corruption, R.id.native_fd_leak,
                 R.id.native_abort, R.id.native_stack_overflow, R.id.native_oom,
                 R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr, R.id.custom_log,
-                R.id.jank, R.id.switchFeature
+                R.id.jank, R.id.switchFeature, R.id.switchBlockFeature
         };
         for (int btnId : btnIds) {
             findViewById(btnId).setOnClickListener(this);
@@ -54,10 +55,10 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void onClick(View view) {
-        doCrash(view.getId());
+        doCrash(view, view.getId());
     }
 
-    public void doCrash(int id) {
+    public void doCrash(View view, int id) {
         switch (id) {
             case R.id.java_null_ptr:
                 crashInJavaNull();
@@ -164,7 +165,34 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 break;
             }
             case R.id.switchFeature: {
-                CrashReporter.setEnabled(false);
+                Boolean enable = (Boolean)view.getTag();
+                if (null == enable) {
+                    enable = true;
+                }
+
+                if (enable) {
+                    CrashReporter.setEnabled(false);
+                    view.setTag(false);
+                } else {
+                    CrashReporter.setEnabled(true);
+                    view.setTag(true);
+                }
+
+                break;
+            }
+            case R.id.switchBlockFeature: {
+                Boolean enable = (Boolean)view.getTag();
+                if (null == enable) {
+                    enable = true;
+                }
+
+                if (enable) {
+                    BlockDetection.setEnabled(false);
+                    view.setTag(false);
+                } else {
+                    BlockDetection.setEnabled(true);
+                    view.setTag(true);
+                }
                 break;
             }
 

@@ -66,7 +66,6 @@ public class AppUtils {
         AppUtils.isForeground = foreground;
     }
 
-
     public static String getAppVersion(Context context) {
         if (!TextUtils.isEmpty(appVersion)) {
             return appVersion;
@@ -130,5 +129,13 @@ public class AppUtils {
 
     public static void setTopActivity(String topActivity) {
         AppUtils.topActivity = topActivity;
+    }
+
+    public static boolean debuggable(Context context) {
+        try {
+            return (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 }
