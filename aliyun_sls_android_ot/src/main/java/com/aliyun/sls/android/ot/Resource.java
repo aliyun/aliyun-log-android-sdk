@@ -1,7 +1,7 @@
 package com.aliyun.sls.android.ot;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.os.Build;
 import android.text.TextUtils;
@@ -12,7 +12,7 @@ import android.util.Pair;
  * @date 2022/3/31
  */
 public class Resource {
-    public final List<Attribute> attributes = new CopyOnWriteArrayList<>();
+    public final List<Attribute> attributes = new LinkedList<>();
     private final static Resource DEFAULT = new Resource();
 
     static {
