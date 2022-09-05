@@ -106,7 +106,7 @@ public class BlockDetectionFeature extends SdkFeature {
                         Pair.create("ex.type", "block"),
                         Pair.create("ex.sub_type", type),
                         Pair.create("ex.origin", data),
-                        Pair.create("ex.seq", IdGenerator.generateSpanId())
+                        Pair.create("ex.uuid", IdGenerator.generateSpanId())
                     )
                 );
             } else {
