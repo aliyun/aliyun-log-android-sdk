@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.ot.utils.IdGenerator;
 import com.aliyun.sls.android.ot.utils.TimeUtils;
 
@@ -66,7 +67,7 @@ public class SpanBuilder {
         if (null != parent) {
             parentSpan = parent;
         } else {
-            parentSpan = null;
+            parentSpan = ContextManager.INSTANCE.activeSpan();
         }
 
         if (null != parentSpan) {

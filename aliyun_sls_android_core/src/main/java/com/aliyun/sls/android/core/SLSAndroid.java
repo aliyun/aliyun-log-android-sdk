@@ -67,6 +67,7 @@ public final class SLSAndroid {
         initCrashReporterFeature(context, credentials, configuration);
         initBlockDetectionFeature(context, credentials, configuration);
         initNetworkDiagnosisFeature(context, credentials, configuration);
+        initTracerFeature(context, credentials, configuration);
 
         hasInitialized.set(true);
 
@@ -203,6 +204,18 @@ public final class SLSAndroid {
         }
 
         initFeature(context, credentials, configuration, "com.aliyun.sls.android.network_diagnosis.NetworkDiagnosisFeature");
+    }
+
+    private static void initTracerFeature(
+        final Context context,
+        final Credentials credentials,
+        final Configuration configuration
+    ) {
+        if (!configuration.enableTracer) {
+            return;
+        }
+
+        initFeature(context, credentials, configuration, "com.aliyun.sls.android.trace.TraceFeature");
     }
 
     private static boolean initFeature(

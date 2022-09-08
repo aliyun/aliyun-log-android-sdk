@@ -18,12 +18,29 @@ public class Span {
     public enum StatusCode {
         UNSET("UNSET"),
         OK("OK"),
-        ERROR("ERROR");
+        ERROR("ERROR"),
+        CUSTOM("CUSTOM");
 
-        public final String code;
+        public String code;
+        public String message;
 
         StatusCode(String code) {
             this.code = code;
+        }
+
+        public static StatusCode of(String code, String message) {
+            StatusCode statusCode = CUSTOM;
+            statusCode.code = code;
+            statusCode.message = message;
+
+            return statusCode;
+        }
+
+        public static StatusCode of(String message) {
+            StatusCode statusCode = ERROR;
+            statusCode.message = message;
+
+            return statusCode;
         }
 
     }

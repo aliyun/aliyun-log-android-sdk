@@ -18,6 +18,7 @@ public class Credentials {
 
     public NetworkDiagnosisCredentials networkDiagnosisCredentials;
     public Credentials crashReporterCredentials;
+    public TracerCredentials tracerCredentials;
 
     public Credentials() {
     }
@@ -27,6 +28,13 @@ public class Credentials {
             networkDiagnosisCredentials = new NetworkDiagnosisCredentials(this);
         }
         return networkDiagnosisCredentials;
+    }
+
+    public TracerCredentials createTraceCredentials() {
+        if (null == tracerCredentials) {
+            tracerCredentials = new TracerCredentials(this);
+        }
+        return tracerCredentials;
     }
 
     public static class LogstoreCredentials extends Credentials {
@@ -48,6 +56,13 @@ public class Credentials {
         public final Map<String, String> extension = new LinkedHashMap<>();
 
         private NetworkDiagnosisCredentials(Credentials credentials) {
+            super(credentials);
+        }
+    }
+
+    public static class TracerCredentials extends LogstoreCredentials {
+
+        public TracerCredentials(Credentials credentials) {
             super(credentials);
         }
     }

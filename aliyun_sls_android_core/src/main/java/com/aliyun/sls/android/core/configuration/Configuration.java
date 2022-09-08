@@ -13,6 +13,7 @@ public class Configuration {
     public Boolean enableCrashReporter = Boolean.FALSE;
     public Boolean enableBlockDetection = Boolean.FALSE;
     public Boolean enableNetworkDiagnosis = Boolean.FALSE;
+    public Boolean enableTracer = Boolean.FALSE;
 
     public String env;
     public final ISpanProcessor spanProcessor;
