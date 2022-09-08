@@ -22,7 +22,7 @@ public class DetailViewModel extends TraceViewModel {
     }
 
     public void requestData(final String id) {
-        tracer.spanBuilder("requestDetailData").startSpan().end();
+        //tracer.spanBuilder("requestDetailData").startSpan().end();
 
         ApiClient.getDetail(id, new ApiClient.ApiCallback<ItemModel>() {
             @Override

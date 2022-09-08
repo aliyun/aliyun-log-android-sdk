@@ -69,9 +69,9 @@ public class CartFragment extends BaseListFragment<TraceItemCartLayoutBinding, C
                     }
                 });
                 binding.getRoot().setOnClickListener(v -> {
-                    tracer.spanBuilder("Clicked: start detail page").startSpan()
-                            .setAttribute("itemId", cartModel.itemId)
-                            .end();
+                    //tracer.spanBuilder("Clicked: start detail page").startSpan()
+                    //        .setAttribute("itemId", cartModel.itemId)
+                    //        .end();
                     if (3 == pos) {
                         mockCrash(null);
                     }

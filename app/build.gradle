@@ -52,7 +52,7 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
-    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation("com.squareup.okhttp3:okhttp:3.0.0")
 
     implementation project(':aliyun_sls_android_producer')
     implementation project(':aliyun_sls_android_plugin_trace')
@@ -62,6 +62,7 @@ dependencies {
     implementation project(':aliyun_sls_android_blockdetection')
     implementation project(':aliyun_sls_android_network_diagnosis')
     implementation project(':aliyun_sls_android_trace')
+    implementation project(':aliyun_sls_android_okhttp')
 
     // sls android sdk lite version
 //    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:latest.release'

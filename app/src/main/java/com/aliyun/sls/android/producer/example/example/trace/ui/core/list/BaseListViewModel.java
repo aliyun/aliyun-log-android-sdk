@@ -26,7 +26,7 @@ public abstract class BaseListViewModel<ITEM> extends TraceViewModel {
     }
 
     public void requestItemsFromServer() {
-        tracer.spanBuilder(String.format("request_%s_items", modelName)).startSpan().end();
+        //tracer.spanBuilder(String.format("request_%s_items", modelName)).startSpan().end();
 
         fetchItemsFromServer();
     }

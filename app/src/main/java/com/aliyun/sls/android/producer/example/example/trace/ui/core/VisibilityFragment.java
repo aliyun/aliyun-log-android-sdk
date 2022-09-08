@@ -31,9 +31,9 @@ public class VisibilityFragment extends BaseFragment implements View.OnAttachSta
 
     private VisibilityFragment localParentFragment;
     private final List<OnFragmentVisibilityChangedListener> listeners = new ArrayList<>();
-    protected Tracer tracer = SLSTracePlugin.getInstance().getSLSTelemetry().getTracer(this.getClass().getSimpleName());
-    private Span pageSpan;
-    private Scope scope;
+    //protected Tracer tracer = SLSTracePlugin.getInstance().getSLSTelemetry().getTracer(this.getClass().getSimpleName());
+    //private Span pageSpan;
+    //private Scope scope;
 
     public void addOnVisibilityChangedListener(OnFragmentVisibilityChangedListener listener) {
         listeners.add(listener);
@@ -184,24 +184,24 @@ public class VisibilityFragment extends BaseFragment implements View.OnAttachSta
      */
     protected void onVisibilityChanged(boolean visible) {
         info("==> onVisibilityChanged = " + visible);
-        if (visible) {
-            pageSpan = tracer.spanBuilder(getSpanName("Page In"))
-                    .startSpan()
-                    .setAttribute("component", "Android.Page")
-                    .setAttribute("page.name", getSpanName())
-                    .setAttribute("page.visibility", "visible");
-            scope = pageSpan.makeCurrent();
-        } else {
-            tracer.spanBuilder(getSpanName("Page Out"))
-                    .startSpan()
-                    .setAttribute("component", "Android.Page")
-                    .setAttribute("page.name", getSpanName())
-                    .setAttribute("page.visibility", "in_visibile")
-                    .end();
-
-            pageSpan.end();
-            scope.close();
-        }
+        //if (visible) {
+        //    pageSpan = tracer.spanBuilder(getSpanName("Page In"))
+        //            .startSpan()
+        //            .setAttribute("component", "Android.Page")
+        //            .setAttribute("page.name", getSpanName())
+        //            .setAttribute("page.visibility", "visible");
+        //    scope = pageSpan.makeCurrent();
+        //} else {
+        //    tracer.spanBuilder(getSpanName("Page Out"))
+        //            .startSpan()
+        //            .setAttribute("component", "Android.Page")
+        //            .setAttribute("page.name", getSpanName())
+        //            .setAttribute("page.visibility", "in_visibile")
+        //            .end();
+        //
+        //    pageSpan.end();
+        //    scope.close();
+        //}
 
         for (OnFragmentVisibilityChangedListener listener : listeners) {
             listener.onFragmentVisibilityChanged(visible);

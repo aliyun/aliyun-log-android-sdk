@@ -10,23 +10,23 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import android.text.TextUtils;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import com.aliyun.sls.android.okhttp.OkHttpTelemetry;
+import com.aliyun.sls.android.okhttp.OkHttpTracingInterceptor;
+import com.aliyun.sls.android.ot.Span;
+import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.plugin.trace.SLSTelemetry;
 import com.aliyun.sls.android.producer.HttpConfigProxy;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
-import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.SpanKind;
-import io.opentelemetry.api.trace.StatusCode;
-import io.opentelemetry.api.trace.Tracer;
+import com.aliyun.sls.android.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapSetter;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 /**
  * @author gordon
@@ -40,7 +40,7 @@ public class HttpTool {
     }
 
     private static SLSTelemetry traceSdk = SLSTelemetry.getInstance();
-    private static Tracer tracer = traceSdk.getTracer("HttpTool");
+    //private static Tracer tracer = traceSdk.getTracer("HttpTool");
 
     private HttpTool() {
         //no instance
@@ -72,14 +72,17 @@ public class HttpTool {
     }
 
     private static void http(String host, String path, String method, String[] headers, String body, HttpCallback callback) {
-        Span span = tracer.spanBuilder(String.format("Request HTTP: %s", path)).startSpan()
-                .setAttribute(SemanticAttributes.HTTP_ROUTE, path)
-                .setAttribute("http.query", body);
-        span.end();
+        //Span span = tracer.spanBuilder(String.format("Request HTTP: %s", path)).startSpan()
+        //        .setAttribute(SemanticAttributes.HTTP_ROUTE, path)
+        //        .setAttribute("http.query", body);
+        //span.end();
 
-        final Context context = Context.current().with(span);
+        //final Context context = Context.current().with(span);
         ThreadUtils.exec(() -> {
-            Response response = internalHttp(host, path, method, headers, body, context);
+            Span span = Tracer.spanBuilder("start http request").build();
+            span.end();
+            ContextManager.INSTANCE.update(span);
+            Response response = internalOkHttp(host, path, method, headers, body, null);
             callback.onComplete(response);
         });
     }
@@ -88,13 +91,13 @@ public class HttpTool {
         Log.v(TAG, "http request =>> host: " + host + ", path: " + path + ", method: " + method + ", headers: " + arrayToString(headers) + ", body: " + body);
         final String urlString = host + path;
 
-        Span span = tracer.spanBuilder("/").setSpanKind(SpanKind.CLIENT).setParent(context).startSpan();
-        span.setAttribute(SemanticAttributes.HTTP_METHOD, method.toUpperCase(Locale.ROOT));
-        span.setAttribute("component", "http");
-        span.setAttribute(SemanticAttributes.HTTP_URL, urlString);
-        span.setAttribute(SemanticAttributes.HTTP_HOST, host);
-        span.setAttribute(SemanticAttributes.HTTP_ROUTE, path);
-        span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, HttpConfigProxy.getUserAgent());
+        //Span span = tracer.spanBuilder("/").setSpanKind(SpanKind.CLIENT).setParent(context).startSpan();
+        //span.setAttribute(SemanticAttributes.HTTP_METHOD, method.toUpperCase(Locale.ROOT));
+        //span.setAttribute("component", "http");
+        //span.setAttribute(SemanticAttributes.HTTP_URL, urlString);
+        //span.setAttribute(SemanticAttributes.HTTP_HOST, host);
+        //span.setAttribute(SemanticAttributes.HTTP_ROUTE, path);
+        //span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, HttpConfigProxy.getUserAgent());
 
         int responseCode = -1;
         try {
@@ -164,14 +167,54 @@ public class HttpTool {
             response.error = ex.getLocalizedMessage();
             response.code = 400;
 
-            span.setAttribute("exception", ex.getLocalizedMessage());
-            span.addEvent("exception", Attributes.builder().put("message", ex.getLocalizedMessage())
-                    .put("cause", ex.getCause().toString()).build());
-            span.setStatus(StatusCode.ERROR, "Http Code: " + responseCode);
+            //span.setAttribute("exception", ex.getLocalizedMessage());
+            //span.addEvent("exception", Attributes.builder().put("message", ex.getLocalizedMessage())
+            //        .put("cause", ex.getCause().toString()).build());
+            //span.setStatus(StatusCode.ERROR, "Http Code: " + responseCode);
 
             return response;
         } finally {
-            span.end();
+            //span.end();
+        }
+    }
+
+    private static Response internalOkHttp(String host, String path, String method, String[] headers, String body, Context context) {
+        Log.v(TAG, "http request =>> host: " + host + ", path: " + path + ", method: " + method + ", headers: " + arrayToString(headers) + ", body: " + body);
+        final String urlString = host + path;
+
+        OkHttpClient client = new OkHttpClient.Builder().build();
+
+        Request request = new Request.Builder()
+            .url(urlString)
+            .header("User-agent", HttpConfigProxy.getUserAgent())
+            //.method(method, RequestBody.create(MediaType.parse("json"), body))
+            .build();
+
+        try {
+            okhttp3.Response res = OkHttpTelemetry.newCallFactory(client).newCall(request).execute();
+            Response response = new Response();
+            response.code = res.code();
+            final int headerCount = res.headers().size();
+            String[] responseHeaders = new String[res.headers().size() * headerCount];
+            for (int i = 0; i < headerCount; i++) {
+                responseHeaders[i] = res.headers().name(i);
+                responseHeaders[i + 1] = res.headers().value(i);
+            }
+            response.headers = responseHeaders;
+
+            if (response.code / 100 == 2) {
+                response.data = res.body().string();
+            } else {
+                response.error = res.message();
+            }
+            Log.v(TAG, "http response=>> code: " + response.code + ", response: " + response.toString());
+            return response;
+        } catch (Throwable ex) {
+            Log.w(TAG, "exception: " + ex.getLocalizedMessage());
+            Response response = new Response();
+            response.error = ex.getLocalizedMessage();
+            response.code = 400;
+            return response;
         }
     }
 

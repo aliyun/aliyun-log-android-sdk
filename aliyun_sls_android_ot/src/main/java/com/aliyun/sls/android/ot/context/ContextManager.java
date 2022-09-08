@@ -16,7 +16,17 @@ public enum ContextManager {
     private final Map<Span, Context> CONTEXT_CACHE = new ConcurrentHashMap<>();
 
     public Context current() {
-        return THREAD_LOCAL_CONTEXT.get();
+        Context context =  THREAD_LOCAL_CONTEXT.get();
+        if (null == context) {
+            context = new Context(null);
+            THREAD_LOCAL_CONTEXT.set(context);
+        }
+        return context;
+    }
+
+    public void update(Span span) {
+        Context context = current();
+        context.span = span;
     }
 
     public Span activeSpan() {
