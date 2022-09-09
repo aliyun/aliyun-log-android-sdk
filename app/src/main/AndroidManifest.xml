@@ -41,6 +41,8 @@
         <activity android:name=".example.crash.CrashExampleActivity"/>
         <activity android:name=".example.network.NetworkExample"/>
         <activity android:name=".example.network.NetworkWithPolicy"/>
+
+        <activity android:name=".example.TraceDemoActivity"/>
     </application>
 
 </manifest>

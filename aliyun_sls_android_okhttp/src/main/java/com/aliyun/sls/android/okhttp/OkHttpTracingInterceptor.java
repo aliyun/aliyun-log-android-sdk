@@ -8,6 +8,7 @@ import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.ot.context.Scope;
 import com.aliyun.sls.android.trace.Tracer;
 import okhttp3.Interceptor;
+import okhttp3.Request;
 import okhttp3.Response;
 
 /**
@@ -17,8 +18,10 @@ import okhttp3.Response;
 public class OkHttpTracingInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Span parent = OkHttpTelemetry.getSpanByRequest(chain.request());
-        SpanBuilder builder = Tracer.spanBuilder("HTTP request");
+        Request request = chain.request();
+
+        Span parent = OkHttpTelemetry.getSpanByRequest(request);
+        SpanBuilder builder = Tracer.spanBuilder("HTTP " + request.method());
         if (null != parent) {
             builder.setParent(parent);
         }

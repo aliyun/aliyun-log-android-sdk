@@ -2,6 +2,7 @@ package com.aliyun.sls.android.producer.example.example.trace.http;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -25,8 +26,11 @@ import com.aliyun.sls.android.producer.utils.ThreadUtils;
 import com.aliyun.sls.android.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapSetter;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * @author gordon
@@ -78,13 +82,14 @@ public class HttpTool {
         //span.end();
 
         //final Context context = Context.current().with(span);
-        ThreadUtils.exec(() -> {
-            Span span = Tracer.spanBuilder("start http request").build();
-            span.end();
-            ContextManager.INSTANCE.update(span);
-            Response response = internalOkHttp(host, path, method, headers, body, null);
-            callback.onComplete(response);
-        });
+        //ThreadUtils.exec(() -> {
+        //    Span span = Tracer.spanBuilder("start http request").build();
+        //    span.end();
+        //    ContextManager.INSTANCE.update(span);
+        //    Response response = internalOkHttp(host, path, method, headers, body, callback);
+            //callback.onComplete(response);
+        internalOkHttp(host, path, method, headers, body, callback);
+        //});
     }
 
     private static Response internalHttp(String host, String path, String method, String[] headers, String body, Context context) {
@@ -178,7 +183,7 @@ public class HttpTool {
         }
     }
 
-    private static Response internalOkHttp(String host, String path, String method, String[] headers, String body, Context context) {
+    private static Response internalOkHttp(String host, String path, String method, String[] headers, String body, HttpCallback callback) {
         Log.v(TAG, "http request =>> host: " + host + ", path: " + path + ", method: " + method + ", headers: " + arrayToString(headers) + ", body: " + body);
         final String urlString = host + path;
 
@@ -191,29 +196,41 @@ public class HttpTool {
             .build();
 
         try {
-            okhttp3.Response res = OkHttpTelemetry.newCallFactory(client).newCall(request).execute();
-            Response response = new Response();
-            response.code = res.code();
-            final int headerCount = res.headers().size();
-            String[] responseHeaders = new String[res.headers().size() * headerCount];
-            for (int i = 0; i < headerCount; i++) {
-                responseHeaders[i] = res.headers().name(i);
-                responseHeaders[i + 1] = res.headers().value(i);
-            }
-            response.headers = responseHeaders;
+            OkHttpTelemetry.newCallFactory(client).newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
 
-            if (response.code / 100 == 2) {
-                response.data = res.body().string();
-            } else {
-                response.error = res.message();
-            }
-            Log.v(TAG, "http response=>> code: " + response.code + ", response: " + response.toString());
-            return response;
+                }
+
+                @Override
+                public void onResponse(Call call, okhttp3.Response res) throws IOException {
+                    Response response = new Response();
+                    response.code = res.code();
+                    final int headerCount = res.headers().size();
+                    String[] responseHeaders = new String[res.headers().size() * headerCount];
+                    for (int i = 0; i < headerCount; i++) {
+                        responseHeaders[i] = res.headers().name(i);
+                        responseHeaders[i + 1] = res.headers().value(i);
+                    }
+                    response.headers = responseHeaders;
+
+                    if (response.code / 100 == 2) {
+                        response.data = res.body().string();
+                    } else {
+                        response.error = res.message();
+                    }
+                    Log.v(TAG, "http response=>> code: " + response.code + ", response: " + response.toString());
+                    callback.onComplete(response);
+                }
+            });
+
+            return null;
         } catch (Throwable ex) {
             Log.w(TAG, "exception: " + ex.getLocalizedMessage());
             Response response = new Response();
             response.error = ex.getLocalizedMessage();
             response.code = 400;
+            callback.onComplete(response);
             return response;
         }
     }
