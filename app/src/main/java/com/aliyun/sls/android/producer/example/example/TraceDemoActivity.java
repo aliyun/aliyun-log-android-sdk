@@ -57,7 +57,8 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
     private void simpleTraceDemo() {
         // single span
         Span span = Tracer.startSpan("span 1");
-        span.addAttribute(Attribute.of("attr_key", "attr_value"));
+        span.addAttribute(Attribute.of("attr_key", "attr_value"))
+            .addResource(Resource.of("res_key", "res_value"));
         span.end();
 
         // span with children
@@ -85,6 +86,7 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
                     public void run() {
                         Tracer.startSpan("nested span 1").end();
                         Tracer.startSpan("nested span 2").end();
+                        // NPE
                         String s = null;
                         s.length();
                     }
