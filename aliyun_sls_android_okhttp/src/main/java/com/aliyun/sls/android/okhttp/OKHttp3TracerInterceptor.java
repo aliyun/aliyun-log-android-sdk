@@ -49,8 +49,8 @@ public class OKHttp3TracerInterceptor implements Interceptor {
 
         Response response;
         try (Scope ignored = ContextManager.INSTANCE.makeCurrent(span)) {
-            final String traceId = span.getTraceID();
-            final String spanId = span.getSpanID();
+            final String traceId = span.getTraceId();
+            final String spanId = span.getSpanId();
 
             final String traceparent = String.format("00-%s-%s-01", traceId, spanId);
             Builder requestBuilder = request.newBuilder();

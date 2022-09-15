@@ -72,7 +72,7 @@ public class SpanBuilder {
     public Span build() {
         Span span = new RecordableSpan(spanProcessor);
         span.setName(spanName);
-        span.setSpanID(IdGenerator.generateSpanId());
+        span.setSpanId(IdGenerator.generateSpanId());
 
         // find the parent span first.
         final Span parentSpan;
@@ -83,10 +83,10 @@ public class SpanBuilder {
         }
 
         if (null != parentSpan) {
-            span.setTraceID(parentSpan.getTraceID());
-            span.setParentSpanID(parentSpan.getSpanID());
+            span.setTraceId(parentSpan.getTraceId());
+            span.setParentSpanId(parentSpan.getSpanId());
         } else {
-            span.setTraceID(IdGenerator.generateTraceId());
+            span.setTraceId(IdGenerator.generateTraceId());
         }
 
         span.setKind(kind);

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import android.text.TextUtils;
 import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.ot.utils.JSONUtils;
 import org.json.JSONObject;
@@ -72,15 +73,15 @@ public class Span {
         return kind;
     }
 
-    public String getTraceID() {
+    public String getTraceId() {
         return traceID;
     }
 
-    public String getSpanID() {
+    public String getSpanId() {
         return spanID;
     }
 
-    public String getParentSpanID() {
+    public String getParentSpanId() {
         return parentSpanID;
     }
 
@@ -124,17 +125,17 @@ public class Span {
         return this;
     }
 
-    public Span setTraceID(String traceID) {
+    public Span setTraceId(String traceID) {
         this.traceID = traceID;
         return this;
     }
 
-    public Span setSpanID(String spanID) {
+    public Span setSpanId(String spanID) {
         this.spanID = spanID;
         return this;
     }
 
-    public Span setParentSpanID(String parentSpanID) {
+    public Span setParentSpanId(String parentSpanID) {
         this.parentSpanID = parentSpanID;
         return this;
     }
@@ -241,7 +242,7 @@ public class Span {
         data.put("statusCode", statusCode.code);
         data.put("statusMessage", statusMessage);
         data.put("host", host);
-        data.put("service", "Android");
+        data.put("service", TextUtils.isEmpty(service) ? "Android" : service);
 
         JSONObject object = new JSONObject();
         Collections.sort(attribute);
