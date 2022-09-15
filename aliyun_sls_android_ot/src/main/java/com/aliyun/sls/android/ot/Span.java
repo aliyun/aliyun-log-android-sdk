@@ -3,6 +3,7 @@ package com.aliyun.sls.android.ot;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,22 +20,13 @@ public class Span {
     public enum StatusCode {
         UNSET("UNSET"),
         OK("OK"),
-        ERROR("ERROR"),
-        CUSTOM("CUSTOM");
+        ERROR("ERROR");
 
         public String code;
         public String message;
 
         StatusCode(String code) {
             this.code = code;
-        }
-
-        public static StatusCode of(String code, String message) {
-            StatusCode statusCode = CUSTOM;
-            statusCode.code = code;
-            statusCode.message = message;
-
-            return statusCode;
         }
 
         public static StatusCode of(String message) {
@@ -46,45 +38,170 @@ public class Span {
 
     }
 
-    public String name;
-    public SpanKind kind = SpanKind.CLIENT;
-    public String traceID;
-    public String spanID;
-    public String parentSpanID;
-    public long start;
-    public long end;
-    public long duration;
-    public List<Attribute> attribute;
-    public StatusCode statusCode = StatusCode.UNSET;
-    public String statusMessage;
-    public String host;
-    public Resource resource;
-    public String service;
+    protected String name;
+    protected SpanKind kind = SpanKind.CLIENT;
+    protected String traceID;
+    protected String spanID;
+    protected String parentSpanID;
+    protected long start;
+    protected long end;
+    protected long duration;
+    protected List<Attribute> attribute;
+    protected StatusCode statusCode = StatusCode.UNSET;
+    protected String statusMessage;
+    protected String host;
+    protected Resource resource;
+    protected String service;
 
-    public String sessionId;
-    public String transactionId;
+    protected String sessionId;
+    protected String transactionId;
 
     private final AtomicBoolean finished = new AtomicBoolean();
 
-    public Span() {
+    Span() {
+        this.attribute = new LinkedList<>();
+        this.resource = new Resource();
     }
 
-    public void addAttribute(Attribute attribute) {
-        this.attribute.add(attribute);
+    // region getter
+    public String getName() {
+        return name;
     }
 
-    public void addAttribute(Attribute... attributes) {
-        this.addAttribute(Arrays.asList(attributes));
+    public SpanKind getKind() {
+        return kind;
     }
 
-    public void addAttribute(List<Attribute> attributes) {
-        this.attribute.addAll(attributes);
+    public String getTraceID() {
+        return traceID;
     }
 
-    public void setStatus(StatusCode statusCode) {
+    public String getSpanID() {
+        return spanID;
+    }
+
+    public String getParentSpanID() {
+        return parentSpanID;
+    }
+
+    public long getStart() {
+        return start;
+    }
+
+    public long getEnd() {
+        return end;
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public StatusCode getStatusCode() {
+        return statusCode;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public String getService() {
+        return service;
+    }
+    // endregion
+
+    // region setter
+    public Span setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Span setKind(SpanKind kind) {
+        this.kind = kind;
+        return this;
+    }
+
+    public Span setTraceID(String traceID) {
+        this.traceID = traceID;
+        return this;
+    }
+
+    public Span setSpanID(String spanID) {
+        this.spanID = spanID;
+        return this;
+    }
+
+    public Span setParentSpanID(String parentSpanID) {
+        this.parentSpanID = parentSpanID;
+        return this;
+    }
+
+    public Span setStart(long start) {
+        this.start = start;
+        return this;
+    }
+
+    public Span setEnd(long end) {
+        this.end = end;
+        return this;
+    }
+
+    public Span setDuration(long duration) {
+        this.duration = duration;
+        return this;
+    }
+
+    public Span setStatus(StatusCode statusCode) {
         this.statusCode = statusCode;
+        return this;
     }
 
+    public Span setStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
+        return this;
+    }
+
+    public Span setHost(String host) {
+        this.host = host;
+        return this;
+    }
+
+    public Span setService(String service) {
+        this.service = service;
+        return this;
+    }
+    // endregion
+
+    // region attribute & resource
+    public Span addAttribute(Attribute attribute) {
+        this.attribute.add(attribute);
+        return this;
+    }
+
+    public Span addAttribute(Attribute... attributes) {
+        this.addAttribute(Arrays.asList(attributes));
+        return this;
+    }
+
+    public Span addAttribute(List<Attribute> attributes) {
+        this.attribute.addAll(attributes);
+        return this;
+    }
+
+    public Span addResource(Resource r) {
+        if (null == r) {
+            return this;
+        }
+
+        this.resource.merge(r);
+        return this;
+    }
+    // endregion
+
+    // region end
     public boolean end() {
         if (finished.getAndSet(true)) {
             return false;
@@ -98,10 +215,17 @@ public class Span {
         return true;
     }
 
-    public boolean isFinished() {
+    public boolean isEnd() {
         return finished.get();
     }
+    // endregion
 
+    // region data convertor
+    public Map<String, String> toMap() {
+        return this.toData();
+    }
+
+    @Deprecated
     public Map<String, String> toData() {
         Map<String, String> data = new LinkedHashMap<>();
         data.put("name", name);
@@ -137,4 +261,5 @@ public class Span {
 
         return data;
     }
+    // endreigon
 }

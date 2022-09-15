@@ -1,6 +1,5 @@
 package com.aliyun.sls.android.ot;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -20,15 +19,18 @@ public class SpanBuilder {
     private boolean active = false;
     private SpanKind kind = SpanKind.CLIENT;
     private final List<Attribute> attributes = new CopyOnWriteArrayList<>();
-    private Resource resource;
+    private final Resource resource = new Resource();
     private Long start = null;
 
+    // region constructor
     public SpanBuilder(String spanName, ISpanProcessor processor, ISpanProvider provider) {
         this.spanName = spanName;
         this.spanProcessor = processor;
         this.spanProvider = provider;
     }
+    // endregion
 
+    // region setter
     public SpanBuilder setParent(Span span) {
         this.parent = span;
         return this;
@@ -59,14 +61,18 @@ public class SpanBuilder {
         return this;
     }
 
-    public void setResource(Resource resource) {
-        this.resource = resource;
+    public SpanBuilder addResource(Resource resource) {
+        this.resource.merge(resource);
+        return this;
     }
 
+    // endregion
+
+    // region build
     public Span build() {
         Span span = new RecordableSpan(spanProcessor);
-        span.name = spanName;
-        span.spanID = IdGenerator.generateSpanId();
+        span.setName(spanName);
+        span.setSpanID(IdGenerator.generateSpanId());
 
         // find the parent span first.
         final Span parentSpan;
@@ -77,19 +83,21 @@ public class SpanBuilder {
         }
 
         if (null != parentSpan) {
-            span.traceID = parentSpan.traceID;
-            span.parentSpanID = parentSpan.spanID;
+            span.setTraceID(parentSpan.getTraceID());
+            span.setParentSpanID(parentSpan.getSpanID());
         } else {
-            span.traceID = IdGenerator.generateTraceId();
+            span.setTraceID(IdGenerator.generateTraceId());
         }
 
-        span.kind = kind;
-        span.attribute = new LinkedList<>();
+        span.setKind(kind);
         if (null != spanProvider) {
-            span.attribute.addAll(spanProvider.provideAttribute());
+            List<Attribute> attrs = spanProvider.provideAttribute();
+            if (null != attrs) {
+                span.addAttribute(attrs);
+            }
         }
 
-        span.attribute.addAll(attributes);
+        span.addAttribute(attributes);
 
         Resource r = Resource.getDefault();
         if (null != spanProvider) {
@@ -98,13 +106,9 @@ public class SpanBuilder {
         if (null != resource) {
             r.merge(resource);
         }
-        span.resource = r;
+        span.addResource(r);
 
-        if (null != start) {
-            span.start = start;
-        } else {
-            span.start = TimeUtils.instance.now();
-        }
+        span.setStart(null != start ? start : TimeUtils.instance.now());
 
         if (active) {
             ContextManager.INSTANCE.update(span);
@@ -112,4 +116,5 @@ public class SpanBuilder {
 
         return span;
     }
+    // endregion
 }

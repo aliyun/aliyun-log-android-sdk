@@ -205,7 +205,7 @@ public class SdkSender extends NoOpSender implements ISpanProcessor {
             return false;
         }
 
-        Map<String, String> spanData = span.toData();
+        Map<String, String> spanData = span.toMap();
         Log log = new Log();
         log.putContents(spanData);
 

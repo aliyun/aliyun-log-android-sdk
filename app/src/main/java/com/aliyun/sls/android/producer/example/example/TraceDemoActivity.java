@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
 import com.aliyun.sls.android.ot.Attribute;
+import com.aliyun.sls.android.ot.Resource;
 import com.aliyun.sls.android.ot.Span;
 import com.aliyun.sls.android.ot.Span.StatusCode;
 import com.aliyun.sls.android.producer.Log;
@@ -65,6 +66,15 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
         Tracer.startSpan("child span 2").end();
         span.end();
 
+        // span with children (SpanBuilder)
+        span = Tracer.spanBuilder("span with children (SpanBuilder)")
+            .setActive(true)
+            .addResource(Resource.of("res_key", "res_value"))
+            .build();
+        Tracer.startSpan("child span 1 (SpanBuilder)").end();
+        Tracer.startSpan("child span 2 (SpanBuilder)").end();
+        span.end();
+
         // span with function block
         Tracer.withinSpan("span with func block", new Runnable() {
             @Override
@@ -75,6 +85,8 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
                     public void run() {
                         Tracer.startSpan("nested span 1").end();
                         Tracer.startSpan("nested span 2").end();
+                        String s = null;
+                        s.length();
                     }
                 });
                 Tracer.startSpan("span within func block 2").end();

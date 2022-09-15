@@ -38,9 +38,9 @@ public class Tracer {
         }
 
         Span span = spanBuilder("logs").build();
-        span.start /= 1000;
-        span.end /= 1000;
-        log.putContents(span.toData());
+        //span.start /= 1000;
+        //span.end /= 1000;
+        log.putContents(span.toMap());
 
         return Tracer.traceFeature.addLog(log);
     }
@@ -103,7 +103,8 @@ public class Tracer {
         try (Scope ignored = active ? ContextManager.INSTANCE.makeCurrent(span) : null) {
             r.run();
         } catch (Throwable t) {
-            span.setStatus(StatusCode.of(t.getMessage()));
+            span.setStatus(StatusCode.ERROR);
+            span.setStatusMessage(String.format("exception: {name: %s, reason: %s}", t.getClass().getName(), t.getMessage()));
         } finally {
             span.end();
         }

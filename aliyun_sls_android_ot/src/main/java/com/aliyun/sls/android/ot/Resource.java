@@ -38,6 +38,10 @@ public class Resource {
         DEFAULT.add("sls.sdk.version", BuildConfig.VERSION_NAME);
     }
 
+    Resource() {
+
+    }
+
     public void add(String key, Object value) {
         this.attributes.add(Attribute.of(key, value));
     }
