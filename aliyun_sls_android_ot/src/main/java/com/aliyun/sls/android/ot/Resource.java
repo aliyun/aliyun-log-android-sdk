@@ -42,19 +42,9 @@ public class Resource {
 
     }
 
-    public void add(String key, Object value) {
-        this.attributes.add(Attribute.of(key, value));
-    }
-
+    // region instance
     public static Resource getDefault() {
         return DEFAULT;
-    }
-
-    public Resource merge(Resource resource) {
-        if (null != resource) {
-            attributes.addAll(resource.attributes);
-        }
-        return this;
     }
 
     public static Resource of(String key, Object value) {
@@ -85,4 +75,20 @@ public class Resource {
         }
         return resource;
     }
+    // endregion
+
+    // region operation
+    public Resource add(String key, Object value) {
+        this.attributes.add(Attribute.of(key, value));
+        return this;
+    }
+
+    public Resource merge(Resource resource) {
+        if (null != resource) {
+            attributes.addAll(resource.attributes);
+        }
+        return this;
+    }
+    // endregiono
+
 }
