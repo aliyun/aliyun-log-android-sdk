@@ -11,6 +11,7 @@ import android.util.Pair;
  * @author gordon
  * @date 2022/3/31
  */
+@SuppressWarnings("UnusedReturnValue")
 public class Resource {
     public final List<Attribute> attributes = new LinkedList<>();
     private final static Resource DEFAULT = new Resource();
@@ -89,6 +90,6 @@ public class Resource {
         }
         return this;
     }
-    // endregiono
+    // endregion
 
 }

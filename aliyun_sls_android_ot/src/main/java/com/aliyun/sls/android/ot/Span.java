@@ -17,6 +17,7 @@ import org.json.JSONObject;
  * @author gordon
  * @date 2022/3/31
  */
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class Span {
     public enum StatusCode {
         UNSET("UNSET"),
@@ -223,6 +224,7 @@ public class Span {
 
     // region data convertor
     public Map<String, String> toMap() {
+        //noinspection deprecation
         return this.toData();
     }
 

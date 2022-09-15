@@ -31,6 +31,7 @@ public enum SpanKind {
         this.kind = kind;
     }
 
+    @SuppressWarnings("unused")
     public static SpanKind kindOf(String kind) {
         if (TextUtils.isEmpty(kind)) {
             return INTERNAL;

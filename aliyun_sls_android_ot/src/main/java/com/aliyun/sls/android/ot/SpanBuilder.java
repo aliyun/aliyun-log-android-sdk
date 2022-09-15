@@ -11,6 +11,7 @@ import com.aliyun.sls.android.ot.utils.TimeUtils;
  * @author gordon
  * @date 2022/4/12
  */
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class SpanBuilder {
     private final String spanName;
     private final ISpanProcessor spanProcessor;
@@ -103,9 +104,7 @@ public class SpanBuilder {
         if (null != spanProvider) {
             r.merge(spanProvider.provideResource());
         }
-        if (null != resource) {
-            r.merge(resource);
-        }
+        r.merge(resource);
         span.addResource(r);
 
         span.setStart(null != start ? start : TimeUtils.instance.now());

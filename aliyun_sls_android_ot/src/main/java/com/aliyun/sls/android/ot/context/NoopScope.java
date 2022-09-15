@@ -9,6 +9,7 @@ import java.io.IOException;
 public enum NoopScope implements Scope {
     INSTANCE;
 
+    @SuppressWarnings("RedundantThrows")
     @Override
     public void close() throws IOException {
 
