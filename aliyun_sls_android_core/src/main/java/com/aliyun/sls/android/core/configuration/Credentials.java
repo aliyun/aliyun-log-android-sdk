@@ -61,9 +61,24 @@ public class Credentials {
     }
 
     public static class TracerCredentials extends LogstoreCredentials {
+        public TracerLogCredentials logCredentials;
 
         public TracerCredentials(Credentials credentials) {
             super(credentials);
+        }
+
+        public TracerLogCredentials createLogCredentials() {
+            if (null == logCredentials) {
+                logCredentials = new TracerLogCredentials(this);
+            }
+            return logCredentials;
+        }
+
+        public static class TracerLogCredentials extends LogstoreCredentials {
+
+            public TracerLogCredentials(Credentials credentials) {
+                super(credentials);
+            }
         }
     }
 

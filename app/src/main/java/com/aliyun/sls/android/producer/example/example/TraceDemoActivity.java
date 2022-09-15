@@ -1,5 +1,6 @@
 package com.aliyun.sls.android.producer.example.example;
 
+import java.io.IOException;
 import java.util.List;
 
 import android.os.Bundle;
@@ -7,13 +8,22 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
+import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.Span;
+import com.aliyun.sls.android.ot.Span.StatusCode;
+import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient.ApiCallback;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.OrderModel;
 import com.aliyun.sls.android.trace.Tracer;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * @author gordon
@@ -28,6 +38,7 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
 
         findViewById(R.id.trace_demo_startup).setOnClickListener(this);
         findViewById(R.id.trace_demo_air).setOnClickListener(this);
+        findViewById(R.id.trace_simple_demo).setOnClickListener(this);
     }
 
     @Override
@@ -36,8 +47,65 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
             startup();
         } else if (R.id.trace_demo_air == v.getId()) {
             openAirConditioner();
+        } else if (R.id.trace_simple_demo == v.getId()) {
+            simpleTraceDemo();
         }
     }
+
+    // region simple trace demo
+    private void simpleTraceDemo() {
+        // single span
+        Span span = Tracer.startSpan("span 1");
+        span.addAttribute(Attribute.of("attr_key", "attr_value"));
+        span.end();
+
+        // span with children
+        span = Tracer.startSpan("span with children", true);
+        Tracer.startSpan("child span 1").end();
+        Tracer.startSpan("child span 2").end();
+        span.end();
+
+        // span with function block
+        Tracer.withinSpan("span with func block", new Runnable() {
+            @Override
+            public void run() {
+                Tracer.startSpan("span within func block 1").end();
+                Tracer.withinSpan("nested span with func block", new Runnable() {
+                    @Override
+                    public void run() {
+                        Tracer.startSpan("nested span 1").end();
+                        Tracer.startSpan("nested span 2").end();
+                    }
+                });
+                Tracer.startSpan("span within func block 2").end();
+            }
+        });
+
+        // http request with traceid
+        Tracer.withinSpan("span with http request func", new Runnable() {
+            @Override
+            public void run() {
+                OKHttp3Tracer.newCallFactory(new OkHttpClient.Builder().build()).newCall(
+                    new Request.Builder()
+                        .url("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue")
+                        .build()
+                ).enqueue(
+                    new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+
+                        }
+                    }
+                );
+            }
+        });
+    }
+    // endregion
 
     // region 启动引擎
     private void startup() {
@@ -99,16 +167,22 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
             Tracer.withinSpan("开空调：1.1 电池检查", true, () -> {
                 Tracer.startSpan("电池电压检查").end();
                 threadSleep();
-                Tracer.startSpan("电池电流检查").end();
+                Span span = Tracer.startSpan("电池电流检查");
+                span.setStatus(StatusCode.of("电池电流检查异常"));
+                span.end();
                 threadSleep();
                 Tracer.startSpan("电池温度检查").end();
+
+                Log log = new Log();
+                log.putContent("content", "状态检查正常");
+                Tracer.log(log);
             });
             Tracer.withinSpan("开空调：1.2 电气信号检查", this::threadSleep);
         });
     }
 
     private void startFan() {
-        Span span = Tracer.startSpan("启动风扇");
+        Span span = Tracer.startSpan("开空调：第二步：启动风扇");
         threadSleep();
         span.end();
     }
@@ -127,7 +201,6 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
         });
     }
     // endregion
-
 
     private void threadSleep() {
         try {

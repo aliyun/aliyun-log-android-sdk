@@ -1,11 +1,13 @@
 package com.aliyun.sls.android.trace;
 
 import android.content.Context;
+import android.text.TextUtils;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.feature.SdkFeature;
 import com.aliyun.sls.android.core.sender.SdkSender;
+import com.aliyun.sls.android.producer.Log;
 
 /**
  * @author gordon
@@ -14,6 +16,8 @@ import com.aliyun.sls.android.core.sender.SdkSender;
 public class TraceFeature extends SdkFeature {
     private static final String TAG = "TraceFeature";
     private TraceSender traceSender;
+    private TraceLogSender traceLogSender;
+
 
     @Override
     protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
@@ -25,9 +29,26 @@ public class TraceFeature extends SdkFeature {
         traceSender = new TraceSender(context, this);
         traceSender.initialize(credentials);
 
+        if (configuration.enableTracerLog) {
+            traceLogSender = new TraceLogSender(context, this);
+            traceLogSender.initialize(credentials);
+        }
+
         Tracer.spanProcessor = traceSender;
         Tracer.spanProvider = configuration.spanProvider;
         Tracer.setTraceFeature(this);
+    }
+
+    boolean addLog(Log log) {
+        if (null == log) {
+            return false;
+        }
+
+        if (null == traceLogSender) {
+            return false;
+        }
+
+        return traceLogSender.send(log);
     }
 
     @Override
@@ -103,5 +124,36 @@ public class TraceFeature extends SdkFeature {
         public void setCredentials(Credentials credentials) {
             super.setCredentials(credentials.tracerCredentials);
         }
+    }
+
+    private static class TraceLogSender extends TraceSender {
+
+        public TraceLogSender(Context context, SdkFeature feature) {
+            super(context, feature);
+            TAG = "TraceLogSender";
+        }
+
+        protected String provideLogFileName() {
+            return "traces_logs";
+        }
+
+        @Override
+        protected String provideEndpoint(Credentials credentials) {
+            return TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.endpoint) ?
+                super.provideEndpoint(credentials) : credentials.tracerCredentials.logCredentials.endpoint;
+        }
+
+        @Override
+        protected String provideProjectName(Credentials credentials) {
+            return TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.project) ?
+                super.provideEndpoint(credentials) : credentials.tracerCredentials.logCredentials.project;
+        }
+
+        @Override
+        protected String provideLogstoreName(Credentials credentials) {
+            return TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.logstore) ?
+                super.provideEndpoint(credentials) : credentials.tracerCredentials.logCredentials.logstore;
+        }
+
     }
 }

@@ -16,21 +16,15 @@ import java.util.Map;
 import android.text.TextUtils;
 import android.util.Log;
 import androidx.annotation.NonNull;
-import com.aliyun.sls.android.okhttp.OkHttpTelemetry;
-import com.aliyun.sls.android.okhttp.OkHttpTracingInterceptor;
-import com.aliyun.sls.android.ot.Span;
-import com.aliyun.sls.android.ot.context.ContextManager;
+import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
 import com.aliyun.sls.android.plugin.trace.SLSTelemetry;
 import com.aliyun.sls.android.producer.HttpConfigProxy;
-import com.aliyun.sls.android.producer.utils.ThreadUtils;
-import com.aliyun.sls.android.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapSetter;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * @author gordon
@@ -196,7 +190,7 @@ public class HttpTool {
             .build();
 
         try {
-            OkHttpTelemetry.newCallFactory(client).newCall(request).enqueue(new Callback() {
+            OKHttp3Tracer.newCallFactory(client).newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
 

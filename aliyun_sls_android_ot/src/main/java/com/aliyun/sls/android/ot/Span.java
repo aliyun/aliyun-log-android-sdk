@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.ot.utils.JSONUtils;
 import org.json.JSONObject;
 
@@ -77,9 +78,7 @@ public class Span {
     }
 
     public void addAttribute(List<Attribute> attributes) {
-        for (Attribute attr : attributes) {
-            this.attribute.add(attr);
-        }
+        this.attribute.addAll(attributes);
     }
 
     public void setStatus(StatusCode statusCode) {
@@ -92,6 +91,10 @@ public class Span {
         }
 
         this.duration = (this.end - this.start) / 1000;
+
+        if (ContextManager.INSTANCE.activeSpan() == this) {
+            ContextManager.INSTANCE.update(null);
+        }
         return true;
     }
 

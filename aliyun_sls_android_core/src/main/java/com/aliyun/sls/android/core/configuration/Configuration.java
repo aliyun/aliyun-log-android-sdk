@@ -14,6 +14,7 @@ public class Configuration {
     public Boolean enableBlockDetection = Boolean.FALSE;
     public Boolean enableNetworkDiagnosis = Boolean.FALSE;
     public Boolean enableTracer = Boolean.FALSE;
+    public Boolean enableTracerLog = Boolean.FALSE;
 
     public String env;
     public final ISpanProcessor spanProcessor;

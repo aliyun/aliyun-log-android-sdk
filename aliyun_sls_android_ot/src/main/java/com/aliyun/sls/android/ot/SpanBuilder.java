@@ -17,6 +17,7 @@ public class SpanBuilder {
     private final ISpanProcessor spanProcessor;
     private final ISpanProvider spanProvider;
     private Span parent;
+    private boolean active = false;
     private SpanKind kind = SpanKind.CLIENT;
     private final List<Attribute> attributes = new CopyOnWriteArrayList<>();
     private Resource resource;
@@ -30,6 +31,11 @@ public class SpanBuilder {
 
     public SpanBuilder setParent(Span span) {
         this.parent = span;
+        return this;
+    }
+
+    public SpanBuilder setActive(boolean active) {
+        this.active = active;
         return this;
     }
 
@@ -98,6 +104,10 @@ public class SpanBuilder {
             span.start = start;
         } else {
             span.start = TimeUtils.instance.now();
+        }
+
+        if (active) {
+            ContextManager.INSTANCE.update(span);
         }
 
         return span;
