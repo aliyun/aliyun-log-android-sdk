@@ -45,7 +45,7 @@ public class Resource {
 
     // region instance
     public static Resource getDefault() {
-        return DEFAULT;
+        return new Resource().merge(DEFAULT);
     }
 
     public static Resource of(String key, Object value) {

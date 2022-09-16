@@ -61,6 +61,19 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
             .addResource(Resource.of("res_key", "res_value"));
         span.end();
 
+        Tracer.spanBuilder("span with spanbuilder")
+            .addAttribute(Attribute.of("attr_key", "attr_value"))
+            .addResource(Resource.of("res_key", "res_value"))
+            .build()
+            .end();
+
+        Tracer.withinSpan("span with block", new Runnable() {
+            @Override
+            public void run() {
+                android.util.Log.d("debug", "print log from withinSpan");
+            }
+        });
+
         // span with children
         span = Tracer.startSpan("span with children", true);
         Tracer.startSpan("child span 1").end();
@@ -70,6 +83,7 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
         // span with children (SpanBuilder)
         span = Tracer.spanBuilder("span with children (SpanBuilder)")
             .setActive(true)
+            .addAttribute(Attribute.of("attr_key", "attr_value"))
             .addResource(Resource.of("res_key", "res_value"))
             .build();
         Tracer.startSpan("child span 1 (SpanBuilder)").end();

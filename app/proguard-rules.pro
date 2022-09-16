@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class com.uc.crashsdk.** { *; }
+-keep interface com.uc.crashsdk.** { *; }
+-keep class com.aliyun.sls.android.producer.* { *; }
+-keep interface com.aliyun.sls.android.producer.* { *; }
+-keep class com.aliyun.sls.android.** { *; }
