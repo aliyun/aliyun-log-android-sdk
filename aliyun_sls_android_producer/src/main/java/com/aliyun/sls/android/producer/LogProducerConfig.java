@@ -7,14 +7,12 @@ import com.aliyun.sls.android.producer.utils.TimeUtils;
 
 @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
 public class LogProducerConfig {
-
     private static boolean hasSoLoaded = false;
     private final long config;
     private final Context context;
     private String endpoint;
     private String project;
     private String logstore;
-    private boolean enableTrack = false;
 
     @Deprecated
     // @formatter:off
@@ -327,13 +325,5 @@ public class LogProducerConfig {
 
     public int isEnabled() {
         return log_producer_persistent_config_is_enabled(config);
-    }
-
-    public void setEnableTrack(boolean enableTrack) {
-        this.enableTrack = enableTrack;
-    }
-
-    public boolean isEnableTrack() {
-        return enableTrack;
     }
 }
