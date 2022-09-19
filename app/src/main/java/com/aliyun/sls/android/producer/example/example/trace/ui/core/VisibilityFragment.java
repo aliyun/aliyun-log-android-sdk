@@ -9,10 +9,10 @@ import android.util.Log;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Scope;
+//import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
+//import io.opentelemetry.api.trace.Span;
+//import io.opentelemetry.api.trace.Tracer;
+//import io.opentelemetry.context.Scope;
 
 /**
  * @author gordon

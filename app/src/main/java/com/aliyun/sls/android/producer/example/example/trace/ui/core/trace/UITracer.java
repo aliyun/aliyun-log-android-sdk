@@ -4,9 +4,9 @@ import java.util.Map;
 
 import android.view.View;
 import androidx.viewbinding.ViewBinding;
-import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
+//import com.aliyun.sls.android.plugin.trace.SLSTracePlugin;
+//import io.opentelemetry.api.trace.Span;
+//import io.opentelemetry.api.trace.Tracer;
 
 /**
  * @author gordon

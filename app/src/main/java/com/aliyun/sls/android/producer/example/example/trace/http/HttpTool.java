@@ -17,10 +17,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
-import com.aliyun.sls.android.plugin.trace.SLSTelemetry;
+//import com.aliyun.sls.android.plugin.trace.SLSTelemetry;
 import com.aliyun.sls.android.producer.HttpConfigProxy;
-import io.opentelemetry.context.Context;
-import io.opentelemetry.context.propagation.TextMapSetter;
+//import io.opentelemetry.context.Context;
+//import io.opentelemetry.context.propagation.TextMapSetter;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -37,7 +37,7 @@ public class HttpTool {
         void onComplete(Response response);
     }
 
-    private static SLSTelemetry traceSdk = SLSTelemetry.getInstance();
+    //private static SLSTelemetry traceSdk = SLSTelemetry.getInstance();
     //private static Tracer tracer = traceSdk.getTracer("HttpTool");
 
     private HttpTool() {
@@ -86,7 +86,7 @@ public class HttpTool {
         //});
     }
 
-    private static Response internalHttp(String host, String path, String method, String[] headers, String body, Context context) {
+    private static Response internalHttp(String host, String path, String method, String[] headers, String body) {
         Log.v(TAG, "http request =>> host: " + host + ", path: " + path + ", method: " + method + ", headers: " + arrayToString(headers) + ", body: " + body);
         final String urlString = host + path;
 
@@ -103,9 +103,9 @@ public class HttpTool {
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            TextMapSetter<HttpURLConnection> setter = URLConnection::setRequestProperty;
+            //TextMapSetter<HttpURLConnection> setter = URLConnection::setRequestProperty;
             // Inject the request with the current Context/Span.
-            traceSdk.getPropagators().getTextMapPropagator().inject(context, connection, setter);
+            //traceSdk.getPropagators().getTextMapPropagator().inject(context, connection, setter);
 
             if (TextUtils.equals("POST", method)) {
                 connection.setDoOutput(true);

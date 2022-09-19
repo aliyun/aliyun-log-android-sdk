@@ -8,7 +8,7 @@ import java.util.Map;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
-import com.aliyun.sls.android.JsonUtil;
+import com.aliyun.sls.android.core.utils.JsonUtil;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ErrorModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
