@@ -4,8 +4,9 @@ import android.content.Context;
 import android.text.TextUtils;
 import com.aliyun.sls.android.producer.utils.SoLoader;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
+import com.aliyun.sls.android.producer.utils.Utils;
 
-@SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
+@SuppressWarnings({"AlibabaLowerCamelCaseVariableNaming", "unused"})
 public class LogProducerConfig {
     private static boolean hasSoLoaded = false;
     private final long config;
@@ -14,16 +15,22 @@ public class LogProducerConfig {
     private String project;
     private String logstore;
 
-    @Deprecated
+    public LogProducerConfig() throws LogProducerException {
+        this(Utils.getContext());
+    }
+
+    public LogProducerConfig(String endpoint, String project, String logstore) throws LogProducerException {
+        this(Utils.getContext(), endpoint, project, logstore);
+    }
+
     // @formatter:off
     public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyId, String accessKeySecret) throws LogProducerException {
         this(endpoint, project, logstore, accessKeyId, accessKeySecret, null);
     }
 
-    @Deprecated
     // @formatter:off
     public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyId, String accessKeySecret, String securityToken) throws LogProducerException {
-        this(null, endpoint, project, logstore, accessKeyId, accessKeySecret, securityToken);
+        this(Utils.getContext(), endpoint, project, logstore, accessKeyId, accessKeySecret, securityToken);
     }
 
     public LogProducerConfig(Context context) throws LogProducerException {
