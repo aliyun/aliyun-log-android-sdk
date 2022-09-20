@@ -7,7 +7,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "bricks_1.1.0"
+        versionName "2.6.6"
         ndk {
             // Specifies the ABI configurations of your native
             // libraries Gradle should build and package with your app.

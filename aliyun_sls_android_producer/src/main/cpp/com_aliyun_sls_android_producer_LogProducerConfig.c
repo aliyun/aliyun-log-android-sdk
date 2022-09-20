@@ -3,6 +3,7 @@
 #include <libs/include/inner_log.h>
 #include <libs/include/log_producer_config.h>
 #include <libs/include/log_http_interface.h>
+#include "sls_android_http_inject.h"
 
 /* Header for class com_aliyun_sls_android_producer_LogProducerConfig */
 
@@ -439,6 +440,14 @@ JNIEXPORT void JNICALL
 Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1use_1webtracking(
         JNIEnv *env, jclass clazz, jlong config, jint use) {
     return log_producer_config_set_use_webtracking((log_producer_config *)config, use);
+}
+
+JNIEXPORT void JNICALL
+Java_com_aliyun_sls_android_producer_LogProducerConfig_log_1producer_1config_1set_1http_1header_1inject(JNIEnv *env,
+                                                                                                        jclass clazz,
+                                                                                                        jlong config,
+                                                                                                        jobject injector) {
+    sls_set_android_http_inject(env, config, injector);
 }
 
 #ifdef __cplusplus

@@ -32,6 +32,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(":aliyun_sls_android_producer")
     implementation project(":aliyun_sls_android_core")
     implementation project(":aliyun_sls_android_ot")
 }

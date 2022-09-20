@@ -2,6 +2,8 @@ package com.aliyun.sls.android.producer;
 
 import android.content.Context;
 import android.text.TextUtils;
+import com.aliyun.sls.android.producer.internal.HttpHeader;
+import com.aliyun.sls.android.producer.internal.LogProducerHttpHeaderInjector;
 import com.aliyun.sls.android.producer.utils.SoLoader;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 import com.aliyun.sls.android.producer.utils.Utils;
@@ -72,6 +74,12 @@ public class LogProducerConfig {
             @Override
             public long getTimeUnix() {
                 return TimeUtils.getTimeInMillis();
+            }
+        });
+        setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
+            @Override
+            public String[] injectHeaders(String[] srcHeaders, int count) {
+                return HttpHeader.getHeadersWithUA(srcHeaders);
             }
         });
 
@@ -162,6 +170,8 @@ public class LogProducerConfig {
     private static native int log_producer_persistent_config_is_enabled(long config);
 
     private static native void log_producer_config_set_use_webtracking(long config, int use);
+
+    private static native void log_producer_config_set_http_header_inject(long config, LogProducerHttpHeaderInjector injector);
 
     public Context getContext() {
         return context;
@@ -332,5 +342,9 @@ public class LogProducerConfig {
 
     public int isEnabled() {
         return log_producer_persistent_config_is_enabled(config);
+    }
+
+    public void setHttpHeaderInjector(LogProducerHttpHeaderInjector injector) {
+        log_producer_config_set_http_header_inject(config, injector);
     }
 }

@@ -24,6 +24,9 @@ import com.aliyun.sls.android.core.utils.JsonUtil;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
 import com.aliyun.sls.android.ot.Resource;
+import com.aliyun.sls.android.producer.LogProducerConfig;
+import com.aliyun.sls.android.producer.internal.HttpHeader;
+import com.aliyun.sls.android.producer.internal.LogProducerHttpHeaderInjector;
 
 /**
  * @author gordon
@@ -56,7 +59,18 @@ public final class SLSAndroid {
         }
 
         SLSAndroid.credentials = credentials;
-        configuration = new Configuration(new SdkSender(context));
+        configuration = new Configuration(new SdkSender(context) {
+            @Override
+            protected void provideLogProducerConfig(LogProducerConfig config) {
+                super.provideLogProducerConfig(config);
+                config.setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
+                    @Override
+                    public String[] injectHeaders(String[] srcHeaders, int count) {
+                        return HttpHeader.getHeadersWithUA(srcHeaders, String.format("apm/%s", BuildConfig.VERSION_NAME));
+                    }
+                });
+            }
+        });
         optionConfiguration.onConfiguration(configuration);
 
         initializeDefaultSpanProvider(context);

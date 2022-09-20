@@ -34,6 +34,16 @@ public class BlockDetectionFeature extends SdkFeature {
 
     private PA pa;
 
+    @Override
+    public String name() {
+        return "block_detection";
+    }
+
+    @Override
+    public String version() {
+        return BuildConfig.VERSION_NAME;
+    }
+
     private String createConfig(String appId) {
         JSONObject config = new JSONObject();
         try {

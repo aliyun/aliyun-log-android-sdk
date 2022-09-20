@@ -8,6 +8,9 @@ import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.feature.SdkFeature;
 import com.aliyun.sls.android.core.sender.SdkSender;
 import com.aliyun.sls.android.producer.Log;
+import com.aliyun.sls.android.producer.LogProducerConfig;
+import com.aliyun.sls.android.producer.internal.HttpHeader;
+import com.aliyun.sls.android.producer.internal.LogProducerHttpHeaderInjector;
 
 /**
  * @author gordon
@@ -18,6 +21,15 @@ public class TraceFeature extends SdkFeature {
     private TraceSender traceSender;
     private TraceLogSender traceLogSender;
 
+    @Override
+    public String name() {
+        return "trace";
+    }
+
+    @Override
+    public String version() {
+        return BuildConfig.VERSION_NAME;
+    }
 
     @Override
     protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
@@ -118,6 +130,17 @@ public class TraceFeature extends SdkFeature {
         @Override
         protected void initLogProducer(Credentials credentials, String fileName) {
             super.initLogProducer(credentials, fileName);
+        }
+
+        @Override
+        protected void provideLogProducerConfig(LogProducerConfig config) {
+            super.provideLogProducerConfig(config);
+            config.setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
+                @Override
+                public String[] injectHeaders(String[] srcHeaders, int count) {
+                    return HttpHeader.getHeadersWithUA(srcHeaders, String.format("%s/%s", feature.name(), feature.version()));
+                }
+            });
         }
 
         @Override

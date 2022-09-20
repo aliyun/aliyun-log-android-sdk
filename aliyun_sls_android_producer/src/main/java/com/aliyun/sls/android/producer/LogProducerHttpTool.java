@@ -31,7 +31,6 @@ public class LogProducerHttpTool {
             }
 
             httpConn.setRequestMethod(method);
-            httpConn.setRequestProperty("User-agent", HttpConfigProxy.getUserAgent());
 
             if (header != null) {
                 int pairs = header.length / 2;

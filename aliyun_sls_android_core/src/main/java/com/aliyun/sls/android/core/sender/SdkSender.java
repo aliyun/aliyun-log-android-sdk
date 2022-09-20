@@ -76,6 +76,10 @@ public class SdkSender extends NoOpSender implements ISpanProcessor {
         return credentials.securityToken;
     }
 
+    protected void provideLogProducerConfig(LogProducerConfig config) {
+
+    }
+
     protected void initLogProducer(Credentials credentials, final String fileName) {
         final String accessKeyId = provideAccessKeyId(credentials);
         final String accessKeySecret = provideAccessKeySecret(credentials);
@@ -128,6 +132,8 @@ public class SdkSender extends NoOpSender implements ISpanProcessor {
         config.setPersistentMaxLogCount(65536);
         config.setDropDelayLog(0);
         config.setDropUnauthorizedLog(0);
+
+        provideLogProducerConfig(config);
 
         try {
             client = new LogProducerClient(config, (resultCode, reqId, errorMessage, logBytes, compressedBytes) -> {
