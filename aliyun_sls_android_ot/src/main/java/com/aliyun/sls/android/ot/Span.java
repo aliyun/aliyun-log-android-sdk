@@ -141,6 +141,12 @@ public class Span {
         return this;
     }
 
+    public Span setParent(Span span) {
+        this.parentSpanID = span.parentSpanID;
+        this.traceID = span.traceID;
+        return this;
+    }
+
     public Span setStart(long start) {
         this.start = start;
         return this;
