@@ -28,10 +28,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __SDS_H
-#define __SDS_H
+#ifndef __LOG_SDS_H
+#define __LOG_SDS_H
 
-#define SDS_MAX_PREALLOC (1024*1024)
+#define LOG_SDS_MAX_PREALLOC (1024*1024)
 
 #include <sys/types.h>
 #include <stdarg.h>
@@ -40,59 +40,59 @@
 #define inline __inline
 #endif
 
-typedef char *sds;
+typedef char *log_sds;
 
-struct sdshdr {
+struct log_sdshdr {
     unsigned int len;
     unsigned int free;
     char buf[];
 };
 
-size_t sdslen(const sds s);
+size_t log_sdslen(const log_sds s);
 
-size_t sdsavail(const sds s);
+size_t log_sdsavail(const log_sds s);
 
-sds sdsnewlen(const void *init, size_t initlen);
+log_sds log_sdsnewlen(const void *init, size_t initlen);
 
-sds sdsnewEmpty(size_t preAlloclen);
+log_sds log_sdsnewEmpty(size_t preAlloclen);
 
-sds sdsnew(const char *init);
+log_sds log_sdsnew(const char *init);
 
-sds sdsempty(void);
+log_sds log_sdsempty(void);
 
-size_t sdslen(const sds s);
+size_t log_sdslen(const log_sds s);
 
-sds sdsdup(const sds s);
+log_sds log_sdsdup(const log_sds s);
 
-void sdsfree(sds s);
+void log_sdsfree(log_sds s);
 
-size_t sdsavail(const sds s);
+size_t log_sdsavail(const log_sds s);
 
-sds sdsgrowzero(sds s, size_t len);
+log_sds log_sdsgrowzero(log_sds s, size_t len);
 
-sds sdscatlen(sds s, const void *t, size_t len);
+log_sds log_sdscatlen(log_sds s, const void *t, size_t len);
 
-sds sdscat(sds s, const char *t);
+log_sds log_sdscat(log_sds s, const char *t);
 
-sds sdscatchar(sds s, char c);
+log_sds log_sdscatchar(log_sds s, char c);
 
-sds sdscatsds(sds s, const sds t);
+log_sds log_sdscatsds(log_sds s, const log_sds t);
 
-sds sdscpylen(sds s, const char *t, size_t len);
+log_sds log_sdscpylen(log_sds s, const char *t, size_t len);
 
-sds sdscpy(sds s, const char *t);
+log_sds log_sdscpy(log_sds s, const char *t);
 
-sds sdscatvprintf(sds s, const char *fmt, va_list ap);
+log_sds log_sdscatvprintf(log_sds s, const char *fmt, va_list ap);
 
-sds sdscatrepr(sds s, const char *p, size_t len);
+log_sds log_sdscatrepr(log_sds s, const char *p, size_t len);
 
 #ifdef __GNUC__
 
-sds sdscatprintf(sds s, const char *fmt, ...)
+log_sds log_sdscatprintf(log_sds s, const char *fmt, ...)
 __attribute__((format(printf, 2, 3)));
 
 #else
-sds sdscatprintf(sds s, const char *fmt, ...);
+log_sds log_sdscatprintf(log_sds s, const char *fmt, ...);
 #endif
 
 
