@@ -8,13 +8,14 @@ import java.util.Map;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
-import com.aliyun.sls.android.JsonUtil;
+import com.aliyun.sls.android.core.utils.JsonUtil;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ErrorModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.OrderModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.UserModel;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
+import com.aliyun.sls.android.trace.Tracer;
 import org.json.JSONObject;
 
 /**
@@ -68,15 +69,17 @@ public class ApiClient {
     }
 
     public static void addToCart(final String id, ApiCallback<Boolean> callback) {
-        JSONObject parameters = new JSONObject();
-        JsonUtil.putOpt(parameters, "id", id);
-        HttpTool.post(API_BASE, API_CART, parameters.toString(), response -> {
-            if (response.success()) {
-                postInMainThread(() -> callback.onSuccess(true));
-                return;
-            }
+        Tracer.withinSpan("add to cart", true, () -> {
+            JSONObject parameters = new JSONObject();
+            JsonUtil.putOpt(parameters, "id", id);
+            HttpTool.post(API_BASE, API_CART, parameters.toString(), response -> {
+                if (response.success()) {
+                    postInMainThread(() -> callback.onSuccess(true));
+                    return;
+                }
 
-            postError(response, callback);
+                postError(response, callback);
+            });
         });
     }
 

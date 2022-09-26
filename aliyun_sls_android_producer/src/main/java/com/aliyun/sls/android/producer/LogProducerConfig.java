@@ -2,30 +2,37 @@ package com.aliyun.sls.android.producer;
 
 import android.content.Context;
 import android.text.TextUtils;
+import com.aliyun.sls.android.producer.internal.HttpHeader;
+import com.aliyun.sls.android.producer.internal.LogProducerHttpHeaderInjector;
 import com.aliyun.sls.android.producer.utils.SoLoader;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
+import com.aliyun.sls.android.producer.utils.Utils;
 
-@SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
+@SuppressWarnings({"AlibabaLowerCamelCaseVariableNaming", "unused"})
 public class LogProducerConfig {
-
     private static boolean hasSoLoaded = false;
     private final long config;
     private final Context context;
     private String endpoint;
     private String project;
     private String logstore;
-    private boolean enableTrack = false;
 
-    @Deprecated
+    public LogProducerConfig() throws LogProducerException {
+        this(Utils.getContext());
+    }
+
+    public LogProducerConfig(String endpoint, String project, String logstore) throws LogProducerException {
+        this(Utils.getContext(), endpoint, project, logstore);
+    }
+
     // @formatter:off
     public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyId, String accessKeySecret) throws LogProducerException {
         this(endpoint, project, logstore, accessKeyId, accessKeySecret, null);
     }
 
-    @Deprecated
     // @formatter:off
     public LogProducerConfig(String endpoint, String project, String logstore, String accessKeyId, String accessKeySecret, String securityToken) throws LogProducerException {
-        this(null, endpoint, project, logstore, accessKeyId, accessKeySecret, securityToken);
+        this(Utils.getContext(), endpoint, project, logstore, accessKeyId, accessKeySecret, securityToken);
     }
 
     public LogProducerConfig(Context context) throws LogProducerException {
@@ -67,6 +74,12 @@ public class LogProducerConfig {
             @Override
             public long getTimeUnix() {
                 return TimeUtils.getTimeInMillis();
+            }
+        });
+        setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
+            @Override
+            public String[] injectHeaders(String[] srcHeaders, int count) {
+                return HttpHeader.getHeadersWithUA(srcHeaders);
             }
         });
 
@@ -157,6 +170,8 @@ public class LogProducerConfig {
     private static native int log_producer_persistent_config_is_enabled(long config);
 
     private static native void log_producer_config_set_use_webtracking(long config, int use);
+
+    private static native void log_producer_config_set_http_header_inject(long config, LogProducerHttpHeaderInjector injector);
 
     public Context getContext() {
         return context;
@@ -329,11 +344,7 @@ public class LogProducerConfig {
         return log_producer_persistent_config_is_enabled(config);
     }
 
-    public void setEnableTrack(boolean enableTrack) {
-        this.enableTrack = enableTrack;
-    }
-
-    public boolean isEnableTrack() {
-        return enableTrack;
+    public void setHttpHeaderInjector(LogProducerHttpHeaderInjector injector) {
+        log_producer_config_set_http_header_inject(config, injector);
     }
 }

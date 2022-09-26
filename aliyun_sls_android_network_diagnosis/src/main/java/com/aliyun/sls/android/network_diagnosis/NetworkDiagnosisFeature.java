@@ -26,6 +26,9 @@ import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProcessor;
 import com.aliyun.sls.android.ot.SpanBuilder;
+import com.aliyun.sls.android.producer.LogProducerConfig;
+import com.aliyun.sls.android.producer.internal.HttpHeader;
+import com.aliyun.sls.android.producer.internal.LogProducerHttpHeaderInjector;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -413,6 +416,17 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         @Override
         protected void initLogProducer(Credentials credentials, String fileName) {
             super.initLogProducer(credentials, fileName);
+        }
+
+        @Override
+        protected void provideLogProducerConfig(LogProducerConfig config) {
+            super.provideLogProducerConfig(config);
+            config.setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
+                @Override
+                public String[] injectHeaders(String[] srcHeaders, int count) {
+                    return HttpHeader.getHeadersWithUA(srcHeaders, String.format("%s/%s", feature.name(), feature.version()));
+                }
+            });
         }
 
         @Override

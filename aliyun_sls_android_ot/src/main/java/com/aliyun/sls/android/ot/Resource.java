@@ -11,6 +11,7 @@ import android.util.Pair;
  * @author gordon
  * @date 2022/3/31
  */
+@SuppressWarnings("UnusedReturnValue")
 public class Resource {
     public final List<Attribute> attributes = new LinkedList<>();
     private final static Resource DEFAULT = new Resource();
@@ -38,19 +39,13 @@ public class Resource {
         DEFAULT.add("sls.sdk.version", BuildConfig.VERSION_NAME);
     }
 
-    public void add(String key, Object value) {
-        this.attributes.add(Attribute.of(key, value));
+    Resource() {
+
     }
 
+    // region instance
     public static Resource getDefault() {
-        return DEFAULT;
-    }
-
-    public Resource merge(Resource resource) {
-        if (null != resource) {
-            attributes.addAll(resource.attributes);
-        }
-        return this;
+        return new Resource().merge(DEFAULT);
     }
 
     public static Resource of(String key, Object value) {
@@ -81,4 +76,20 @@ public class Resource {
         }
         return resource;
     }
+    // endregion
+
+    // region operation
+    public Resource add(String key, Object value) {
+        this.attributes.add(Attribute.of(key, value));
+        return this;
+    }
+
+    public Resource merge(Resource resource) {
+        if (null != resource) {
+            attributes.addAll(resource.attributes);
+        }
+        return this;
+    }
+    // endregion
+
 }

@@ -9,7 +9,8 @@ import com.aliyun.sls.android.ot.utils.TimeUtils;
 public class RecordableSpan extends Span {
     private final ISpanProcessor spanProcessor;
 
-    public RecordableSpan(ISpanProcessor spanProcessor) {
+    RecordableSpan(ISpanProcessor spanProcessor) {
+        super();
         this.spanProcessor = spanProcessor;
     }
 

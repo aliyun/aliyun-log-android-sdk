@@ -18,6 +18,7 @@ public class Credentials {
 
     public NetworkDiagnosisCredentials networkDiagnosisCredentials;
     public Credentials crashReporterCredentials;
+    public TracerCredentials tracerCredentials;
 
     public Credentials() {
     }
@@ -27,6 +28,13 @@ public class Credentials {
             networkDiagnosisCredentials = new NetworkDiagnosisCredentials(this);
         }
         return networkDiagnosisCredentials;
+    }
+
+    public TracerCredentials createTraceCredentials() {
+        if (null == tracerCredentials) {
+            tracerCredentials = new TracerCredentials(this);
+        }
+        return tracerCredentials;
     }
 
     public static class LogstoreCredentials extends Credentials {
@@ -49,6 +57,28 @@ public class Credentials {
 
         private NetworkDiagnosisCredentials(Credentials credentials) {
             super(credentials);
+        }
+    }
+
+    public static class TracerCredentials extends LogstoreCredentials {
+        public TracerLogCredentials logCredentials;
+
+        public TracerCredentials(Credentials credentials) {
+            super(credentials);
+        }
+
+        public TracerLogCredentials createLogCredentials() {
+            if (null == logCredentials) {
+                logCredentials = new TracerLogCredentials(this);
+            }
+            return logCredentials;
+        }
+
+        public static class TracerLogCredentials extends LogstoreCredentials {
+
+            public TracerLogCredentials(Credentials credentials) {
+                super(credentials);
+            }
         }
     }
 

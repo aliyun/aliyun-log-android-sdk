@@ -16,8 +16,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
-import com.aliyun.sls.android.SLSLog;
-import com.aliyun.sls.android.utdid.Utdid;
+import com.aliyun.sls.android.core.SLSLog;
+import com.aliyun.sls.android.core.utdid.Utdid;
 
 /**
  * Utils set for get device info.

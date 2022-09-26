@@ -19,6 +19,7 @@ import androidx.viewbinding.ViewBinding;
 import com.aliyun.sls.android.producer.example.databinding.BaseListContainerLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.trace.UITracer;
+import com.aliyun.sls.android.trace.Tracer;
 
 /**
  * @author gordon
@@ -33,8 +34,9 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
     protected abstract BaseRecyclerAdapter.IViewContract<BIND, ITEM> onCreateViewUpdater();
 
     protected void onRefresh() {
-        viewModel.getTracer().spanBuilder(viewModel.generatorSpanName("pull_refresh")).startSpan().end();
-        viewModel.requestItemsFromServer();
+        //viewModel.getTracer().spanBuilder(viewModel.generatorSpanName("pull_refresh")).startSpan().end();
+        Tracer.withinSpan("refresh home page", true, () -> viewModel.requestItemsFromServer());
+        //viewModel.requestItemsFromServer();
     }
 
     protected boolean init = false;
@@ -56,7 +58,7 @@ public abstract class BaseListFragment<BIND extends ViewBinding, ITEM, VM extend
         }
 
         listContainerLayoutBinding.baseErrorBtn.setOnClickListener(v -> {
-            viewModel.getTracer().spanBuilder(viewModel.generatorSpanName("retry")).startSpan().end();
+            //viewModel.getTracer().spanBuilder(viewModel.generatorSpanName("retry")).startSpan().end();
             BaseListFragment.this.update();
         });
 

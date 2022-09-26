@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import androidx.annotation.Nullable;
-import com.aliyun.sls.android.SLSLog;
+import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.network_diagnosis.NetworkDiagnosis;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
