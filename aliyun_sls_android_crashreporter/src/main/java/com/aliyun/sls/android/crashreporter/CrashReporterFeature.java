@@ -17,11 +17,13 @@ import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.feature.SdkFeature;
 import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.core.utils.AppUtils;
+import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
 import com.aliyun.sls.android.crashreporter.utils.IOUtils;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.SpanBuilder;
 import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.CustomInfo;
+import com.uc.crashsdk.export.CustomLogInfo;
 import com.uc.crashsdk.export.ICrashClient;
 import com.uc.crashsdk.export.LogType;
 
@@ -35,6 +37,9 @@ public class CrashReporterFeature extends SdkFeature {
     private static final String PATH_ROOT = "sls_crash_reporter";
     private static final String PATH_ITRACE_LOGS = PATH_ROOT + File.separator + "itrace/logs";
     private static final String PATH_ITRACE_TAGS = PATH_ROOT + File.separator + "itrace/tags";
+
+    private static final String LOG_SECTION_SEP = "--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---";
+    private static final String LINE_SEP = "\n";
 
     private CrashApi crashApi;
     private int startCount = 0;
@@ -95,6 +100,28 @@ public class CrashReporterFeature extends SdkFeature {
             crashApi.disableLog(LogType.UNEXP);
             SLSLog.d(TAG, "CrashReporterFeature disabled.");
         }
+    }
+
+    public void reportError(final String type, final LogLevel logLevel, final  String message, final String stacktrace) {
+        if (null == crashApi || TextUtils.isEmpty(type)) {
+            return;
+        }
+
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("k_ct: exception").append(LINE_SEP);
+        buffer.append("k_ac: ").append(type).append(LINE_SEP);
+
+        buffer.append(LOG_SECTION_SEP).append(LINE_SEP);
+        buffer.append("Exception message: ").append(TextUtils.isEmpty(message) ? "" : message).append(LINE_SEP);
+        buffer.append("Back traces starts.").append(LINE_SEP);
+        buffer.append("level: ").append(logLevel.ordinal()).append(LINE_SEP);
+        buffer.append("stack traceback:").append(LINE_SEP).append(TextUtils.isEmpty(stacktrace) ? "" : stacktrace).append(LINE_SEP);
+        buffer.append("Back traces ends.");
+
+        CustomLogInfo errorInfo = new CustomLogInfo(buffer, type);
+        errorInfo.mUploadNow = true;
+
+        crashApi.generateCustomLog(errorInfo);
     }
 
     private void initCrashApi(Context context, Credentials credentials, Configuration configuration) {
@@ -305,6 +332,10 @@ public class CrashReporterFeature extends SdkFeature {
             } else if (f.getName().endsWith("unexp.log")) {
                 type = "unexp";
             }
+            //else {
+            //    //sls-androd-dev-f1a8_1.0_1.0_sdk-gphone64-arm64_12_166418712090940564_20220926181213_fg_custom.log
+            //
+            //}
 
             if (null != type) {
                 parseCrashFile(f, type);
