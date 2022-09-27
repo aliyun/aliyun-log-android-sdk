@@ -58,8 +58,10 @@ public final class SLSAndroid {
             return false;
         }
 
+        final Context applicationContext = context.getApplicationContext();
+
         SLSAndroid.credentials = credentials;
-        configuration = new Configuration(new SdkSender(context) {
+        configuration = new Configuration(new SdkSender(applicationContext) {
             @Override
             protected void provideLogProducerConfig(LogProducerConfig config) {
                 super.provideLogProducerConfig(config);
@@ -73,15 +75,15 @@ public final class SLSAndroid {
         });
         optionConfiguration.onConfiguration(configuration);
 
-        initializeDefaultSpanProvider(context);
+        initializeDefaultSpanProvider(applicationContext);
         if (configuration.enableCrashReporter || configuration.enableBlockDetection) {
-            initializeSdkSender(context);
+            initializeSdkSender(applicationContext);
         }
 
-        initCrashReporterFeature(context, credentials, configuration);
-        initBlockDetectionFeature(context, credentials, configuration);
-        initNetworkDiagnosisFeature(context, credentials, configuration);
-        initTracerFeature(context, credentials, configuration);
+        initCrashReporterFeature(applicationContext, credentials, configuration);
+        initBlockDetectionFeature(applicationContext, credentials, configuration);
+        initNetworkDiagnosisFeature(applicationContext, credentials, configuration);
+        initTracerFeature(applicationContext, credentials, configuration);
 
         hasInitialized.set(true);
 
