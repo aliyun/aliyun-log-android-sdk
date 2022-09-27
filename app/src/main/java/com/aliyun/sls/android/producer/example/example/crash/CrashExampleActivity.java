@@ -1,6 +1,8 @@
 package com.aliyun.sls.android.producer.example.example.crash;
 
 import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import com.aliyun.sls.android.blockdetection.BlockDetection;
 import com.aliyun.sls.android.crashreporter.CrashReporter;
+import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
 import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
@@ -127,6 +130,15 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                     }
                 }
             case R.id.custom_log: {
+                try {
+                    String tst = null;
+                    tst.length();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+
+                    CrashReporter.reportError("exception", t);
+                }
+
                 //Credentials credentials = new Credentials();
                 //credentials.instanceId = "yuanbo-test-1111";
                 //credentials.accessKeyId = PreferenceUtils.getAccessKeyId(this);
