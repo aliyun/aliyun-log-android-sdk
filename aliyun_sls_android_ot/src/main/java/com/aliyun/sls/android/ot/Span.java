@@ -60,7 +60,7 @@ public class Span {
 
     private final AtomicBoolean finished = new AtomicBoolean();
 
-    Span() {
+    protected Span() {
         this.attribute = new LinkedList<>();
         this.resource = new Resource();
     }
@@ -142,7 +142,7 @@ public class Span {
     }
 
     public Span setParent(Span span) {
-        this.parentSpanID = span.parentSpanID;
+        this.parentSpanID = span.spanID;
         this.traceID = span.traceID;
         return this;
     }

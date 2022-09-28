@@ -113,6 +113,8 @@ public class SpanBuilder {
             ContextManager.INSTANCE.update(span);
         }
 
+        ContextManager.INSTANCE.setGlobalActiveSpan(span);
+
         return span;
     }
     // endregion

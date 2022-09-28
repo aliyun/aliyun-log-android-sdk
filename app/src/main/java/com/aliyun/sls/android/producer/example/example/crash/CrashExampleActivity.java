@@ -20,6 +20,7 @@ import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
 import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.utils.ThreadUtils;
 
 /**
  * @author gordon
@@ -64,7 +65,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
     public void doCrash(View view, int id) {
         switch (id) {
             case R.id.java_null_ptr:
-                crashInJavaNull();
+                ThreadUtils.exec(this::crashInJavaNull);
                 break;
 
             case R.id.java_oom:
@@ -136,7 +137,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 } catch (Throwable t) {
                     t.printStackTrace();
 
-                    CrashReporter.reportError("exception", t);
+                    CrashReporter.reportError("custom", t);
                 }
 
                 //Credentials credentials = new Credentials();

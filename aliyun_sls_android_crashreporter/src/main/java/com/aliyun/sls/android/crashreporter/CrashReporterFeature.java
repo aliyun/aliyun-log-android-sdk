@@ -20,7 +20,11 @@ import com.aliyun.sls.android.core.utils.AppUtils;
 import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
 import com.aliyun.sls.android.crashreporter.utils.IOUtils;
 import com.aliyun.sls.android.ot.Attribute;
+import com.aliyun.sls.android.ot.Span;
+import com.aliyun.sls.android.ot.Span.StatusCode;
 import com.aliyun.sls.android.ot.SpanBuilder;
+import com.aliyun.sls.android.ot.context.ContextManager;
+import com.aliyun.sls.android.trace.Tracer;
 import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.CustomInfo;
 import com.uc.crashsdk.export.CustomLogInfo;
@@ -41,9 +45,12 @@ public class CrashReporterFeature extends SdkFeature {
     private static final String LOG_SECTION_SEP = "--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---";
     private static final String LINE_SEP = "\n";
 
+    private Configuration configuration;
     private CrashApi crashApi;
     private int startCount = 0;
     private boolean isForeground = false;
+
+    private LastCachedSpan lastCachedSpan;
 
     public CrashReporterFeature() {
     }
@@ -60,6 +67,7 @@ public class CrashReporterFeature extends SdkFeature {
 
     @Override
     protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
+        this.configuration = configuration;
         this.initCrashApi(context, credentials, configuration);
         CrashReporter.setCrashReporterFeature(this);
     }
@@ -170,6 +178,19 @@ public class CrashReporterFeature extends SdkFeature {
             public void onLogGenerated(File file, String logType) {
                 SLSLog.v(TAG,
                     SLSLog.format("onLogGenerated, logType: %s, fileName: %s", logType, file.getAbsolutePath()));
+
+                // onLogGenerated method called while the java & anr crash log file generated
+                if (configuration.enableTracer) {
+                    Span activeSpan = ContextManager.INSTANCE.activeSpan();
+                    if (null == activeSpan) {
+                        activeSpan = ContextManager.INSTANCE.getGlobalActiveSpan();
+                    }
+
+                    if (null != activeSpan) {
+                        lastCachedSpan = new LastCachedSpan(activeSpan);
+                    }
+                }
+
                 parseCrashFile(file, logType);
             }
 
@@ -350,6 +371,14 @@ public class CrashReporterFeature extends SdkFeature {
                 + ", content.length: " + content.length()
         );
 
+        // if last cached span is null, should read active span from cache
+        if (null == lastCachedSpan) {
+            Span span = ContextManager.INSTANCE.getLastGlobalActiveSpan();
+            if (null != span) {
+                lastCachedSpan = new LastCachedSpan(span);
+            }
+        }
+
         SpanBuilder builder = newSpanBuilder("crash");
         builder.addAttribute(
             Attribute.of(
@@ -360,13 +389,41 @@ public class CrashReporterFeature extends SdkFeature {
                 Pair.create("ex.file", file.getName())
             )
         );
-        final boolean ret = builder.build().end();
+
+        if (null != lastCachedSpan) {
+            builder.setParent(lastCachedSpan);
+        }
+
+        final Span crashSpan = builder.build();
+
+        final boolean ret = crashSpan.end();
         if (ret) {
             //noinspection ResultOfMethodCallIgnored
             file.delete();
             SLSLog.v(TAG, "report crash success.");
         } else {
             SLSLog.w(TAG, "report crash fail.");
+        }
+
+        // if tracer enabled, report crash to tracer
+        if (configuration.enableTracer) {
+            // error monitor not supported
+            if (TextUtils.equals(type, "java") || TextUtils.equals(type, "jni")
+                || TextUtils.equals(type, "anr") || TextUtils.equals(type, "unexp")) {
+                Span span = Tracer.startSpan("application crashed")
+                    .setSpanId(crashSpan.getSpanId())
+                    .addAttribute(
+                        Attribute.of("ex.file", file.getName()),
+                        Attribute.of("ex.type", type)
+                    )
+                    .setStatus(StatusCode.ERROR);
+
+                if (null != lastCachedSpan) {
+                    span.setParent(lastCachedSpan);
+                }
+
+                span.end();
+            }
         }
     }
 
@@ -381,7 +438,7 @@ public class CrashReporterFeature extends SdkFeature {
             return;
         }
         BufferedReader bufferedReader = null;
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         String time = null;
         try {
             final FileReader fileReader = new FileReader(file);
@@ -423,6 +480,17 @@ public class CrashReporterFeature extends SdkFeature {
             return time.substring(0, time.length() - 1);
         } catch (Throwable t) {
             return null;
+        }
+    }
+
+    private static class LastCachedSpan extends Span {
+        LastCachedSpan(Span span) {
+            super();
+
+            setTraceId(span.getTraceId());
+            if (!TextUtils.isEmpty(span.getParentSpanId())) {
+                setSpanId(span.getParentSpanId());
+            }
         }
     }
 }

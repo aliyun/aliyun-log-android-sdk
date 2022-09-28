@@ -35,6 +35,7 @@ dependencies {
     implementation project(":aliyun_sls_android_producer")
     implementation project(":aliyun_sls_android_core")
     implementation project(":aliyun_sls_android_ot")
+    implementation project(":aliyun_sls_android_trace")
 }
 
 ext {
