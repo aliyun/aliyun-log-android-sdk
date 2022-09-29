@@ -372,7 +372,7 @@ public class CrashReporterFeature extends SdkFeature {
         );
 
         // if last cached span is null, should read active span from cache
-        if (null == lastCachedSpan) {
+        if (configuration.enableTracer && null == lastCachedSpan) {
             Span span = ContextManager.INSTANCE.getLastGlobalActiveSpan();
             if (null != span) {
                 lastCachedSpan = new LastCachedSpan(span);
@@ -390,7 +390,7 @@ public class CrashReporterFeature extends SdkFeature {
             )
         );
 
-        if (null != lastCachedSpan) {
+        if (configuration.enableTracer && null != lastCachedSpan) {
             builder.setParent(lastCachedSpan);
         }
 

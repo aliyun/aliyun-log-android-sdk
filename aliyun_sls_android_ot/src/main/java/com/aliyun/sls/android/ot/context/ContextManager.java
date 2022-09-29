@@ -147,11 +147,10 @@ public enum ContextManager {
             return;
         }
 
-        final String timestamp = String.valueOf(startupTimestamp);
         sharedPreferences.edit()
-            .putStringSet(timestamp, new HashSet<String>() {
+            .putStringSet(startupTimestamp, new HashSet<String>() {
                 {
-                    add(timestamp);
+                    add(startupTimestamp);
                     add("t:" + span.getTraceId());
                     add("s:" + span.getSpanId());
                     add("p:" + (TextUtils.isEmpty(span.getParentSpanId()) ? "" : span.getParentSpanId()));
