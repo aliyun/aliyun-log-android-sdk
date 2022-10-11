@@ -29,7 +29,35 @@
                 android:id="@+id/trace_simple_demo"
                 android:layout_span="2"
                 android:padding="8dp"
+                android:textAllCaps="false"
                 android:text="Simple Trace Demo" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/trace_nested_trace_demo"
+                android:layout_span="2"
+                android:padding="8dp"
+                android:textAllCaps="false"
+                android:text="嵌套 trace 示例" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/trace_add_event_demo"
+                android:layout_span="1"
+                android:padding="8dp"
+                android:textAllCaps="false"
+                android:text="addEvent" />
+
+            <Button
+                android:id="@+id/trace_record_exception_demo"
+                android:layout_span="1"
+                android:padding="8dp"
+                android:textAllCaps="false"
+                android:text="recordException" />
         </TableRow>
     </TableLayout>
 </LinearLayout>

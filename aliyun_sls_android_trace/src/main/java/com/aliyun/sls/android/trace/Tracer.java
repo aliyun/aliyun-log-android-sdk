@@ -105,6 +105,8 @@ public class Tracer {
         } catch (Throwable t) {
             span.setStatus(StatusCode.ERROR);
             span.setStatusMessage(String.format("exception: {name: %s, reason: %s}", t.getClass().getName(), t.getMessage()));
+
+            span.recordException(t);
         } finally {
             span.end();
         }

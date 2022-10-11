@@ -1,5 +1,8 @@
 package com.aliyun.sls.android.ot;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -9,8 +12,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.text.TextUtils;
-import com.aliyun.sls.android.ot.context.ContextManager;
+import android.util.Pair;
+import com.aliyun.sls.android.ot.context.Scope;
 import com.aliyun.sls.android.ot.utils.JSONUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -49,6 +54,7 @@ public class Span {
     protected long end;
     protected long duration;
     protected List<Attribute> attribute;
+    protected List<Event> events;
     protected StatusCode statusCode = StatusCode.UNSET;
     protected String statusMessage;
     protected String host;
@@ -59,9 +65,11 @@ public class Span {
     protected String transactionId;
 
     private final AtomicBoolean finished = new AtomicBoolean();
+    /* packaged */Scope scope;
 
     protected Span() {
         this.attribute = new LinkedList<>();
+        this.events = new LinkedList<>();
         this.resource = new Resource();
     }
 
@@ -209,6 +217,75 @@ public class Span {
     }
     // endregion
 
+    // region event
+    public Span addEvent(String name) {
+        addEvent(
+            Event.create(name)
+        );
+
+        return this;
+    }
+
+    public Span addEvent(String name, Attribute attribute) {
+        addEvent(
+            Event.create(name).addAttribute(attribute)
+        );
+
+        return this;
+    }
+
+    public Span addEvent(String name, Attribute... attributes) {
+        addEvent(
+            Event.create(name).addAttribute(attributes)
+        );
+
+        return this;
+    }
+
+    public Span addEvent(String name, List<Attribute> attributes) {
+        addEvent(
+            Event.create(name).addAttribute(attributes)
+        );
+
+        return this;
+    }
+    // endregion
+
+    // region exception
+    public Span recordException(Throwable t) {
+        this.recordException(t, (Attribute[])null);
+        return this;
+    }
+
+    public Span recordException(Throwable t, Attribute... attributes) {
+        return recordException(t, null == attributes ? null : Arrays.asList(attributes));
+    }
+
+    public Span recordException(Throwable t, List<Attribute> attributes) {
+        StringWriter stringWriter = new StringWriter();
+        try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
+            t.printStackTrace(printWriter);
+        }
+
+        addEvent(
+            Event.create("exception")
+                .addAttribute(
+                    Attribute.of(
+                        Pair.create("exception.type", t.getClass().getCanonicalName()),
+                        Pair.create("exception.message", TextUtils.isEmpty(t.getMessage()) ? "" : t.getMessage()),
+                        Pair.create("exception.stacktrace", stringWriter.toString())
+                    )
+                )
+                .addAttribute(attributes)
+        );
+        return this;
+    }
+    // endregion
+
+    private void addEvent(Event event) {
+        events.add(event);
+    }
+
     // region end
     public boolean end() {
         if (finished.getAndSet(true)) {
@@ -217,8 +294,12 @@ public class Span {
 
         this.duration = (this.end - this.start) / 1000;
 
-        if (ContextManager.INSTANCE.activeSpan() == this) {
-            ContextManager.INSTANCE.update(null);
+        if (null != scope) {
+            try {
+                scope.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return true;
     }
@@ -268,7 +349,29 @@ public class Span {
             data.put("resource", object.toString());
         }
 
+        if (events.size() != 0) {
+            JSONArray logs = new JSONArray();
+            for (Event event : events) {
+                object = new JSONObject();
+                JSONUtils.put(object, "name", TextUtils.isEmpty(event.getName()) ? "" : event.getName());
+                JSONUtils.put(object, "epochNanos", event.getEpochNanos());
+                JSONUtils.put(object, "totalAttributeCount", event.getTotalAttributeCount());
+
+                final List<Attribute> attributes = event.getAttributes();
+                Collections.sort(attributes);
+                JSONObject attrObject = new JSONObject();
+                for (Attribute attr : attributes) {
+                    JSONUtils.put(attrObject, attr.key, attr.value);
+                }
+                JSONUtils.put(object, "attributes", attrObject);
+
+                logs.put(object);
+            }
+
+            data.put("logs", logs.toString());
+        }
+
         return data;
     }
-    // endreigon
+    // endregion
 }
