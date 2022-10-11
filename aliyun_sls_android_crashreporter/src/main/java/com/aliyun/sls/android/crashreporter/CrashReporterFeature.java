@@ -46,6 +46,7 @@ public class CrashReporterFeature extends SdkFeature {
     private static final String LINE_SEP = "\n";
 
     private Configuration configuration;
+    private Credentials credentials;
     private CrashApi crashApi;
     private int startCount = 0;
     private boolean isForeground = false;
@@ -68,6 +69,8 @@ public class CrashReporterFeature extends SdkFeature {
     @Override
     protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
         this.configuration = configuration;
+        this.credentials = credentials;
+
         this.initCrashApi(context, credentials, configuration);
         CrashReporter.setCrashReporterFeature(this);
     }
@@ -414,7 +417,9 @@ public class CrashReporterFeature extends SdkFeature {
                     .setSpanId(crashSpan.getSpanId())
                     .addAttribute(
                         Attribute.of("ex.file", file.getName()),
-                        Attribute.of("ex.type", type)
+                        Attribute.of("ex.type", type),
+                        Attribute.of("ex.uuid", Utdid.getInstance().getUtdid(context)),
+                        Attribute.of("ex.project", credentials.project)
                     )
                     .setStatus(StatusCode.ERROR);
 
