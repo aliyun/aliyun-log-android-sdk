@@ -110,7 +110,7 @@ public class SpanBuilder {
         span.setStart(null != start ? start : TimeUtils.instance.now());
 
         if (active) {
-            ContextManager.INSTANCE.update(span);
+            span.scope = ContextManager.INSTANCE.makeCurrent(span);
         }
 
         return span;

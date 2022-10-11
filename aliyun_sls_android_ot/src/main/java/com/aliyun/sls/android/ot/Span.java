@@ -1,5 +1,6 @@
 package com.aliyun.sls.android.ot;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -12,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.text.TextUtils;
 import android.util.Pair;
-import com.aliyun.sls.android.ot.context.ContextManager;
+import com.aliyun.sls.android.ot.context.Scope;
 import com.aliyun.sls.android.ot.utils.JSONUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -64,6 +65,7 @@ public class Span {
     protected String transactionId;
 
     private final AtomicBoolean finished = new AtomicBoolean();
+    /* packaged */Scope scope;
 
     Span() {
         this.attribute = new LinkedList<>();
@@ -288,8 +290,12 @@ public class Span {
 
         this.duration = (this.end - this.start) / 1000;
 
-        if (ContextManager.INSTANCE.activeSpan() == this) {
-            ContextManager.INSTANCE.update(null);
+        if (null != scope) {
+            try {
+                scope.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return true;
     }
