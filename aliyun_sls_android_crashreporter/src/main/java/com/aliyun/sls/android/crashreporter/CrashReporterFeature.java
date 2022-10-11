@@ -3,6 +3,8 @@ package com.aliyun.sls.android.crashreporter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import android.app.Activity;
 import android.app.Application;
@@ -413,13 +415,20 @@ public class CrashReporterFeature extends SdkFeature {
             // error monitor not supported
             if (TextUtils.equals(type, "java") || TextUtils.equals(type, "jni")
                 || TextUtils.equals(type, "anr") || TextUtils.equals(type, "unexp")) {
-                Span span = Tracer.startSpan("application crashed")
+                final String classify = TextUtils.equals(type, "anr") ? "anr" : "crash";
+                final String filterType = TextUtils.equals(type, "jni") ? "native" : (TextUtils.equals(type, "java") ? "java" : "");
+                SLSLog.v(TAG, "report crash to tracer. type: " + type + ", time: " +time + ", classify: " + classify + ", filter type: " + filterType);
+
+                Span span = Tracer.startSpan(TextUtils.equals(classify, "anr") ? "Application Not Responding" : ("Application Crashed - " + filterType))
                     .setSpanId(crashSpan.getSpanId())
                     .addAttribute(
                         Attribute.of("ex.file", file.getName()),
-                        Attribute.of("ex.type", type),
                         Attribute.of("ex.uuid", Utdid.getInstance().getUtdid(context)),
-                        Attribute.of("ex.project", credentials.project)
+                        Attribute.of("ex.project", credentials.project),
+                        Attribute.of("ex.time", time),
+                        Attribute.of("ex.filter_time", time.substring(0, 10)),
+                        Attribute.of("ex.filter_classify", classify),
+                        Attribute.of("ex.filter_type", filterType)
                     )
                     .setStatus(StatusCode.ERROR);
 
@@ -476,6 +485,9 @@ public class CrashReporterFeature extends SdkFeature {
             IOUtils.close(bufferedReader);
         }
 
+        if (TextUtils.isEmpty(time)) {
+            time = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        }
         reportCrash(time, type, file, buffer.toString());
     }
 
