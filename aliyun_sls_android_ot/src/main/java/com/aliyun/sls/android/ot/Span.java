@@ -258,6 +258,10 @@ public class Span {
     }
 
     public Span recordException(Throwable t, Attribute... attributes) {
+        return recordException(t, null == attributes ? null : Arrays.asList(attributes));
+    }
+
+    public Span recordException(Throwable t, List<Attribute> attributes) {
         StringWriter stringWriter = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
             t.printStackTrace(printWriter);
