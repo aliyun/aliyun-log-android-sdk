@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import android.os.Bundle;
+import android.os.Trace;
 import android.view.View;
 import android.view.View.OnClickListener;
 import androidx.annotation.Nullable;
@@ -13,6 +14,8 @@ import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.Resource;
 import com.aliyun.sls.android.ot.Span;
 import com.aliyun.sls.android.ot.Span.StatusCode;
+import com.aliyun.sls.android.ot.context.ContextManager;
+import com.aliyun.sls.android.ot.context.Scope;
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
@@ -40,6 +43,9 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
         findViewById(R.id.trace_demo_startup).setOnClickListener(this);
         findViewById(R.id.trace_demo_air).setOnClickListener(this);
         findViewById(R.id.trace_simple_demo).setOnClickListener(this);
+        findViewById(R.id.trace_nested_trace_demo).setOnClickListener(this);
+        findViewById(R.id.trace_add_event_demo).setOnClickListener(this);
+        findViewById(R.id.trace_record_exception_demo).setOnClickListener(this);
     }
 
     @Override
@@ -50,6 +56,12 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
             openAirConditioner();
         } else if (R.id.trace_simple_demo == v.getId()) {
             simpleTraceDemo();
+        } else if (R.id.trace_nested_trace_demo == v.getId()) {
+            nestedTraceDemo();
+        } else if (R.id.trace_add_event_demo == v.getId()) {
+            addEvent();
+        } else if (R.id.trace_record_exception_demo == v.getId()) {
+            recordException();
         }
     }
 
@@ -229,6 +241,51 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
         });
     }
     // endregion
+
+    private void nestedTraceDemo() {
+        Span root = Tracer.startSpan("root span");
+        try (Scope ignored = ContextManager.INSTANCE.makeCurrent(root)) {
+            Tracer.startSpan("root span start.").end();
+
+            Span child1 = Tracer.spanBuilder("nest child span 1").setActive(true).build();
+            Tracer.startSpan("span in nest child span 1 start").end();
+            Tracer.startSpan("span in nest child span 1 end").end();
+            ContextManager.INSTANCE.activeSpan().addAttribute(Attribute.of("child1_key", "child1_value"));
+            child1.end();
+
+            ContextManager.INSTANCE.activeSpan().addAttribute(Attribute.of("root_key1", "root_value1"));
+
+            Span child2 = Tracer.spanBuilder("nest child span 2").setActive(true).build();
+            Tracer.startSpan("span in nest child span 2 start").end();
+            Tracer.startSpan("span in nest child span 2 end").end();
+            ContextManager.INSTANCE.activeSpan().addAttribute(Attribute.of("child2_key", "child2_value"));
+
+            Span child21 = Tracer.spanBuilder("nest nest child in span2").setActive(true).build();
+            Tracer.startSpan("span in nest nest child in span2 start").end();
+            Tracer.startSpan("span in nest nest child in span2 end").end();
+            ContextManager.INSTANCE.activeSpan().addAttribute(Attribute.of("child21_key", "child21_value"));
+            child21.end();
+            child2.end();
+
+            ContextManager.INSTANCE.activeSpan().addAttribute(Attribute.of("root_key2", "root_value2"));
+
+            Tracer.startSpan("root span end.").end();
+
+            root.end();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addEvent() {
+        Tracer.startSpan("add event 1").addEvent("add event 1").end();
+        Tracer.startSpan("add event 2").addEvent("add event 2", Attribute.of("key", "value"), Attribute.of("key2", "value2")).end();
+    }
+
+    private void recordException() {
+        Tracer.startSpan("record exception 1").recordException(new IllegalArgumentException("invalid argument")).end();
+        Tracer.startSpan("record exception 2").recordException(new IllegalArgumentException("invalid argument"), Attribute.of("key", "value"), Attribute.of("key2", "value2")).end();
+    }
 
     private void threadSleep() {
         try {
