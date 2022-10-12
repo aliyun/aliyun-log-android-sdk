@@ -121,8 +121,8 @@ public class CrashReporterFeature extends SdkFeature {
         }
 
         StringBuffer buffer = new StringBuffer();
-        buffer.append("k_ct: exception").append(LINE_SEP);
-        buffer.append("k_ac: ").append(type).append(LINE_SEP);
+        buffer.append("k_ct:exception").append(LINE_SEP);
+        buffer.append("k_ac:").append(type).append(LINE_SEP);
 
         buffer.append(LOG_SECTION_SEP).append(LINE_SEP);
         buffer.append("Exception message: ").append(TextUtils.isEmpty(message) ? "" : message).append(LINE_SEP);
@@ -131,7 +131,7 @@ public class CrashReporterFeature extends SdkFeature {
         buffer.append("stack traceback:").append(LINE_SEP).append(TextUtils.isEmpty(stacktrace) ? "" : stacktrace).append(LINE_SEP);
         buffer.append("Back traces ends.");
 
-        CustomLogInfo errorInfo = new CustomLogInfo(buffer, type);
+        CustomLogInfo errorInfo = new CustomLogInfo(buffer, "exception");
         errorInfo.mUploadNow = true;
 
         crashApi.generateCustomLog(errorInfo);
@@ -143,6 +143,7 @@ public class CrashReporterFeature extends SdkFeature {
         String fileDirName = context.getFilesDir().getName();
 
         final Bundle args = new Bundle();
+        args.putBoolean("mDebug", configuration.debuggable && AppUtils.debuggable(context));
         // 路径配置
         args.putBoolean("mBackupLogs", false);
         args.putString("mTagFilesFolderName", fileDirName + File.separator + PATH_ITRACE_TAGS);
@@ -177,6 +178,11 @@ public class CrashReporterFeature extends SdkFeature {
 
         // 防止 uc 计算 crc
         args.putString("mBuildId", AppUtils.getAppVersion(context));
+
+        // 错误分析文件数量限制设置
+        args.putInt("mMaxCustomLogFilesCount", Integer.MAX_VALUE);
+        args.putInt("mMaxCustomLogCountPerTypePerDay", Integer.MAX_VALUE);
+        args.putInt("mMaxUploadCustomLogCountPerDay", Integer.MAX_VALUE);
 
         crashApi = CrashApi.createInstanceEx(context, getAppIdByInstanceId(appId), false, args, new ICrashClient() {
             @Override
@@ -348,7 +354,7 @@ public class CrashReporterFeature extends SdkFeature {
         }
 
         for (File f : files) {
-            String type = null;
+            String type;
             if (f.getName().endsWith("jni.log")) {
                 type = "jni";
             } else if (f.getName().endsWith("anr.log")) {
@@ -357,15 +363,20 @@ public class CrashReporterFeature extends SdkFeature {
                 type = "java";
             } else if (f.getName().endsWith("unexp.log")) {
                 type = "unexp";
+            } else {
+                // unknown type should be ignored.
+                // no impact on error analysis
+
+                //noinspection ResultOfMethodCallIgnored
+                f.delete();
+                continue;
             }
             //else {
             //    //sls-androd-dev-f1a8_1.0_1.0_sdk-gphone64-arm64_12_166418712090940564_20220926181213_fg_custom.log
             //
             //}
 
-            if (null != type) {
-                parseCrashFile(f, type);
-            }
+            parseCrashFile(f, type);
         }
     }
 

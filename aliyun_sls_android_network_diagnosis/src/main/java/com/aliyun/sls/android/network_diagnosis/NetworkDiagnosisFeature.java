@@ -23,6 +23,7 @@ import com.aliyun.sls.android.core.feature.SdkFeature;
 import com.aliyun.sls.android.core.sender.SdkSender;
 import com.aliyun.sls.android.core.sender.Sender;
 import com.aliyun.sls.android.core.utdid.Utdid;
+import com.aliyun.sls.android.core.utils.AppUtils;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProcessor;
 import com.aliyun.sls.android.ot.SpanBuilder;
@@ -110,7 +111,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             networkDiagnosisCredentials.siteId,
             networkDiagnosisCredentials.extension
         );
-        Diagnosis.enableDebug(false);
+        Diagnosis.enableDebug(configuration.debuggable && AppUtils.debuggable(context));
 
         networkDiagnosisSender = new NetworkDiagnosisSender(context, this);
         networkDiagnosisSender.initialize(credentials);
