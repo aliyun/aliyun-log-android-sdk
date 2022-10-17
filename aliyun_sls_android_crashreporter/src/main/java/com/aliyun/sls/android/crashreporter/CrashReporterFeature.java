@@ -445,6 +445,8 @@ public class CrashReporterFeature extends SdkFeature {
 
                 if (null != lastCachedSpan) {
                     span.setParent(lastCachedSpan);
+                } else {
+                    span.setTraceId(crashSpan.getTraceId());
                 }
 
                 span.end();
