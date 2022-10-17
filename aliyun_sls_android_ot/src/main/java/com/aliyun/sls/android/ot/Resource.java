@@ -15,6 +15,7 @@ import android.util.Pair;
 public class Resource {
     public final List<Attribute> attributes = new LinkedList<>();
     private final static Resource DEFAULT = new Resource();
+    private final Object lock = new Object();
 
     static {
         DEFAULT.add("sdk.language", "Android");
@@ -80,16 +81,21 @@ public class Resource {
 
     // region operation
     public Resource add(String key, Object value) {
-        this.attributes.add(Attribute.of(key, value));
-        return this;
+        synchronized (lock) {
+            this.attributes.add(Attribute.of(key, value));
+            return this;
+        }
     }
 
     public Resource merge(Resource resource) {
-        if (null != resource) {
-            attributes.addAll(resource.attributes);
+        if (null == resource) {
+            return this;
         }
-        return this;
+
+        synchronized (lock) {
+            attributes.addAll(resource.attributes);
+            return this;
+        }
     }
     // endregion
-
 }
