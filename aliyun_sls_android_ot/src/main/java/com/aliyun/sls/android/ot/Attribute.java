@@ -18,6 +18,7 @@ public class Attribute implements Comparable<Attribute> {
         this.value = value;
     }
 
+    // region instance
     public static Attribute of(String key, boolean value) {
         return of(key, (Object)value);
     }
@@ -56,6 +57,7 @@ public class Attribute implements Comparable<Attribute> {
         }
         return attributeList;
     }
+    // endregion
 
     @Override
     public int compareTo(Attribute o) {

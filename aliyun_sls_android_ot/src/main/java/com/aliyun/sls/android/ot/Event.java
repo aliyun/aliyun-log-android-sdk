@@ -25,10 +25,13 @@ public class Event {
         this.epochNanos = TimeUtils.instance.now();
     }
 
+    // region instance
     public static Event create(String name) {
         return new Event(name);
     }
+    // endregion
 
+    // region operation
     public Event addAttribute(Attribute... attributes) {
         if (null == attributes) {
             return this;
@@ -55,33 +58,48 @@ public class Event {
     }
 
     public String getName() {
-        return name;
+        synchronized (lock) {
+            return name;
+        }
     }
 
     public Event setName(String name) {
-        this.name = name;
-        return this;
+        synchronized (lock) {
+            this.name = name;
+            return this;
+        }
     }
 
     public List<Attribute> getAttributes() {
-        return attributes;
+        synchronized (lock) {
+            return attributes;
+        }
     }
 
     public long getEpochNanos() {
-        return epochNanos;
+        synchronized (lock) {
+            return epochNanos;
+        }
     }
 
     public Event setEpochNanos(long epochNanos) {
-        this.epochNanos = epochNanos;
-        return this;
+        synchronized (lock) {
+            this.epochNanos = epochNanos;
+            return this;
+        }
     }
 
     public int getTotalAttributeCount() {
-        return totalAttributeCount;
+        synchronized (lock) {
+            return totalAttributeCount;
+        }
     }
 
     public Event setTotalAttributeCount(int totalAttributeCount) {
-        this.totalAttributeCount = totalAttributeCount;
-        return this;
+        synchronized (lock) {
+            this.totalAttributeCount = totalAttributeCount;
+            return this;
+        }
     }
+    // end region
 }
