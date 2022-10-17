@@ -1,5 +1,6 @@
 package com.aliyun.sls.android.producer;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import android.text.TextUtils;
@@ -46,7 +47,7 @@ public class LogProducerClient {
             return LogProducerResult.LOG_PRODUCER_INVALID;
         }
 
-        Map<String, String> contents = log.getContent();
+        Map<String, String> contents = new LinkedHashMap<>(log.getContent());
         int pairCount = contents.size();
 
         String[] keyArray = new String[pairCount];

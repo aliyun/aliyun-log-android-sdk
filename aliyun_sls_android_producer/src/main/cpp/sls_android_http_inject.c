@@ -105,8 +105,10 @@ void sls_android_set_http_inject_func(log_producer_config *config, char **src_he
 
                 const char *c_key = (*env)->GetStringUTFChars(env, key, NULL);
                 const char *c_value = (*env)->GetStringUTFChars(env, value, NULL);
-                char *kv = (char *) malloc(sizeof(char) * 256);
-                memset(kv, 0, sizeof(char) * 256);
+                unsigned long len = strlen(c_key) + strlen(c_value) + strlen(":") + 1;
+                // dynamic alloc 'len' of char* for reduce mem cost
+                char *kv = (char *) malloc(sizeof(char) * len);
+                memset(kv, 0, sizeof(char) * len);
                 strcat(kv, c_key);
                 strcat(kv, ":");
                 strcat(kv, c_value);

@@ -1,6 +1,5 @@
 package com.aliyun.sls.android.producer;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,7 +14,8 @@ public class Log {
 
     private long logTime;
 
-    private final Map<String, String> content = new HashMap<>();
+    private final Map<String, String> content = new LinkedHashMap<>();
+    private final Object lock = new Object();
 
     public Log() {
         this.logTime = TimeUtils.getTimeInMillis();
@@ -26,46 +26,64 @@ public class Log {
             return;
         }
 
-        content.putAll(new LinkedHashMap<String, String>(contents));
+        synchronized (lock) {
+            content.putAll(new LinkedHashMap<String, String>(contents));
+        }
     }
 
     public void putContent(String key, String value) {
-        content.put(key, value);
+        synchronized (lock) {
+            content.put(key, value);
+        }
     }
 
     public void putContent(String key, int value) {
-        content.put(key, String.valueOf(value));
+        synchronized (lock) {
+            content.put(key, String.valueOf(value));
+        }
     }
 
     public void putContent(String key, long value) {
-        content.put(key, String.valueOf(value));
+        synchronized (lock) {
+            content.put(key, String.valueOf(value));
+        }
     }
 
     public void putContent(String key, boolean value) {
-        content.put(key, String.valueOf(value));
+        synchronized (lock) {
+            content.put(key, String.valueOf(value));
+        }
     }
 
     public void putContent(String key, float value) {
-        content.put(key, String.valueOf(value));
+        synchronized (lock) {
+            content.put(key, String.valueOf(value));
+        }
     }
 
     public void putContent(String key, double value) {
-        content.put(key, String.valueOf(value));
+        synchronized (lock) {
+            content.put(key, String.valueOf(value));
+        }
     }
 
     public void putContent(String key, JSONObject object) {
-        if (null != object) {
-            content.put(key, object.toString());
-        } else {
-            content.put(key, "null");
+        synchronized (lock) {
+            if (null != object) {
+                content.put(key, object.toString());
+            } else {
+                content.put(key, "null");
+            }
         }
     }
 
     public void putContent(String key, JSONArray array) {
-        if (null != array) {
-            content.put(key, array.toString());
-        } else {
-            content.put(key, "null");
+        synchronized (lock) {
+            if (null != array) {
+                content.put(key, array.toString());
+            } else {
+                content.put(key, "null");
+            }
         }
     }
 
@@ -131,7 +149,9 @@ public class Log {
     }
 
     public Map<String, String> getContent() {
-        return content;
+        synchronized (lock) {
+            return content;
+        }
     }
 
     public long getLogTime() {
