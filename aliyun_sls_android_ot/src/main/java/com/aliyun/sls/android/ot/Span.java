@@ -65,7 +65,9 @@ public class Span {
     protected String transactionId;
 
     private final AtomicBoolean finished = new AtomicBoolean();
-    /* packaged */Scope scope;
+    /* packaged */ Scope scope;
+
+    private final Object lock = new Object();
 
     protected Span() {
         this.attribute = new LinkedList<>();
@@ -75,145 +77,203 @@ public class Span {
 
     // region getter
     public String getName() {
-        return name;
+        synchronized (lock) {
+            return name;
+        }
     }
 
     public SpanKind getKind() {
-        return kind;
+        synchronized (lock) {
+            return kind;
+        }
     }
 
     public String getTraceId() {
-        return traceID;
+        synchronized (lock) {
+            return traceID;
+        }
     }
 
     public String getSpanId() {
-        return spanID;
+        synchronized (lock) {
+            return spanID;
+        }
     }
 
     public String getParentSpanId() {
-        return parentSpanID;
+        synchronized (lock) {
+            return parentSpanID;
+        }
     }
 
     public long getStart() {
-        return start;
+        synchronized (lock) {
+            return start;
+        }
     }
 
     public long getEnd() {
-        return end;
+        synchronized (lock) {
+            return end;
+        }
     }
 
     public long getDuration() {
-        return duration;
+        synchronized (lock) {
+            return duration;
+        }
     }
 
     public StatusCode getStatusCode() {
-        return statusCode;
+        synchronized (lock) {
+            return statusCode;
+        }
     }
 
     public String getStatusMessage() {
-        return statusMessage;
+        synchronized (lock) {
+            return statusMessage;
+        }
     }
 
     public String getHost() {
-        return host;
+        synchronized (lock) {
+            return host;
+        }
     }
 
     public String getService() {
-        return service;
+        synchronized (lock) {
+            return service;
+        }
     }
     // endregion
 
     // region setter
     public Span setName(String name) {
-        this.name = name;
-        return this;
+        synchronized (lock) {
+            this.name = name;
+            return this;
+        }
     }
 
     public Span setKind(SpanKind kind) {
-        this.kind = kind;
-        return this;
+        synchronized (lock) {
+            this.kind = kind;
+            return this;
+        }
     }
 
     public Span setTraceId(String traceID) {
-        this.traceID = traceID;
-        return this;
+        synchronized (lock) {
+            this.traceID = traceID;
+            return this;
+        }
     }
 
     public Span setSpanId(String spanID) {
-        this.spanID = spanID;
-        return this;
+        synchronized (lock) {
+            this.spanID = spanID;
+            return this;
+        }
     }
 
     public Span setParentSpanId(String parentSpanID) {
-        this.parentSpanID = parentSpanID;
-        return this;
+        synchronized (lock) {
+            this.parentSpanID = parentSpanID;
+            return this;
+        }
     }
 
     public Span setParent(Span span) {
-        this.parentSpanID = span.spanID;
-        this.traceID = span.traceID;
-        return this;
+        synchronized (lock) {
+            this.parentSpanID = span.spanID;
+            this.traceID = span.traceID;
+            return this;
+        }
     }
 
     public Span setStart(long start) {
-        this.start = start;
-        return this;
+        synchronized (lock) {
+            this.start = start;
+            return this;
+        }
     }
 
     public Span setEnd(long end) {
-        this.end = end;
-        return this;
+        synchronized (lock) {
+            this.end = end;
+            return this;
+        }
     }
 
     public Span setDuration(long duration) {
-        this.duration = duration;
-        return this;
+        synchronized (lock) {
+            this.duration = duration;
+            return this;
+        }
     }
 
     public Span setStatus(StatusCode statusCode) {
-        this.statusCode = statusCode;
-        return this;
+        synchronized (lock) {
+            this.statusCode = statusCode;
+            return this;
+        }
     }
 
     public Span setStatusMessage(String statusMessage) {
-        this.statusMessage = statusMessage;
-        return this;
+        synchronized (lock) {
+            this.statusMessage = statusMessage;
+            return this;
+        }
     }
 
     public Span setHost(String host) {
-        this.host = host;
-        return this;
+        synchronized (lock) {
+            this.host = host;
+            return this;
+        }
     }
 
     public Span setService(String service) {
-        this.service = service;
-        return this;
+        synchronized (lock) {
+            this.service = service;
+            return this;
+        }
     }
     // endregion
 
     // region attribute & resource
     public Span addAttribute(Attribute attribute) {
-        this.attribute.add(attribute);
-        return this;
+        synchronized (lock) {
+            this.attribute.add(attribute);
+            return this;
+        }
     }
 
     public Span addAttribute(Attribute... attributes) {
-        this.addAttribute(Arrays.asList(attributes));
-        return this;
+        synchronized (lock) {
+            this.addAttribute(Arrays.asList(attributes));
+            return this;
+        }
     }
 
     public Span addAttribute(List<Attribute> attributes) {
-        this.attribute.addAll(attributes);
-        return this;
+        synchronized (lock) {
+            this.attribute.addAll(attributes);
+            return this;
+        }
     }
 
     public Span addResource(Resource r) {
-        if (null == r) {
+        synchronized (lock) {
+            if (null == r) {
+                return this;
+            }
+
+            this.resource.merge(r);
             return this;
         }
-
-        this.resource.merge(r);
-        return this;
     }
     // endregion
 
@@ -283,7 +343,9 @@ public class Span {
     // endregion
 
     private void addEvent(Event event) {
-        events.add(event);
+        synchronized (lock) {
+            events.add(event);
+        }
     }
 
     // region end
@@ -292,16 +354,18 @@ public class Span {
             return false;
         }
 
-        this.duration = (this.end - this.start) / 1000;
+        synchronized (lock) {
+            this.duration = (this.end - this.start) / 1000;
 
-        if (null != scope) {
-            try {
-                scope.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (null != scope) {
+                try {
+                    scope.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            return true;
         }
-        return true;
     }
 
     public boolean isEnd() {
@@ -317,61 +381,63 @@ public class Span {
 
     @Deprecated
     public Map<String, String> toData() {
-        Map<String, String> data = new LinkedHashMap<>();
-        data.put("name", name);
-        data.put("kind", kind.kind);
-        data.put("traceID", traceID);
-        data.put("spanID", spanID);
-        data.put("parentSpanID", parentSpanID);
-        data.put("sid", sessionId);
-        data.put("pid", transactionId);
-        data.put("start", String.valueOf(start));
-        data.put("duration", String.valueOf(duration));
-        data.put("end", String.valueOf(end));
-        data.put("statusCode", statusCode.code);
-        data.put("statusMessage", statusMessage);
-        data.put("host", host);
-        data.put("service", TextUtils.isEmpty(service) ? "Android" : service);
+        synchronized (lock) {
+            Map<String, String> data = new LinkedHashMap<>();
+            data.put("name", name);
+            data.put("kind", kind.kind);
+            data.put("traceID", traceID);
+            data.put("spanID", spanID);
+            data.put("parentSpanID", parentSpanID);
+            data.put("sid", sessionId);
+            data.put("pid", transactionId);
+            data.put("start", String.valueOf(start));
+            data.put("duration", String.valueOf(duration));
+            data.put("end", String.valueOf(end));
+            data.put("statusCode", statusCode.code);
+            data.put("statusMessage", statusMessage);
+            data.put("host", host);
+            data.put("service", TextUtils.isEmpty(service) ? "Android" : service);
 
-        JSONObject object = new JSONObject();
-        Collections.sort(attribute);
-        for (Attribute attr : attribute) {
-            JSONUtils.put(object, attr.key, attr.value);
-        }
-        data.put("attribute", object.toString());
-
-        if (null != resource) {
-            Collections.sort(resource.attributes);
-            object = new JSONObject();
-            for (Attribute attribute : resource.attributes) {
-                JSONUtils.put(object, attribute.key, attribute.value);
+            JSONObject object = new JSONObject();
+            Collections.sort(attribute);
+            for (Attribute attr : attribute) {
+                JSONUtils.put(object, attr.key, attr.value);
             }
-            data.put("resource", object.toString());
-        }
+            data.put("attribute", object.toString());
 
-        if (events.size() != 0) {
-            JSONArray logs = new JSONArray();
-            for (Event event : events) {
+            if (null != resource) {
+                Collections.sort(resource.attributes);
                 object = new JSONObject();
-                JSONUtils.put(object, "name", TextUtils.isEmpty(event.getName()) ? "" : event.getName());
-                JSONUtils.put(object, "epochNanos", event.getEpochNanos());
-                JSONUtils.put(object, "totalAttributeCount", event.getTotalAttributeCount());
-
-                final List<Attribute> attributes = event.getAttributes();
-                Collections.sort(attributes);
-                JSONObject attrObject = new JSONObject();
-                for (Attribute attr : attributes) {
-                    JSONUtils.put(attrObject, attr.key, attr.value);
+                for (Attribute attribute : resource.attributes) {
+                    JSONUtils.put(object, attribute.key, attribute.value);
                 }
-                JSONUtils.put(object, "attributes", attrObject);
-
-                logs.put(object);
+                data.put("resource", object.toString());
             }
 
-            data.put("logs", logs.toString());
-        }
+            if (events.size() != 0) {
+                JSONArray logs = new JSONArray();
+                for (Event event : events) {
+                    object = new JSONObject();
+                    JSONUtils.put(object, "name", TextUtils.isEmpty(event.getName()) ? "" : event.getName());
+                    JSONUtils.put(object, "epochNanos", event.getEpochNanos());
+                    JSONUtils.put(object, "totalAttributeCount", event.getTotalAttributeCount());
 
-        return data;
+                    final List<Attribute> attributes = event.getAttributes();
+                    Collections.sort(attributes);
+                    JSONObject attrObject = new JSONObject();
+                    for (Attribute attr : attributes) {
+                        JSONUtils.put(attrObject, attr.key, attr.value);
+                    }
+                    JSONUtils.put(object, "attributes", attrObject);
+
+                    logs.put(object);
+                }
+
+                data.put("logs", logs.toString());
+            }
+
+            return data;
+        }
     }
     // endregion
 }
