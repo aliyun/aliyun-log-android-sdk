@@ -16,20 +16,25 @@ public class RecordableSpan extends Span {
 
     @Override
     public boolean end() {
-        this.end = TimeUtils.instance.now();
+        synchronized (lock) {
+            this.end = TimeUtils.instance.now();
+        }
+
         boolean ret = super.end();
 
         if (!ret) {
             return false;
         }
 
-        this.start = this.start / 1000;
-        this.end = this.end / 1000;
+        synchronized (lock) {
+            this.start = this.start / 1000;
+            this.end = this.end / 1000;
 
-        if (null != spanProcessor) {
-            return spanProcessor.onEnd(this);
+            if (null != spanProcessor) {
+                return spanProcessor.onEnd(this);
+            }
+
+            return false;
         }
-
-        return false;
     }
 }

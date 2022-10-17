@@ -67,7 +67,7 @@ public class Span {
     private final AtomicBoolean finished = new AtomicBoolean();
     /* packaged */ Scope scope;
 
-    private final Object lock = new Object();
+    protected final Object lock = new Object();
 
     protected Span() {
         this.attribute = new LinkedList<>();
