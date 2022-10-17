@@ -191,7 +191,11 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
 
     // region 打开空调
     private void openAirConditioner() {
-        new Thread(() -> Tracer.withinSpan("执行打开空调操作", true, new Runnable() {
+        Span span = Tracer.startSpan("收到指令<<= 打开空调");
+        span.setTraceId("00000016001825130000000952991827");
+        span.setParentSpanId("0000001298825193");
+
+        new Thread(() -> Tracer.withinSpan("执行打开空调操作", true, span, new Runnable() {
             @Override
             public void run() {
                 connectAirPower();
