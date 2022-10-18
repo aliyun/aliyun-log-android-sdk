@@ -2,14 +2,15 @@ package com.aliyun.sls.android.producer.utils;
 
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Build.VERSION;
+import android.text.TextUtils;
 
 /**
  * @author gordon
@@ -51,7 +52,14 @@ public final class Utils {
         }
 
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        final boolean connected = cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+        final boolean connected;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            connected = cm.getActiveNetwork() != null && cm.getNetworkCapabilities(cm.getActiveNetwork()) != null;
+        } else {
+            connected = cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+        }
+
+        //final boolean connected = cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
         // check again if no connection
         if (!connected || !finalNetworkConnected) {
             ConnectionChecker.start();
@@ -86,13 +94,15 @@ public final class Utils {
 
     private static class ConnectionChecker {
         private static boolean checking = false;
+        private static final Object lock = new Object();
 
-        private static synchronized void start() {
-            if (checking) {
-                return;
+        private static void start() {
+            synchronized (lock) {
+                if (checking) {
+                    return;
+                }
+                checking = true;
             }
-
-            checking = true;
 
             new AsyncTask<Void, Void, Void>() {
 
@@ -100,11 +110,13 @@ public final class Utils {
                 protected Void doInBackground(Void... voids) {
                     try {
                         InetAddress address = InetAddress.getByName("www.aliyun.com");
-                        Utils.finalNetworkConnected = null != address && !address.getHostAddress().equals("");
-                    } catch (UnknownHostException e) {
+                        Utils.finalNetworkConnected = null != address && !TextUtils.isEmpty(address.getHostAddress());
+                    } catch (Throwable e) {
                         Utils.finalNetworkConnected  = false;
                     } finally {
-                        checking = false;
+                        synchronized (lock) {
+                            checking = false;
+                        }
                     }
                     return null;
                 }

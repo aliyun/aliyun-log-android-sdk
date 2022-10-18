@@ -19,10 +19,9 @@ public class LogProducerHttpTool {
 
     public static int android_http_post(String urlString, String method, String[] header, byte[] body) {
         try {
-            if (!Utils.checkInternetConnection()) {
-                return -1;
-            }
-
+            //if (!Utils.checkInternetConnection()) {
+            //    return -1;
+            //}
             URL url = new URL(urlString);
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
 
