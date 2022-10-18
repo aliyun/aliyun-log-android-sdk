@@ -1,4 +1,4 @@
-package com.aliyun.sls.android.ot;
+package com.aliyun.sls.android.testing;
 
 import org.junit.Test;
 

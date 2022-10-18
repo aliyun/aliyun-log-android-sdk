@@ -7,7 +7,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0.5"
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,19 +31,14 @@ android {
 }
 
 dependencies {
-//    testImplementation project(':testing')
-//    implementation project(':testing')
-
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:2.8.9'
     testImplementation 'com.vmlens:concurrent-junit:1.0.2'
-
-    implementation project(':aliyun_sls_android_producer')
 }
 
 ext {
     moduleVersion = android.defaultConfig.versionName
-    moduleName = 'sls-android-ot'
+    moduleName = 'sls-android-trace'
 }
 
 //====以下是将android library上传到jcenter的脚本
