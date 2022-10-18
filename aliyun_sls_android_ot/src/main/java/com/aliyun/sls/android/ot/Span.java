@@ -3,6 +3,7 @@ package com.aliyun.sls.android.ot;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -55,6 +56,7 @@ public class Span {
     protected long duration;
     protected List<Attribute> attribute;
     protected List<Event> events;
+    protected List<Link> links;
     protected StatusCode statusCode = StatusCode.UNSET;
     protected String statusMessage;
     protected String host;
@@ -70,9 +72,10 @@ public class Span {
     protected final Object lock = new Object();
 
     protected Span() {
-        this.attribute = new LinkedList<>();
-        this.events = new LinkedList<>();
+        this.attribute = new ArrayList<>();
+        this.events = new ArrayList<>();
         this.resource = new Resource();
+        this.links = new ArrayList<>();
     }
 
     // region getter
@@ -342,6 +345,16 @@ public class Span {
     }
     // endregion
 
+    // region links
+    public Span addLink(Link link) {
+        synchronized (lock) {
+            this.links.add(link);
+        }
+        return this;
+    }
+
+    // endregion
+
     private void addEvent(Event event) {
         synchronized (lock) {
             events.add(event);
@@ -434,6 +447,26 @@ public class Span {
                 }
 
                 data.put("logs", logs.toString());
+            }
+
+            if (links.size() != 0) {
+                JSONArray links = new JSONArray();
+                for (Link link : this.links) {
+                    object = new JSONObject();
+                    JSONUtils.put(object, "traceID", link.getTraceId());
+                    JSONUtils.put(object, "spanID", link.getSpanId());
+
+                    final List<Attribute> attributes = link.getAttributes();
+                    Collections.sort(attributes);
+                    JSONObject attrObject = new JSONObject();
+                    for (Attribute attr : attributes) {
+                        JSONUtils.put(attrObject, attr.key, attr.value);
+                    }
+                    JSONUtils.put(object, "attributes", attrObject);
+                    links.put(object);
+                }
+
+                data.put("links", links.toString());
             }
 
             return data;
