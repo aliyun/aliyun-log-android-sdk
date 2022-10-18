@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
 import com.aliyun.sls.android.ot.Attribute;
+import com.aliyun.sls.android.ot.Link;
 import com.aliyun.sls.android.ot.Resource;
 import com.aliyun.sls.android.ot.Span;
 import com.aliyun.sls.android.ot.Span.StatusCode;
@@ -46,6 +47,7 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
         findViewById(R.id.trace_nested_trace_demo).setOnClickListener(this);
         findViewById(R.id.trace_add_event_demo).setOnClickListener(this);
         findViewById(R.id.trace_record_exception_demo).setOnClickListener(this);
+        findViewById(R.id.trace_add_links_demo).setOnClickListener(this);
     }
 
     @Override
@@ -62,6 +64,8 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
             addEvent();
         } else if (R.id.trace_record_exception_demo == v.getId()) {
             recordException();
+        } else if (R.id.trace_add_links_demo == v.getId()) {
+            addLink();
         }
     }
 
@@ -191,11 +195,11 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
 
     // region 打开空调
     private void openAirConditioner() {
-        Span span = Tracer.startSpan("收到指令<<= 打开空调");
-        span.setTraceId("00000016001825130000000952991827");
-        span.setParentSpanId("0000001298825193");
+        //Span span = Tracer.startSpan("收到指令<<= 打开空调");
+        //span.setTraceId("00000016001825130000000952991827");
+        //span.setParentSpanId("0000001298825193");
 
-        new Thread(() -> Tracer.withinSpan("执行打开空调操作", true, span, new Runnable() {
+        new Thread(() -> Tracer.withinSpan("执行打开空调操作", true, new Runnable() {
             @Override
             public void run() {
                 connectAirPower();
@@ -289,6 +293,14 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
     private void recordException() {
         Tracer.startSpan("record exception 1").recordException(new IllegalArgumentException("invalid argument")).end();
         Tracer.startSpan("record exception 2").recordException(new IllegalArgumentException("invalid argument"), Attribute.of("key", "value"), Attribute.of("key2", "value2")).end();
+    }
+
+    private void addLink() {
+        Span span = Tracer.startSpan("add link", true).addLink(Link.create("1592d2f276d0908d1031940e5aeb6821", "5d84c8144e511d29"));
+
+        Tracer.startSpan("span in add link").end();
+
+        span.end();
     }
 
     private void threadSleep() {

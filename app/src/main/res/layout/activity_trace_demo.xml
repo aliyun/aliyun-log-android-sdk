@@ -59,5 +59,15 @@
                 android:textAllCaps="false"
                 android:text="recordException" />
         </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/trace_add_links_demo"
+                android:layout_span="2"
+                android:padding="8dp"
+                android:textAllCaps="false"
+                android:text="addLink" />
+        </TableRow>
     </TableLayout>
 </LinearLayout>
