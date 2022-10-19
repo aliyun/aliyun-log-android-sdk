@@ -31,7 +31,7 @@ android {
 }
 
 dependencies {
-//    testImplementation project(':testing')
+    testImplementation project(':testing')
 //    implementation project(':testing')
 
     testImplementation 'junit:junit:4.13.2'

@@ -1,13 +1,20 @@
 package com.aliyun.sls.android.ot;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import android.text.TextUtils;
 import android.util.Pair;
 import com.aliyun.sls.android.ot.Span.StatusCode;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author gordon
@@ -155,7 +162,6 @@ public class SpanTest {
         }
     }
 
-
     @Test
     public void span_addResource() {
         Span span = new Span();
@@ -167,4 +173,193 @@ public class SpanTest {
             assertEquals("value", attribute.value);
         }
     }
+
+    @Test
+    public void span_addEvent() {
+        Span span = new Span();
+        span.addEvent("e-name");
+
+        for (Event event : span.events) {
+            assertEquals("e-name", event.getName());
+        }
+    }
+
+    @Test
+    public void span_addEvent2() {
+        Span span = new Span();
+        span.addEvent("e-name", Attribute.of("key", "value"), Attribute.of("key2", "value2"));
+
+        for (Event event : span.events) {
+            assertEquals("e-name", event.getName());
+            assertEquals("key", event.getAttributes().get(0).key);
+            assertEquals("value", event.getAttributes().get(0).value);
+
+            assertEquals("key2", event.getAttributes().get(1).key);
+            assertEquals("value2", event.getAttributes().get(1).value);
+        }
+    }
+
+    @Test
+    public void span_addEvent3() {
+        Span span = new Span();
+        List<Attribute> attributes = new ArrayList<Attribute>() {
+            {
+                add(Attribute.of("key", "value"));
+                add(Attribute.of("key2", "value2"));
+            }
+        };
+        span.addEvent("e-name", attributes);
+
+        for (Event event : span.events) {
+            assertEquals("e-name", event.getName());
+
+            assertEquals("key", event.getAttributes().get(0).key);
+            assertEquals("value", event.getAttributes().get(0).value);
+
+            assertEquals("key2", event.getAttributes().get(1).key);
+            assertEquals("value2", event.getAttributes().get(1).value);
+        }
+    }
+
+    @Test
+    public void span_recordException() {
+        Span span = new Span();
+        Throwable t = new IllegalArgumentException("illegal argument");
+        span.recordException(t);
+
+        StringWriter stringWriter = new StringWriter();
+        try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
+            t.printStackTrace(printWriter);
+        }
+
+        for (Event event : span.events) {
+            assertEquals("exception", event.getName());
+            assertEquals("exception.type", event.getAttributes().get(0).key);
+            assertEquals(t.getClass().getCanonicalName(), event.getAttributes().get(0).value);
+
+            assertEquals("exception.message", event.getAttributes().get(1).key);
+            assertEquals((TextUtils.isEmpty(t.getMessage()) ? "" : t.getMessage()), event.getAttributes().get(1).value);
+
+            assertEquals("exception.stacktrace", event.getAttributes().get(2).key);
+            assertEquals(stringWriter.toString(), event.getAttributes().get(2).value);
+        }
+    }
+
+    @Test
+    public void span_addLink() {
+        Span span = new Span();
+        Link link = Link.create("00000018361438910000001022299876", "6c264809643e04e6");
+        span.addLink(link);
+
+        for (Link lin : span.links) {
+            assertEquals("00000018361438910000001022299876", lin.getTraceId());
+            assertEquals("6c264809643e04e6", lin.getSpanId());
+        }
+    }
+
+    @Test
+    public void span_addLink2() {
+        Span span = new Span();
+        Link link = Link.create("00000018361438910000001022299876", "6c264809643e04e6");
+        link.addAttribute(Attribute.of("key", "value"));
+
+        span.addLink(link);
+
+        for (Link lin : span.links) {
+            assertEquals("00000018361438910000001022299876", lin.getTraceId());
+            assertEquals("6c264809643e04e6", lin.getSpanId());
+
+            assertEquals("key", lin.getAttributes().get(0).key);
+            assertEquals("value", lin.getAttributes().get(0).value);
+        }
+    }
+
+    @Test
+    public void span_addLink3() {
+        Span span = new Span();
+        Link link = Link.create("00000018361438910000001022299876", "6c264809643e04e6");
+        link.addAttribute(Attribute.of("key", "value"), Attribute.of("key2", "value2"));
+
+        span.addLink(link);
+
+        for (Link lin : span.links) {
+            assertEquals("00000018361438910000001022299876", lin.getTraceId());
+            assertEquals("6c264809643e04e6", lin.getSpanId());
+
+            assertEquals("key", lin.getAttributes().get(0).key);
+            assertEquals("value", lin.getAttributes().get(0).value);
+
+            assertEquals("key2", lin.getAttributes().get(1).key);
+            assertEquals("value2", lin.getAttributes().get(1).value);
+        }
+    }
+
+    @Test
+    public void span_addLink4() {
+        Span span = new Span();
+        Link link = Link.create("00000018361438910000001022299876", "6c264809643e04e6");
+        List<Attribute> attributes = new ArrayList<Attribute>() {
+            {
+                add(Attribute.of("key", "value"));
+                add(Attribute.of("key2", "value2"));
+            }
+        };
+        link.addAttribute(attributes);
+
+        span.addLink(link);
+
+        for (Link lin : span.links) {
+            assertEquals("00000018361438910000001022299876", lin.getTraceId());
+            assertEquals("6c264809643e04e6", lin.getSpanId());
+
+            assertEquals("key", lin.getAttributes().get(0).key);
+            assertEquals("value", lin.getAttributes().get(0).value);
+
+            assertEquals("key2", lin.getAttributes().get(1).key);
+            assertEquals("value2", lin.getAttributes().get(1).value);
+        }
+    }
+
+    @Test
+    public void span_end() {
+        Span span = new Span();
+        assertFalse(span.isEnd());
+        assertEquals(0L, span.duration);
+        assertEquals(0L, span.end);
+
+        span.end();
+        assertTrue(span.isEnd());
+        assertEquals(span.duration, (span.end - span.start) / 1000);
+    }
+
+    @Test
+    public void span_toData() {
+        final long start = System.nanoTime();
+        final long end = start + 1002;
+        Span span = new Span();
+        span.setStart(start);
+        span.setEnd(end);
+        span.setName("s-name");
+        span.setTraceId("00000018361438910000001022299876");
+        span.setSpanId("6c264809643e04e6");
+        span.end();
+
+        final Map<String, String> data = span.toData();
+        assertEquals(start, Long.parseLong(data.get("start")));
+        assertEquals(end, Long.parseLong(data.get("end")));
+        assertEquals(span.duration, Long.parseLong(data.get("duration")));
+        assertEquals("s-name", data.get("name"));
+        assertEquals(span.kind.kind, data.get("kind"));
+        assertEquals("00000018361438910000001022299876", data.get("traceID"));
+        assertEquals("6c264809643e04e6", data.get("spanID"));
+        assertEquals(null, data.get("parentSpanID"));
+        assertEquals(null, data.get("sid"));
+        assertEquals(null, data.get("pid"));
+        assertEquals(StatusCode.UNSET.code, data.get("statusCode"));
+        assertEquals(null, data.get("statusMessage"));
+        assertEquals(null, data.get("host"));
+        assertEquals("Android", data.get("service"));
+
+    }
+
 }
