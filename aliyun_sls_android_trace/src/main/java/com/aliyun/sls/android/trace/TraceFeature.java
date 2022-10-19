@@ -109,7 +109,7 @@ public class TraceFeature extends SdkFeature {
 
         @Override
         protected String provideLogstoreName(Credentials credentials) {
-            return credentials.tracerCredentials.logstore;
+            return String.format("%s-traces", credentials.tracerCredentials.instanceId);
         }
 
         @Override
@@ -174,8 +174,7 @@ public class TraceFeature extends SdkFeature {
 
         @Override
         protected String provideLogstoreName(Credentials credentials) {
-            return TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.logstore) ?
-                super.provideEndpoint(credentials) : credentials.tracerCredentials.logCredentials.logstore;
+            return String.format("%s-logs", credentials.tracerCredentials.instanceId);
         }
 
     }
