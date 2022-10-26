@@ -201,7 +201,7 @@ public class SdkSender extends NoOpSender implements ISpanProcessor {
             config.setProject(credentials.project);
         }
         if (!TextUtils.isEmpty(credentials.instanceId)) {
-            config.setLogstore(getLogstoreByInstanceId(credentials.instanceId));
+            config.setLogstore(provideLogstoreName(credentials));
         }
     }
 
