@@ -189,6 +189,10 @@ public class Span {
     }
 
     public Span setParent(Span span) {
+        if (null == span) {
+            return this;
+        }
+
         synchronized (lock) {
             this.parentSpanID = span.spanID;
             this.traceID = span.traceID;
@@ -248,6 +252,10 @@ public class Span {
 
     // region attribute & resource
     public Span addAttribute(Attribute attribute) {
+        if (null == attribute) {
+            return this;
+        }
+
         synchronized (lock) {
             this.attribute.add(attribute);
             return this;
@@ -255,6 +263,10 @@ public class Span {
     }
 
     public Span addAttribute(Attribute... attributes) {
+        if (null == attributes) {
+            return this;
+        }
+
         synchronized (lock) {
             this.addAttribute(Arrays.asList(attributes));
             return this;
@@ -262,6 +274,10 @@ public class Span {
     }
 
     public Span addAttribute(List<Attribute> attributes) {
+        if (null == attributes) {
+            return this;
+        }
+
         synchronized (lock) {
             this.attribute.addAll(attributes);
             return this;
@@ -269,11 +285,11 @@ public class Span {
     }
 
     public Span addResource(Resource r) {
-        synchronized (lock) {
-            if (null == r) {
-                return this;
-            }
+        if (null == r) {
+            return this;
+        }
 
+        synchronized (lock) {
             this.resource.merge(r);
             return this;
         }
@@ -473,4 +489,22 @@ public class Span {
         }
     }
     // endregion
+
+    @Override
+    public String toString() {
+        return "Span{" +
+            "name='" + name + '\'' +
+            ", kind=" + kind +
+            ", traceID='" + traceID + '\'' +
+            ", spanID='" + spanID + '\'' +
+            ", parentSpanID='" + parentSpanID + '\'' +
+            ", start=" + start +
+            ", end=" + end +
+            ", duration=" + duration +
+            ", statusCode=" + statusCode +
+            ", statusMessage='" + statusMessage + '\'' +
+            ", service='" + service + '\'' +
+            ", finished=" + finished +
+            '}';
+    }
 }
