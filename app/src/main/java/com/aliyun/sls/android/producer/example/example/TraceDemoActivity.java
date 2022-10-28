@@ -296,7 +296,12 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
     }
 
     private void addLink() {
-        Span span = Tracer.startSpan("add link", true).addLink(Link.create("1592d2f276d0908d1031940e5aeb6821", "5d84c8144e511d29"));
+        Span span = Tracer.startSpan("add link", true)
+            .addLink(
+                Link.create(
+                "3997030938be98a32d17da3609eaceca",
+                "fb5a457b7548b6f4")
+            );
 
         Tracer.startSpan("span in add link").end();
 

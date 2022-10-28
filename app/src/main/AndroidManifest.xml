@@ -43,6 +43,8 @@
         <activity android:name=".example.network.NetworkWithPolicy"/>
 
         <activity android:name=".example.TraceDemoActivity"/>
+
+        <activity android:name=".example.TraceDemoKotlinActivity" />
     </application>
 
 </manifest>

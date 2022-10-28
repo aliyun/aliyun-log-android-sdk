@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 29
@@ -40,6 +42,13 @@ android {
     buildFeatures {
         viewBinding true
     }
+    sourceSets {
+        main.jniLibs.srcDirs = ['libs']
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 //repositories {
@@ -62,6 +71,7 @@ dependencies {
     implementation project(':aliyun_sls_android_network_diagnosis')
     implementation project(':aliyun_sls_android_trace')
     implementation project(':aliyun_sls_android_okhttp')
+    implementation project(':aliyun_sls_android_ot_ktx')
 
 //    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.7'
 //    implementation 'com.aliyun.openservices:sls-android-core:1.0.4'

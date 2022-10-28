@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.aliyun.sls.android.producer.example.example.TraceDemoActivity;
+import com.aliyun.sls.android.producer.example.example.TraceDemoKotlinActivity;
 import com.aliyun.sls.android.producer.example.example.crash.CrashExampleActivity;
 import com.aliyun.sls.android.producer.example.example.network.NetworkExample;
 import com.aliyun.sls.android.producer.example.example.producer.ProducerExample;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.main_trace).setOnClickListener(this);
         findViewById(R.id.main_network_diagnosis).setOnClickListener(this);
         findViewById(R.id.main_trace_demo).setOnClickListener(this);
+
+        findViewById(R.id.main_kotlin_trace).setOnClickListener(this);
 
     }
 
@@ -80,6 +83,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (R.id.main_trace_demo == v.getId()) {
             // Trace Demo
             startActivity(TraceDemoActivity.class);
+        } else if (R.id.main_kotlin_trace == v.getId()) {
+            // Trace Demo
+            startActivity(TraceDemoKotlinActivity.class);
         }
     }
 
