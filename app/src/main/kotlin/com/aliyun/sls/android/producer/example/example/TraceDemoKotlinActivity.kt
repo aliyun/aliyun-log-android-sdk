@@ -182,14 +182,17 @@ class TraceDemoKotlinActivity : AppCompatActivity() {
         }
     }
 
-    private fun httpRequest(): String? {
-        val response: Response = OKHttp3Tracer.newCallFactory(OkHttpClient.Builder().build()).newCall(
-            Request.Builder()
-                .url("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue")
-                .build()
-        ).execute()
+    private suspend fun httpRequest(): String? {
+        withinSpan("http request") {
+            delay(1000)
+            val response: Response = OKHttp3Tracer.newCallFactory(OkHttpClient.Builder().build()).newCall(
+                Request.Builder()
+                    .url("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue")
+                    .build()
+            ).execute()
 
-        return response.body()?.string()
+            return response.body()?.string()
+        }
     }
 
     companion object {
