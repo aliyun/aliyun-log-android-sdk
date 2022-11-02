@@ -33,7 +33,7 @@ android {
 dependencies {
     implementation project(":aliyun_sls_android_ot")
     implementation project(":aliyun_sls_android_trace")
-    implementation("com.squareup.okhttp3:okhttp:3.0.0")
+    implementation("com.squareup.okhttp3:okhttp:3.11.0")
 }
 
 ext {

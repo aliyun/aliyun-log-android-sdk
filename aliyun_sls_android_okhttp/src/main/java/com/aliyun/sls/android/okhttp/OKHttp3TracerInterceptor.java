@@ -31,7 +31,8 @@ public class OKHttp3TracerInterceptor implements Interceptor {
             return chain.proceed(request);
         }
 
-        Span parent = OKHttp3Tracer.getSpanByRequest(request);
+        //Span parent = OKHttp3Tracer.getSpanByRequest(request);
+        Span parent = (Span) request.tag(Span.class);
         SpanBuilder builder = Tracer.spanBuilder("HTTP " + request.method());
         if (null != parent) {
             builder.setParent(parent);
@@ -60,7 +61,7 @@ public class OKHttp3TracerInterceptor implements Interceptor {
             response = chain.proceed(requestBuilder.build());
         } finally {
             span.end();
-            OKHttp3Tracer.removeSpanByRequest(request);
+            //OKHttp3Tracer.removeSpanByRequest(request);
         }
 
         return response;
