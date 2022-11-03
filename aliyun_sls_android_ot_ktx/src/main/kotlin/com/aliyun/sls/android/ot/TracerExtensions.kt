@@ -71,8 +71,16 @@ fun <T> withRunBlocking(
     val parentSpan: Span? = ensureParentSpan(parent, context)
     val span = Tracer.spanBuilder(operationName).setParent(parentSpan).build()
     return runBlocking(span.asContext() + context) {
-        val t: T = block(CoroutineScopeSpan(this, span))
-        span.end()
+        val t: T
+        try {
+            t = block(CoroutineScopeSpan(this, span))
+        } catch (e: Throwable) {
+            span.setStatus(Span.StatusCode.ERROR)
+            span.recordException(e)
+            throw e
+        } finally {
+            span.end()
+        }
         t
     }
 }
@@ -87,8 +95,15 @@ fun CoroutineScope.withLaunch(
     val parentSpan: Span? = ensureParentSpan(parent, context, coroutineContext)
     val span = Tracer.spanBuilder(operationName).setParent(parentSpan).build()
     return launch(span.asContext(), start) {
-        block(CoroutineScopeSpan(this, span))
-        span.end()
+        try {
+            block(CoroutineScopeSpan(this, span))
+        } catch (e: Throwable) {
+            span.setStatus(Span.StatusCode.ERROR)
+            span.recordException(e)
+            throw e
+        } finally {
+            span.end()
+        }
     }
 }
 
@@ -101,8 +116,16 @@ suspend fun <T : Any?> withContext(
     val parentSpan: Span? = ensureParentSpan(parent, context, coroutineContext)
     val span = Tracer.spanBuilder(operationName).setParent(parentSpan).build()
     return withContext(span.asContext() + context) {
-        val t: T = block(CoroutineScopeSpan(this, span))
-        span.end()
+        val t: T
+        try {
+            t = block(CoroutineScopeSpan(this, span))
+        } catch (e: Throwable) {
+            span.setStatus(Span.StatusCode.ERROR)
+            span.recordException(e)
+            throw e
+        } finally {
+            span.end()
+        }
         t
     }
 }
@@ -117,8 +140,16 @@ fun <T : Any?> CoroutineScope.withAsync(
     val parentSpan: Span? = ensureParentSpan(parent, context, coroutineContext)
     val span = Tracer.spanBuilder(operationName).setParent(parentSpan).build()
     return async(span.asContext() + context, start) {
-        val t: T = block(CoroutineScopeSpan(this, span))
-        span.end()
+        val t: T
+        try {
+            t = block(CoroutineScopeSpan(this, span))
+        } catch (e: Throwable) {
+            span.setStatus(Span.StatusCode.ERROR)
+            span.recordException(e)
+            throw e
+        } finally {
+            span.end()
+        }
         t
     }
 }
@@ -138,7 +169,11 @@ private suspend fun <T : Any?> CoroutineScope.withCoroutineSpan(
     context: CoroutineContext = EmptyCoroutineContext,
     block: suspend CoroutineScopeSpan.() -> T
 ): T {
-    return withinSpan(operationName, ensureParentSpan(parent, context, coroutineContext), context != Dispatchers.Unconfined) {
+    return withinSpan(
+        operationName,
+        ensureParentSpan(parent, context, coroutineContext),
+        context != Dispatchers.Unconfined
+    ) {
         block(CoroutineScopeSpan(this@withCoroutineSpan, this))
     }
 }
