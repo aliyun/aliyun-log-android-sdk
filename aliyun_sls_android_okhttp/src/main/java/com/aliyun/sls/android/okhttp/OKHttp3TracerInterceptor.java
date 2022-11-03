@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import android.text.TextUtils;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.Span;
+import com.aliyun.sls.android.ot.Span.StatusCode;
 import com.aliyun.sls.android.ot.SpanBuilder;
 import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.ot.context.Scope;
@@ -31,7 +32,6 @@ public class OKHttp3TracerInterceptor implements Interceptor {
             return chain.proceed(request);
         }
 
-        //Span parent = OKHttp3Tracer.getSpanByRequest(request);
         Span parent = (Span) request.tag(Span.class);
         SpanBuilder builder = Tracer.spanBuilder("HTTP " + request.method());
         if (null != parent) {
@@ -59,9 +59,12 @@ public class OKHttp3TracerInterceptor implements Interceptor {
             injectCustomHeaders(request, requestBuilder);
 
             response = chain.proceed(requestBuilder.build());
+        } catch (Throwable e) {
+            span.setStatus(StatusCode.ERROR);
+            span.recordException(e);
+            throw e;
         } finally {
             span.end();
-            //OKHttp3Tracer.removeSpanByRequest(request);
         }
 
         return response;
