@@ -16,6 +16,7 @@ public class LogProducerConfig {
     private String endpoint;
     private String project;
     private String logstore;
+    private boolean enablePersistent = false;
 
     public LogProducerConfig() throws LogProducerException {
         this(Utils.getContext());
@@ -237,11 +238,21 @@ public class LogProducerConfig {
     }
 
     public void setSendThreadCount(int num) {
+        // force set 1 send thread
+        if (enablePersistent && 1 != num) {
+            num = 1;
+        }
         log_producer_config_set_send_thread_count(config, num);
     }
 
     public void setPersistent(int num) {
+        this.enablePersistent = 1 == num;
         log_producer_config_set_persistent(config, num);
+
+        // force set 1 send thread
+        if (enablePersistent) {
+            setSendThreadCount(1);
+        }
     }
 
     public void setPersistentFilePath(String path) {
