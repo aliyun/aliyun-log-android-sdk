@@ -520,6 +520,8 @@ public class CrashReporterFeature extends SdkFeature {
             setTraceId(span.getTraceId());
             if (!TextUtils.isEmpty(span.getParentSpanId())) {
                 setSpanId(span.getParentSpanId());
+            } else {
+                setSpanId(span.getSpanId());
             }
         }
     }
