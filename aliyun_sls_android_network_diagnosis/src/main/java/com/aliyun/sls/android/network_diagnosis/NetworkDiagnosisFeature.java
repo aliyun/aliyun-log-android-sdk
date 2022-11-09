@@ -53,6 +53,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     private static final TaskIdGenerator TASK_ID_GENERATOR = new TaskIdGenerator();
     private NetworkDiagnosisSender networkDiagnosisSender;
+    private boolean enableMultiplePortsDetect = false;
 
     @Override
     public String name() {
@@ -163,6 +164,11 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
 
     @Override
+    public void setMultiplePortsDetect(boolean enable) {
+        this.enableMultiplePortsDetect = enable;
+    }
+
+    @Override
     public void setCallback(Sender.Callback callback) {
         super.setCallback(callback);
         if (null != networkDiagnosisSender) {
@@ -179,19 +185,19 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
 
     public void http(String url, Callback callback) {
-        Diagnosis.startHttpPing(
-            new HttpConfig(
-                TASK_ID_GENERATOR.generate(),
-                url,
-                (context, result) -> {
-                    if (null != callback) {
-                        callback.onComplete(Type.HTTP, result);
-                    }
-                    return 0;
-                },
-                this
-            )
+        final HttpConfig config = new HttpConfig(
+            TASK_ID_GENERATOR.generate(),
+            url,
+            (context, result) -> {
+                if (null != callback) {
+                    callback.onComplete(Type.HTTP, result);
+                }
+                return 0;
+            },
+            this
         );
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        Diagnosis.startHttpPing(config);
     }
     // endregion
 
@@ -218,22 +224,23 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     @Override
     public void ping(String domain, int size, int maxTimes, int timeout, Callback callback) {
-        Diagnosis.startPing(
-            new PingConfig(
-                TASK_ID_GENERATOR.generate(),
-                domain,
-                size,
-                maxTimes,
-                timeout,
-                (context, result) -> {
-                    if (null != callback) {
-                        callback.onComplete(Type.PING, result);
-                    }
-                    return 0;
-                },
-                this
-            )
+        final PingConfig config = new PingConfig(
+            TASK_ID_GENERATOR.generate(),
+            domain,
+            size,
+            maxTimes,
+            timeout,
+            (context, result) -> {
+                if (null != callback) {
+                    callback.onComplete(Type.PING, result);
+                }
+                return 0;
+            },
+            this
         );
+
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        Diagnosis.startPing(config);
     }
     // endregion
 
@@ -255,22 +262,22 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     @Override
     public void tcpPing(String domain, int port, int maxTimes, int timeout, Callback callback) {
-        Diagnosis.startTcpPing(
-            new TcpPingConfig(
-                TASK_ID_GENERATOR.generate(),
-                domain,
-                port,
-                maxTimes,
-                timeout,
-                (context, result) -> {
-                    if (null != callback) {
-                        callback.onComplete(Type.TCPPING, result);
-                    }
-                    return 0;
-                },
-                this
-            )
+        final TcpPingConfig config = new TcpPingConfig(
+            TASK_ID_GENERATOR.generate(),
+            domain,
+            port,
+            maxTimes,
+            timeout,
+            (context, result) -> {
+                if (null != callback) {
+                    callback.onComplete(Type.TCPPING, result);
+                }
+                return 0;
+            },
+            this
         );
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        Diagnosis.startTcpPing(config);
     }
     // endregion
 
@@ -302,23 +309,23 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     @Override
     public void mtr(String domain, int maxTTL, int maxPaths, int maxTimes, int timeout, Callback callback) {
-        Diagnosis.startMtr(
-            new MtrConfig(
-                TASK_ID_GENERATOR.generate(),
-                domain,
-                maxTTL,
-                maxPaths,
-                maxTimes,
-                timeout,
-                (context, result) -> {
-                    if (null != callback) {
-                        callback.onComplete(Type.MTR, result);
-                    }
-                    return 0;
-                },
-                this
-            )
+        final MtrConfig config = new MtrConfig(
+            TASK_ID_GENERATOR.generate(),
+            domain,
+            maxTTL,
+            maxPaths,
+            maxTimes,
+            timeout,
+            (context, result) -> {
+                if (null != callback) {
+                    callback.onComplete(Type.MTR, result);
+                }
+                return 0;
+            },
+            this
         );
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        Diagnosis.startMtr(config);
     }
     // endregion
 
@@ -345,22 +352,22 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     @Override
     public void dns(String nameServer, String domain, String type, int timeout, Callback callback) {
-        Diagnosis.startDns(
-            new DnsConfig(
-                TASK_ID_GENERATOR.generate(),
-                nameServer,
-                domain,
-                type,
-                timeout,
-                (context, result) -> {
-                    if (null != callback) {
-                        callback.onComplete(Type.DNS, result);
-                    }
-                    return 0;
-                },
-                this
-            )
+        final DnsConfig config = new DnsConfig(
+            TASK_ID_GENERATOR.generate(),
+            nameServer,
+            domain,
+            type,
+            timeout,
+            (context, result) -> {
+                if (null != callback) {
+                    callback.onComplete(Type.DNS, result);
+                }
+                return 0;
+            },
+            this
         );
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        Diagnosis.startDns(config);
     }
     // endregion
 

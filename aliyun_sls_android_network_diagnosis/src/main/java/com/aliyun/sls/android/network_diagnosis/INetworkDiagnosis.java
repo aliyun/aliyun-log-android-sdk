@@ -22,6 +22,12 @@ public interface INetworkDiagnosis {
     void setPolicyDomain(String domain);
 
     void disableExNetworkInfo();
+
+    /**
+     * Enable the multiple ports detect. Default is false, use the default port.
+     * @param enable true/false
+     */
+    void setMultiplePortsDetect(boolean enable);
     // end
 
     // region http

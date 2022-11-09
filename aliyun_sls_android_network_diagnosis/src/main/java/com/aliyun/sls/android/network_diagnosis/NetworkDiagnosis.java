@@ -32,6 +32,12 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
         }
     }
 
+    public void setMultiplePortsDetect(boolean enable) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.setMultiplePortsDetect(enable);
+        }
+    }
+
     @Override
     public void setPolicyDomain(String domain) {
         if (checkNetworkDiagnosis()) {
