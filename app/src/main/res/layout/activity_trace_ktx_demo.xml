@@ -57,5 +57,25 @@
                 android:text="Demo1: 启动引擎"
                 android:textAllCaps="false" />
         </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/trace_ktx_demo_start_air_conditioner"
+                android:layout_span="2"
+                android:padding="8dp"
+                android:text="Demo2: 远程打开空调"
+                android:textAllCaps="false" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/trace_ktx_demo_crash"
+                android:layout_span="2"
+                android:padding="8dp"
+                android:text="Demo3: 移动运维监控"
+                android:textAllCaps="false" />
+        </TableRow>
     </TableLayout>
 </LinearLayout>

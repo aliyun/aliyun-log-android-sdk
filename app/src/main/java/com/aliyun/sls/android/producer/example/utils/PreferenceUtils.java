@@ -90,6 +90,15 @@ public class PreferenceUtils {
         return sp.getString("settings_end_point", "");
     }
 
+    public static String getNetworkSecKey(Context context) {
+        if (BuildConfig.CONFIG_ENABLE) {
+            return BuildConfig.NETWORK_SECKEY;
+        }
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString("network_seckey", "");
+    }
+
     public static void overrideConfig(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         sp.edit()
@@ -100,6 +109,7 @@ public class PreferenceUtils {
                 .putString("settings_end_point", BuildConfig.END_POINT)
                 .putString("settings_project", BuildConfig.LOG_PROJECT)
                 .putString("settings_store", BuildConfig.LOG_STORE)
+                .putString("network_seckey", BuildConfig.NETWORK_SECKEY)
         .apply();
 
 

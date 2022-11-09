@@ -23,6 +23,7 @@ android {
         buildConfigField "String", "ACCESS_KEYID", project.hasProperty("ACCESS_KEYID") ? "\"${ACCESS_KEYID}\"" : "\"\""
         buildConfigField "String", "ACCESS_KEY_SECRET", project.hasProperty("ACCESS_KEY_SECRET") ? "\"${ACCESS_KEY_SECRET}\"" : "\"\""
         buildConfigField "String", "ACCESS_KEY_TOKEN", project.hasProperty("ACCESS_KEY_TOKEN") ? "\"${ACCESS_KEY_TOKEN}\"" : "\"\""
+        buildConfigField "String", "NETWORK_SECKEY", project.hasProperty("NETWORK_SECKEY") ? "\"${NETWORK_SECKEY}\"" : "\"\""
         ndk {
             // Specifies the ABI configurations of your native
             // libraries Gradle should build and package with your app.
@@ -61,7 +62,9 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
-    implementation("com.squareup.okhttp3:okhttp:3.0.0")
+    implementation("com.squareup.okhttp3:okhttp:3.11.0")
+    implementation 'com.squareup.retrofit2:retrofit:2.1.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
 
     implementation project(':aliyun_sls_android_producer')
     implementation project(':aliyun_sls_android_core')
@@ -73,15 +76,15 @@ dependencies {
     implementation project(':aliyun_sls_android_okhttp')
     implementation project(':aliyun_sls_android_ot_ktx')
 
-//    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.7'
+//    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.9'
 //    implementation 'com.aliyun.openservices:sls-android-core:1.0.5'
 //    implementation 'com.aliyun.openservices:sls-android-ot:1.0.6'
 //    implementation 'com.aliyun.openservices:sls-android-ot-ktx:1.0.1'
-//    implementation 'com.aliyun.openservices:sls-android-network-diagnosis:2.0.3'
+//    implementation 'com.aliyun.openservices:sls-android-network-diagnosis:2.0.4'
 //    implementation 'com.aliyun.openservices:sls-android-crashreporter:2.0.3'
 //    implementation 'com.aliyun.openservices:sls-android-blockdetection:1.0.2'
 //    implementation 'com.aliyun.openservices:sls-android-trace:1.0.3'
-//    implementation 'com.aliyun.openservices:sls-android-okhttp:1.0.0'
+//    implementation 'com.aliyun.openservices:sls-android-okhttp:1.0.1'
 
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'

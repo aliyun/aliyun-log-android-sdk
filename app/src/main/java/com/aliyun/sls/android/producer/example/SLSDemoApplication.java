@@ -10,6 +10,7 @@ import androidx.multidex.MultiDexApplication;
 import com.aliyun.sls.android.core.SLSAndroid;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Credentials;
+import com.aliyun.sls.android.core.configuration.Credentials.NetworkDiagnosisCredentials;
 import com.aliyun.sls.android.core.configuration.Credentials.TracerCredentials;
 import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.core.sender.Sender.Callback;
@@ -52,6 +53,11 @@ public class SLSDemoApplication extends MultiDexApplication {
         tracerCredentials.endpoint = "https://cn-beijing.log.aliyuncs.com";
         tracerCredentials.project = "qs-demos";
 
+        NetworkDiagnosisCredentials networkDiagnosisCredentials = credentials.getNetworkDiagnosisCredentials();
+        networkDiagnosisCredentials.secretKey = PreferenceUtils.getNetworkSecKey(this);
+        networkDiagnosisCredentials.endpoint = "https://cn-hangzhou.log.aliyuncs.com";
+        networkDiagnosisCredentials.project = "zaiyun-test5";
+
         SLSAndroid.setLogLevel(Log.VERBOSE);
         SLSAndroid.initialize(
             this,
@@ -74,6 +80,7 @@ public class SLSDemoApplication extends MultiDexApplication {
 
                 configuration.enableCrashReporter = true;
                 configuration.enableTracer = true;
+                configuration.enableNetworkDiagnosis = true;
 
                 UserInfo info = new UserInfo();
                 info.uid = "123321";
@@ -111,6 +118,7 @@ public class SLSDemoApplication extends MultiDexApplication {
             @Override
             public boolean shouldInstrument(Request request) {
                 final String host = request.url().url().getHost();
+                // 只有request符合预期时才植入trace信息
                 return !host.contains("log.aliyuncs.com");
             }
         });

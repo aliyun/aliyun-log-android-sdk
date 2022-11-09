@@ -62,8 +62,6 @@ public class ProducerExample extends BaseActivity {
             // 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败
             // 默认为64 * 1024 * 1024
             config.setMaxBufferLimit(64 * 1024 * 1024);
-            // 发送线程数，默认为1
-            config.setSendThreadCount(1);
 
             //网络连接超时时间，整数，单位秒，默认为10
             config.setConnectTimeoutSec(10);

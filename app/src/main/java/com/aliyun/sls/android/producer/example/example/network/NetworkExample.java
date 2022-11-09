@@ -76,6 +76,8 @@ public class NetworkExample extends BaseActivity {
         //
         //adapter.init(config);
 
+        NetworkDiagnosis.getInstance().setMultiplePortsDetect(true);
+
         findViewById(R.id.example_send_http_text).setOnClickListener(v -> {
             printStatus("start http...");
             NetworkDiagnosis.getInstance().http("https://www.aliyun.com", (type, ret) -> {
