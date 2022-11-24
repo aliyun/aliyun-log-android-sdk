@@ -120,17 +120,17 @@ publishing {
         }
     }
 
-    repositories {
-        maven {
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots"
-            url = projectVersionName.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            credentials {
-                username sonatypeUser
-                password sonatypePswd
-            }
-        }
-    }
+    // repositories {
+    //     maven {
+    //         def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+    //         def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots"
+    //         url = projectVersionName.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+    //         credentials {
+    //             username sonatypeUser
+    //             password sonatypePswd
+    //         }
+    //     }
+    // }
 }
 
 signing {

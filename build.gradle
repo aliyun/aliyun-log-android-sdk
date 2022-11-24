@@ -18,6 +18,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+}
+
 allprojects {
     repositories {
         google()
@@ -31,4 +35,16 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/") //注意地址
+            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
+            packageGroup = "com.aliyun.openservices" //groupId，必填
+            username = sonatypeuser //配置在properties的sonatype user
+            password = sonatypepswd //配置在properties的sonatype pswd
+        }
+    }
 }
