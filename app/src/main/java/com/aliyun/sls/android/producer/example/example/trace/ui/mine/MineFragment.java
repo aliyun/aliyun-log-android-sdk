@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.databinding.TraceMineItemLayoutBinding;
+import com.aliyun.sls.android.producer.example.example.trace.auto.Auto;
 import com.aliyun.sls.android.producer.example.example.trace.ui.FragmentActivity;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseListFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.list.BaseRecyclerAdapter;
@@ -74,6 +75,14 @@ public class MineFragment extends BaseListFragment<TraceMineItemLayoutBinding, M
 
                     if (model.type == 2) {
                         binding.getRoot().setOnClickListener(v -> FragmentActivity.startOrderListPage(getActivity()));
+                    } else if (model.type == 3) {
+                        binding.getRoot().setOnClickListener(v -> Auto.startCreateOrderNormal1());
+                    } else if (model.type == 4) {
+                        binding.getRoot().setOnClickListener(v -> Auto.startCreateOrderNormal2());
+                    } else if (model.type == 5) {
+                        binding.getRoot().setOnClickListener(v -> Auto.startCreateOrderAnomaly1());
+                    } else if (model.type == 6) {
+                        binding.getRoot().setOnClickListener(v -> Auto.startAutoCreateOrder());
                     }
                 }
             }

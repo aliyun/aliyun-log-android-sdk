@@ -9,9 +9,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,10 +23,18 @@ import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
 import com.aliyun.sls.android.producer.HttpConfigProxy;
 //import io.opentelemetry.context.Context;
 //import io.opentelemetry.context.propagation.TextMapSetter;
+import com.aliyun.sls.android.producer.example.example.trace.http.cookie.PersistentCookieStore;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.OkHttpClient.Builder;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 
 /**
  * @author gordon
@@ -50,6 +60,10 @@ public class HttpTool {
 
     public static void get(String host, String path, Map<String, String> headers, HttpCallback callback) {
         http(host, path, "GET", mapToStrings(headers), null, callback);
+    }
+
+    public static void delete(String host, String path, HttpCallback callback) {
+        http(host, path, "DELETE", mapToStrings(null), null, callback);
     }
 
     public static void post(String url, String body, HttpCallback callback) {
@@ -181,12 +195,40 @@ public class HttpTool {
         Log.v(TAG, "http request =>> host: " + host + ", path: " + path + ", method: " + method + ", headers: " + arrayToString(headers) + ", body: " + body);
         final String urlString = host + path;
 
-        OkHttpClient client = new OkHttpClient.Builder().build();
+        OkHttpClient client = new Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .cookieJar(new CookieJar() {
+
+            @Override
+            public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+                //SLSCookieManager.setCookie(cookies);
+                if (null == cookies) {
+                    return;
+                }
+
+                for (Cookie cookie : cookies) {
+                    PersistentCookieStore.getInstance().add(url, cookie);
+                }
+
+                //SLSCookieManager.setCookie(cookies.get(0).value());
+            }
+
+            @Override
+            public List<Cookie> loadForRequest(HttpUrl url) {
+                return PersistentCookieStore.getInstance().get(url);
+                //List<Cookie> cookieList = new ArrayList<>();
+                ////cookieList.add(new Cookie.Builder().hostOnlyDomain(url.host()).name("md.sid").value("s%3ABOofXUkt8mj3zJ2ZC1JHKR6FwmFmAiD0.wTBsquQZ5oF7tYubhg1imc2hXVyt9gToRXdaD50rXIU; logged_in=BOofXUkt8mj3zJ2ZC1JHKR6FwmFmAiD0").build());
+                //cookieList.add(new Cookie.Builder().hostOnlyDomain(url.host()).name("md.sid").value(SLSCookieManager.getCookie()).build());
+                //return cookieList;
+            }
+        }).build();
 
         Request request = new Request.Builder()
             .url(urlString)
-            .header("User-agent", HttpConfigProxy.getUserAgent())
-            //.method(method, RequestBody.create(MediaType.parse("json"), body))
+            .method(method, TextUtils.equals("GET", method) ? null : RequestBody.create(MediaType.parse("application/json"), TextUtils.isEmpty(body) ? "" : body))
+            .headers(Headers.of(headers))
             .build();
 
         try {
@@ -243,10 +285,11 @@ public class HttpTool {
     }
 
     private static String[] mapToStrings(Map<String, String> maps) {
-        if (null == maps || maps.size() == 0) {
-            return null;
+        if (null == maps) {
+            maps = new HashMap<>();
         }
 
+        maps.put("User-agent", HttpConfigProxy.getUserAgent());
         maps.put("Content-Type", "application/json; charset=UTF-8");
 
         String[] headers = new String[maps.size() * 2];

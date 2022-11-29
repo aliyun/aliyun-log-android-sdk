@@ -36,6 +36,26 @@ public class MineViewModel extends BaseListViewModel<MineModel> {
         model.title = "我的订单";
         models.add(model);
 
+        model = new MineModel();
+        model.type = 3;
+        model.title = "自动化-正常1";
+        models.add(model);
+
+        model = new MineModel();
+        model.type = 4;
+        model.title = "自动化-正常2";
+        models.add(model);
+
+        model = new MineModel();
+        model.type = 5;
+        model.title = "自动化-异常1";
+        models.add(model);
+
+        model = new MineModel();
+        model.type = 6;
+        model.title = "自动化执行";
+        models.add(model);
+
         items.setValue(models);
         status.setValue(Status.success());
     }
