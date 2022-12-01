@@ -40,10 +40,10 @@ public class Auto {
     public static void startAutoCreateOrder() {
         for (int i = 0; i < 1000; i++) {
             int random = r.nextInt(2000);
-            if (random % 200 == 0) {
+            if (random % 100 == 0) {
                 SLSLog.e("startAutoCreateOrder", "anomaly1");
                 startCreateOrderAnomaly1();
-            } else if (random % 50 == 0) {
+            } else if (random % 30 == 0) {
                 SLSLog.w("startAutoCreateOrder", "normal2");
                 startCreateOrderNormal2();
             } else {
@@ -104,61 +104,70 @@ public class Auto {
     }
 
     private static void createOrderNormal() {
-        atoCommon1();
-        // 4. 加购
-        addToCart();
+        Tracer.withinSpan("正常下单1", () -> {
+            atoCommon1();
+            // 4. 加购
+            addToCart();
 
-        sleep();
+            sleep();
 
-        // 5. 进入到购物车
-        pageStart("购物车");
+            // 5. 进入到购物车
+            pageStart("购物车");
 
-        click("提交订单");
-        pageStart("下单");
+            click("提交订单");
+            pageStart("下单");
 
-        // 6. 提交订单
-        createOrder();
+            // 6. 提交订单
+            createOrder();
+        });
+
     }
 
     private static void createOrderNormal2() {
-        atoCommon1();
+        Tracer.withinSpan("正常下单2", () -> {
+            atoCommon1();
 
-        addToCart();
-        sleep();
-        addToCart();
-        sleep();
-        addToCart();
-        sleep();
+            addToCart();
+            sleep();
+            addToCart();
+            sleep();
+            addToCart();
+            sleep();
 
-        pageStart("购物车");
+            pageStart("购物车");
 
-        click("提交订单");
-        pageStart("下单");
+            click("提交订单");
+            pageStart("下单");
 
-        click("切换地址");
-        click("选择地址");
-        pageStart("购物车");
+            click("切换地址");
+            click("选择地址");
+            pageStart("购物车");
 
-        click("提交订单");
-        pageStart("下单");
-        createOrder();
+            click("提交订单");
+            pageStart("下单");
+            createOrder();
+        });
+
     }
 
     private static void createOrderAnomaly() {
-        atoCommon1();
+        Tracer.withinSpan("异常下单1", () -> {
+            atoCommon1();
 
-        addToCart();
+            addToCart();
 
-        pageStart("购物车");
+            pageStart("购物车");
 
-        click("提交订单");
-        pageStart("下单");
+            click("提交订单");
+            pageStart("下单");
 
-        click("切换地址");
-        click("选择地址");
-        pageStart("下单页");
+            click("切换地址");
+            click("选择地址");
+            pageStart("下单页");
 
-        createOrder();
+            createOrder();
+        });
+
     }
 
     private static void pageStart(String pageName) {

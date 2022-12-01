@@ -30,11 +30,13 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.OkHttpClient.Builder;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * @author gordon
@@ -196,6 +198,13 @@ public class HttpTool {
         final String urlString = host + path;
 
         OkHttpClient client = new Builder()
+            .addInterceptor(new Interceptor() {
+                @Override
+                public okhttp3.Response intercept(Chain chain) throws IOException {
+                    Request request = chain.request();
+                    return chain.proceed(request);
+                }
+            })
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
@@ -232,7 +241,8 @@ public class HttpTool {
             .build();
 
         try {
-            OKHttp3Tracer.newCallFactory(client).newCall(request).enqueue(new Callback() {
+            //OKHttp3Tracer.newCallFactory(client).newCall(request).enqueue(new Callback() {
+            client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
 
