@@ -1,20 +1,31 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    ext {
+        agp_version = "4.0.2"
+        booster_version = "4.13.0"
+        kotlin_version = "1.5.30"
+    }
     repositories {
         google()
 //        jcenter()
+        mavenLocal()
         mavenCentral()
-        maven {
-            url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-        }
+        gradlePluginPortal()
+        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.2'
+        classpath "com.android.tools.build:gradle:${agp_version}"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+
+        /* 👇👇👇👇 引用 Booster Gradle 插件 👇👇👇👇 */
+        classpath "com.didiglobal.booster:booster-gradle-plugin:$booster_version"
+        classpath "com.aliyun.openservices:sls-android-gradle-plugin:0.0.1-SNAPSHOT"
     }
 }
 
@@ -22,10 +33,12 @@ allprojects {
     repositories {
         google()
 //        jcenter()
+        mavenLocal()
         mavenCentral()
-        maven {
-            url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-        }
+        gradlePluginPortal()
+        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
 }
 

@@ -37,16 +37,23 @@ println "publish -->> moduleVersion: " + moduleVersion
 
 task androidSourcesJar(type: Jar) {
     archiveClassifier.set("sources")
-    from android.sourceSets.main.java.source
-    exclude "**/R.class"
-    exclude "**/BuildConfig.class"
+
+    if (project.plugins.hasPlugin('java')) {
+        from "sourceSets.main.java.source", "sourceSets.main.kotlin.source"
+    } else {
+        from android.sourceSets.main.java.source
+        exclude "**/R.class"
+        exclude "**/BuildConfig.class"
+    }
 }
 
 task makeJar(type: Copy) {
-    delete('build/libs')
-    from('build/outputs/aar')
-    into('build/libs')
-    include('aliyun_sls_android_producer-release.aar')
+    if (!project.plugins.hasPlugin('java')) {
+        delete('build/libs')
+        from('build/outputs/aar')
+        into('build/libs')
+        include('aliyun_sls_android_producer-release.aar')
+    }
 }
 
 makeJar.dependsOn(build)
@@ -57,7 +64,12 @@ publishing {
             groupId projectGroupId
             artifactId projectArtifactId
             version projectVersionName
-            artifact("$buildDir/outputs/aar/${projectArtifactId}-release.aar")
+            if (project.plugins.hasPlugin('java')) {
+                artifact("$buildDir/libs/${projectArtifactId}.jar")
+            } else {
+                artifact("$buildDir/outputs/aar/${projectArtifactId}-release.aar")
+            }
+
             artifact androidSourcesJar
 
             pom {

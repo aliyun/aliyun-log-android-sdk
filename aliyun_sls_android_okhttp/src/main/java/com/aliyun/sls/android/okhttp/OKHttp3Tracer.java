@@ -11,6 +11,9 @@ import okhttp3.Request;
  * @date 2022/9/8
  */
 public class OKHttp3Tracer {
+    public OKHttp3Tracer(OkHttpClient.Builder builder) {
+        OkHttp3Utils.registerTracerInterceptor(builder);
+    }
 
     private static final OKHttp3TracerInterceptor OK_HTTP_3_TRACER_INTERCEPTOR = new OKHttp3TracerInterceptor();
 
