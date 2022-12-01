@@ -15,7 +15,7 @@ public class OKHttp3Tracer {
         OkHttp3Utils.registerTracerInterceptor(builder);
     }
 
-    private static final OKHttp3TracerInterceptor OK_HTTP_3_TRACER_INTERCEPTOR = new OKHttp3TracerInterceptor();
+    static final OKHttp3TracerInterceptor OK_HTTP_3_TRACER_INTERCEPTOR = new OKHttp3TracerInterceptor();
 
     public static Call.Factory newCallFactory(OkHttpClient client) {
         OkHttpClient httpClient = client.newBuilder().addInterceptor(OK_HTTP_3_TRACER_INTERCEPTOR).build();

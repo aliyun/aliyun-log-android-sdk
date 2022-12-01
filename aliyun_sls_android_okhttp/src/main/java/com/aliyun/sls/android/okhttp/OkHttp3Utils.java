@@ -6,6 +6,8 @@ import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
+import static com.aliyun.sls.android.okhttp.OKHttp3Tracer.OK_HTTP_3_TRACER_INTERCEPTOR;
+
 /**
  * @author gordon
  * @date 2022/12/1
@@ -26,7 +28,7 @@ public final class OkHttp3Utils {
     }
 
     public static void registerTracerInterceptor(OkHttpClient.Builder builder) {
-        builder.addInterceptor(new OKHttp3TracerInterceptor());
+        builder.addInterceptor(OK_HTTP_3_TRACER_INTERCEPTOR);
     }
 
     public Call newCall(Request request) {
