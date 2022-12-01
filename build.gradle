@@ -56,8 +56,8 @@ nexusPublishing {
             nexusUrl = uri("https://s01.oss.sonatype.org/service/local/") //注意地址
             snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
             packageGroup = "com.aliyun.openservices" //groupId，必填
-            username = "" //配置在properties的sonatype user
-            password = "" //配置在properties的sonatype pswd
+//            username = "" //配置在properties的sonatype user
+//            password = "" //配置在properties的sonatype pswd
         }
     }
 }
