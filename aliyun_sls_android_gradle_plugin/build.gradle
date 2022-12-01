@@ -43,7 +43,7 @@ dependencies {
 }
 
 ext {
-    moduleVersion = "0.0.1-SNAPSHOT"
+    moduleVersion = "0.0.1"
     moduleName = 'sls-android-gradle-plugin'
 }
 
