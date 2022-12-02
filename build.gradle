@@ -25,7 +25,7 @@ buildscript {
 
         /* 👇👇👇👇 引用 Booster Gradle 插件 👇👇👇👇 */
         classpath "com.didiglobal.booster:booster-gradle-plugin:$booster_version"
-        classpath "com.aliyun.openservices:sls-android-gradle-plugin:0.0.1-SNAPSHOT"
+//        classpath "com.aliyun.openservices:sls-android-gradle-plugin:0.0.1"
     }
 }
 
@@ -33,7 +33,14 @@ plugins {
     id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 }
 
-allprojects {
+allprojects { project ->
+//    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+
+    def moduleName = findProperty('moduleName').with { it != DEFAULT_VERSION ? it : null } ?: DEFAULT_VERSION
+    group = 'com.aliyun.openservices'
+    version = findProperty('version').with { it != DEFAULT_VERSION ? it : null } ?: DEFAULT_VERSION
+
     repositories {
         google()
 //        jcenter()
@@ -44,11 +51,167 @@ allprojects {
         maven { url 'https://oss.sonatype.org/content/repositories/public/' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
+
+    task packageSources(type: Jar) {
+//        classifier = 'sources'
+//        from sourceSets.main.allSource
+        archiveClassifier.set("sources")
+        if (project.plugins.hasPlugin('java')) {
+            from "sourceSets.main.java.source", "sourceSets.main.kotlin.source"
+        } else if (project.plugins.hasPlugin('com.android.library')) {
+            from android.sourceSets.main.java.source
+            exclude "**/R.class"
+            exclude "**/BuildConfig.class"
+        }
+    }
+
+    artifacts {
+        if (project.plugins.hasPlugin('java')) {
+            archives packageJavadoc, packageSources
+        } else if (project.plugins.hasPlugin('com.android.library')) {
+            archives packageSources
+        }
+    }
+
+//    test {
+//        testLogging {
+//            events "passed", "skipped", "failed", "standardOut", "standardError"
+//        }
+//    }
+
+    def configurePublication = { MavenPublication publication ->
+        println("============= start publication module: ${moduleName}, version: ${version} ============= ")
+        groupId = project.group
+        artifactId = moduleName
+        version = project.version
+        if (project != project.getRootProject()) {
+            project.archivesBaseName = moduleName
+        }
+
+
+        if (project.plugins.hasPlugin('java')) {
+            javadoc {
+                failOnError = false
+            }
+
+            task packageJavadoc(type: Jar) {
+                classifier = 'javadoc'
+                from javadoc
+            }
+
+            if ("mavenJava" == publication.name) {
+                from components.java
+            }
+        }
+
+//        if ("mavenJava" == publication.name) {
+//            from components.java
+//        }
+
+        artifact project.packageSources {
+            classifier "sources"
+        }
+
+        if (project.plugins.hasPlugin('java')) {
+            artifact project.packageJavadoc {
+                classifier "javadoc"
+            }
+        }
+
+        pom {
+            name = moduleName
+            url = 'https://github.com/aliyun/aliyun-log-android-sdk'
+            description = 'Aliyun Open Services SDK for Android\n' +
+                    '      Copyright (C) Alibaba Cloud Computing\n' +
+                    '      All rights reserved.\n' +
+                    '      版权所有 （C）阿里云计算有限公司\n' +
+                    '      http://www.aliyun.com' //project description
+
+            scm {
+                connection = 'https://github.com/aliyun/aliyun-log-android-sdk'
+                developerConnection = 'https://github.com/aliyun/aliyun-log-android-sdk'
+                url = 'https://github.com/aliyun/aliyun-log-android-sdk'
+            }
+
+            licenses {
+                license {
+                    name = 'Apache License'
+                    url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                }
+            }
+
+            developers {
+                developer {
+                    id = "aliyunplroducts"
+                    name = "Aliyun Log development team"
+                    email = "aliyunsdk@aliyun.com"
+                }
+            }
+
+            withXml {
+                if (project.plugins.hasPlugin('java')) {
+                    return
+                }
+
+                def dependenciesNode = asNode().appendNode('dependencies')
+                project.configurations.all { configuration ->
+                    def name = configuration.name
+                    if (name != "implementation" && name != "compile" && name != "api") {
+                        return
+                    }
+                    println("============= project name: ${project.name} ============= ")
+                    println("============= configuration: ${configuration} ============= ")
+                    configuration.dependencies.each {
+                        println(it)
+                        if (it.name == "unspecified" || it.version == 'unspecified') {
+                            // 忽略无法识别的
+                            return
+                        }
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                        if (name == "api" || name == "compile") {
+                            dependencyNode.appendNode("scope", "compile")
+                        } else { // implementation
+                            dependencyNode.appendNode("scope", "runtime")
+                        }
+                        println("============= dependenciesNode: ${it.group}:${it.name}:${it.version} ============= ")
+                    }
+                }
+            }
+        }
+
+
+        if (!project.hasProperty("signing.skip")) {
+            apply plugin: 'signing'
+
+            project.signing {
+                sign publication
+            }
+        }
+    }
+
+    project.afterEvaluate {
+        publishing {
+            publications {
+                if (project.plugins.hasPlugin('java-gradle-plugin')) {
+                    withType(MavenPublication).configureEach(configurePublication)
+                } else {
+                    mavenJava(MavenPublication, configurePublication)
+                }
+            }
+        }
+    }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
+//subprojects { project ->
+//    rootProject.clean.dependsOn project.clean
+//}
+
+//task clean(type: Delete) {
+//    delete rootProject.buildDir
+//}
 
 nexusPublishing {
     repositories {

@@ -1,150 +1,150 @@
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-
-// load properties
-File localPropertiesFile = project.rootProject.file("local.properties");
-if(localPropertiesFile.exists()){
-    properties.load(localPropertiesFile.newDataInputStream())
-}
-File projectPropertiesFile = project.rootProject.file("project.properties");
-if(projectPropertiesFile.exists()){
-    properties.load(projectPropertiesFile.newDataInputStream())
-}
-
-// read properties
-def projectName = properties.getProperty("project.name")
-def projectGroupId = properties.getProperty("project.groupId")
-def projectSiteUrl = properties.getProperty("project.siteUrl")
-def projectGitUrl = properties.getProperty("project.gitUrl")
-
-def developerId = properties.getProperty("sonatype.developer.id")
-def developerName = properties.getProperty("sonatype.developer.name")
-def developerEmail = properties.getProperty("sonatype.developer.email")
-
-def sonatypeUser = properties.getProperty("sonatype.user")
-def sonatypePswd = properties.getProperty("sonatype.pswd")
-
-def projectArtifactId = moduleName
-def projectVersionName = moduleVersion
-project.archivesBaseName = projectArtifactId
-
-println "publish -->> moduleName: " + moduleName
-println "publish -->> moduleVersion: " + moduleVersion
-
-task androidSourcesJar(type: Jar) {
-    archiveClassifier.set("sources")
-
-    if (project.plugins.hasPlugin('java')) {
-        from "sourceSets.main.java.source", "sourceSets.main.kotlin.source"
-    } else {
-        from android.sourceSets.main.java.source
-        exclude "**/R.class"
-        exclude "**/BuildConfig.class"
-    }
-}
-
-task makeJar(type: Copy) {
-    if (!project.plugins.hasPlugin('java')) {
-        delete('build/libs')
-        from('build/outputs/aar')
-        into('build/libs')
-        include('aliyun_sls_android_producer-release.aar')
-    }
-}
-
-makeJar.dependsOn(build)
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId projectGroupId
-            artifactId projectArtifactId
-            version projectVersionName
-            if (project.plugins.hasPlugin('java')) {
-                artifact("$buildDir/libs/${projectArtifactId}.jar")
-            } else {
-                artifact("$buildDir/outputs/aar/${projectArtifactId}-release.aar")
-            }
-
-            artifact androidSourcesJar
-
-            pom {
-                name = projectName
-                description = 'Aliyun Open Services SDK for Android\n' +
-                        '      Copyright (C) Alibaba Cloud Computing\n' +
-                        '      All rights reserved.\n' +
-                        '      版权所有 （C）阿里云计算有限公司\n' +
-                        '      http://www.aliyun.com' //project description
-                url = projectSiteUrl
-
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id = developerId
-                        name = developerName
-                        email = developerEmail
-                    }
-                }
-
-                scm {
-                    url = projectSiteUrl
-                    connection = projectGitUrl
-                    developerConnection = projectGitUrl
-                }
-
-                withXml {
-                    def dependenciesNode = asNode().appendNode('dependencies')
-                    project.configurations.all { configuration ->
-                        def name = configuration.name
-                        if (name != "implementation" && name != "compile" && name != "api") {
-                            return
-                        }
-                        println(configuration)
-                        configuration.dependencies.each {
-                            println(it)
-                            if (it.name == "unspecified" || it.version == 'unspecified') {
-                                // 忽略无法识别的
-                                return
-                            }
-                            def dependencyNode = dependenciesNode.appendNode('dependency')
-                            dependencyNode.appendNode('groupId', it.group)
-                            dependencyNode.appendNode('artifactId', it.name)
-                            dependencyNode.appendNode('version', it.version)
-                            if (name == "api" || name == "compile") {
-                                dependencyNode.appendNode("scope", "compile")
-                            } else { // implementation
-                                dependencyNode.appendNode("scope", "runtime")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-//    repositories {
-//        maven {
-//            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-//            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots"
-//            url = projectVersionName.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-//            credentials {
-//                username sonatypeUser
-//                password sonatypePswd
+//apply plugin: 'maven-publish'
+//apply plugin: 'signing'
+//
+//Properties properties = new Properties()
+//properties.load(project.rootProject.file('local.properties').newDataInputStream())
+//
+//
+//// load properties
+//File localPropertiesFile = project.rootProject.file("local.properties");
+//if(localPropertiesFile.exists()){
+//    properties.load(localPropertiesFile.newDataInputStream())
+//}
+//File projectPropertiesFile = project.rootProject.file("project.properties");
+//if(projectPropertiesFile.exists()){
+//    properties.load(projectPropertiesFile.newDataInputStream())
+//}
+//
+//// read properties
+//def projectName = properties.getProperty("project.name")
+//def projectGroupId = properties.getProperty("project.groupId")
+//def projectSiteUrl = properties.getProperty("project.siteUrl")
+//def projectGitUrl = properties.getProperty("project.gitUrl")
+//
+//def developerId = properties.getProperty("sonatype.developer.id")
+//def developerName = properties.getProperty("sonatype.developer.name")
+//def developerEmail = properties.getProperty("sonatype.developer.email")
+//
+//def sonatypeUser = properties.getProperty("sonatype.user")
+//def sonatypePswd = properties.getProperty("sonatype.pswd")
+//
+//def projectArtifactId = moduleName
+//def projectVersionName = moduleVersion
+//project.archivesBaseName = projectArtifactId
+//
+//println "publish -->> moduleName: " + moduleName
+//println "publish -->> moduleVersion: " + moduleVersion
+//
+//task androidSourcesJar(type: Jar) {
+//    archiveClassifier.set("sources")
+//
+//    if (project.plugins.hasPlugin('java')) {
+//        from "sourceSets.main.java.source", "sourceSets.main.kotlin.source"
+//    } else {
+//        from android.sourceSets.main.java.source
+//        exclude "**/R.class"
+//        exclude "**/BuildConfig.class"
+//    }
+//}
+//
+//task makeJar(type: Copy) {
+//    if (!project.plugins.hasPlugin('java')) {
+//        delete('build/libs')
+//        from('build/outputs/aar')
+//        into('build/libs')
+//        include('aliyun_sls_android_producer-release.aar')
+//    }
+//}
+//
+//makeJar.dependsOn(build)
+//
+//publishing {
+//    publications {
+//        mavenJava(MavenPublication) {
+//            groupId projectGroupId
+//            artifactId projectArtifactId
+//            version projectVersionName
+//            if (project.plugins.hasPlugin('java')) {
+//                artifact("$buildDir/libs/${projectArtifactId}.jar")
+//            } else {
+//                artifact("$buildDir/outputs/aar/${projectArtifactId}-release.aar")
+//            }
+//
+//            artifact androidSourcesJar
+//
+//            pom {
+//                name = projectName
+//                description = 'Aliyun Open Services SDK for Android\n' +
+//                        '      Copyright (C) Alibaba Cloud Computing\n' +
+//                        '      All rights reserved.\n' +
+//                        '      版权所有 （C）阿里云计算有限公司\n' +
+//                        '      http://www.aliyun.com' //project description
+//                url = projectSiteUrl
+//
+//                licenses {
+//                    license {
+//                        name = 'The Apache License, Version 2.0'
+//                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                    }
+//                }
+//
+//                developers {
+//                    developer {
+//                        id = developerId
+//                        name = developerName
+//                        email = developerEmail
+//                    }
+//                }
+//
+//                scm {
+//                    url = projectSiteUrl
+//                    connection = projectGitUrl
+//                    developerConnection = projectGitUrl
+//                }
+//
+//                withXml {
+//                    def dependenciesNode = asNode().appendNode('dependencies')
+//                    project.configurations.all { configuration ->
+//                        def name = configuration.name
+//                        if (name != "implementation" && name != "compile" && name != "api") {
+//                            return
+//                        }
+//                        println(configuration)
+//                        configuration.dependencies.each {
+//                            println(it)
+//                            if (it.name == "unspecified" || it.version == 'unspecified') {
+//                                // 忽略无法识别的
+//                                return
+//                            }
+//                            def dependencyNode = dependenciesNode.appendNode('dependency')
+//                            dependencyNode.appendNode('groupId', it.group)
+//                            dependencyNode.appendNode('artifactId', it.name)
+//                            dependencyNode.appendNode('version', it.version)
+//                            if (name == "api" || name == "compile") {
+//                                dependencyNode.appendNode("scope", "compile")
+//                            } else { // implementation
+//                                dependencyNode.appendNode("scope", "runtime")
+//                            }
+//                        }
+//                    }
+//                }
 //            }
 //        }
 //    }
-}
-
-signing {
-    sign publishing.publications
-}
+//
+////    repositories {
+////        maven {
+////            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+////            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots"
+////            url = projectVersionName.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+////            credentials {
+////                username sonatypeUser
+////                password sonatypePswd
+////            }
+////        }
+////    }
+//}
+//
+//signing {
+//    sign publishing.publications
+//}

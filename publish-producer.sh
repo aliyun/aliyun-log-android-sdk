@@ -1,4 +1,9 @@
 #!/bin/sh
-./gradlew :aliyun_sls_android_producer:clean
-./gradlew :aliyun_sls_android_producer:assembleRelease
-./gradlew :aliyun_sls_android_producer:publishToSonatype closeAndReleaseStagingRepository
+# 定义版本号
+version=2.6.10
+moduleName=aliyun-log-android-sdk
+
+./gradlew :aliyun_sls_android_producer:clean -Pversion=${version} -PmoduleName=${moduleName}
+./gradlew :aliyun_sls_android_producer:assembleRelease -Pversion=${version} -PmoduleName=${moduleName}
+./gradlew :aliyun_sls_android_producer:publishToSonatype closeAndReleaseStagingRepository -Pversion=${version} -PmoduleName=${moduleName}
+#./gradlew :aliyun_sls_android_producer:publishToMavenLocal -Pversion=${version} -PmoduleName=${moduleName}
