@@ -25,7 +25,7 @@ buildscript {
 
         /* 👇👇👇👇 引用 Booster Gradle 插件 👇👇👇👇 */
         classpath "com.didiglobal.booster:booster-gradle-plugin:$booster_version"
-//        classpath "com.aliyun.openservices:sls-android-gradle-plugin:0.0.1"
+        classpath "com.aliyun.openservices:sls-android-gradle-plugin:0.0.1"
     }
 }
 
