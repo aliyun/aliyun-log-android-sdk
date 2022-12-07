@@ -274,7 +274,8 @@ class TraceDemoKotlinActivity : AppCompatActivity() {
     private suspend fun httpRequest(): String? {
         withinSpan("http request") {
             delay(1000)
-            val response: Response = OKHttp3Tracer.newCallFactory(OkHttpClient.Builder().build()).newCall(
+//            val response: Response = OKHttp3Tracer.newCallFactory(OkHttpClient.Builder().build()).newCall(
+            val response: Response = OkHttpClient.Builder().build().newCall(
                 Request.Builder()
                     .url("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue")
                     .build()
@@ -322,7 +323,7 @@ class TraceDemoKotlinActivity : AppCompatActivity() {
         private const val TAG = "TraceDemoKotlinActivity"
         private val retrofit = Retrofit.Builder()
             .baseUrl("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com")
-            .callFactory(OKHttp3Tracer.newCallFactory(OkHttpClient.Builder().build()))
+//            .callFactory(OKHttp3Tracer.newCallFactory(OkHttpClient.Builder().build()))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

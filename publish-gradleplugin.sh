@@ -1,6 +1,6 @@
 #!/bin/sh
 # 定义版本号
-version=0.0.2
+version=0.0.3
 moduleName=sls-android-gradle-plugin
 
 ./gradlew :aliyun_sls_android_gradle_plugin:clean -Pversion=${version} -PmoduleName=${moduleName}

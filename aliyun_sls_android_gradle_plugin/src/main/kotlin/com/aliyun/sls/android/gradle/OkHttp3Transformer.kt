@@ -16,13 +16,13 @@ import org.objectweb.asm.tree.*
 class OkHttp3Transformer : ClassTransformer {
 
     override fun transform(context: TransformContext, klass: ClassNode): ClassNode {
-        println("[SLS](0.0.2) transform: ${klass.name}, className: ${klass.className}")
+        println("[SLS](3) transform: ${klass.name}, className: ${klass.className}")
 
-        if ("okhttp3/OkHttpClient" === klass.name) {
+        if ("okhttp3/OkHttpClient" == klass.name) {
             return transformNewCall(context, klass)
         }
 
-        if ("okhttp3/OkHttpClient\$Builder" === klass.name) {
+        if ("okhttp3/OkHttpClient\$Builder" == klass.name) {
             return transformBuilder(context, klass)
         }
 
@@ -64,19 +64,46 @@ class OkHttp3Transformer : ClassTransformer {
         // inject the OkHttpClient.Builder() constructor.
         // add interceptor.
         val builder = klass.methods.find {
-            "${it.name}${it.desc}" == ".<init>()V" ||
-                    "${it.name}${it.desc}" == ".<init>(Lokhttp3/OkHttpClient\$Builder;)V"
+            println("[SLS] transformBuilder, method: ${it.name}${it.desc}")
+            it.name == "<init>"
         }
 
         builder?.instructions?.asIterable()?.forEach {
             val opcode = it.opcode
             if ((opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) || (opcode == Opcodes.ATHROW)) {
                 builder.instructions.apply {
+                    println("[SLS] transformBuilder, instructions: ${builder.instructions.size()}")
+
                     val newInsn = InsnList()
                     newInsn.add(LabelNode())
-                    newInsn.add(VarInsnNode(Opcodes.ALOAD, 1))
-                    newInsn.add(MethodInsnNode(Opcodes.INVOKESTATIC, "", "", "", false))
+                    newInsn.add(VarInsnNode(Opcodes.ALOAD, 0))
+                    newInsn.add(
+                        FieldInsnNode(
+                            Opcodes.GETFIELD,
+                            "okhttp3/OkHttpClient\$Builder",
+                            "networkInterceptors",
+                            "Ljava/util/List;"
+                        )
+                    )
+                    newInsn.add(
+                        FieldInsnNode(
+                            Opcodes.GETSTATIC,
+                            OKHTTP3_UTILS_CLAZZ,
+                            "OKHTTP3_INTERCEPTOR",
+                            "Lokhttp3/Interceptor;"
+                        )
+                    )
+                    newInsn.add(
+                        (MethodInsnNode(
+                            Opcodes.INVOKEINTERFACE,
+                            "java/util/List",
+                            "add",
+                            "(Ljava/lang/Object;)Z",
+                            true
+                        ))
+                    )
                     insertBefore(it, newInsn)
+
                     println("[SLS] end transformBuilder: ${klass.className}")
                 }
             }
