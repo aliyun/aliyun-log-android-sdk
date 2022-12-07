@@ -12,7 +12,7 @@ import okhttp3.Request;
  */
 public class OKHttp3Tracer {
     public OKHttp3Tracer(OkHttpClient.Builder builder) {
-        OkHttp3Utils.registerTracerInterceptor(builder);
+        OkHttp3Instrumentation.registerTracerInterceptor(builder);
     }
 
     static final OKHttp3TracerInterceptor OK_HTTP_3_TRACER_INTERCEPTOR = new OKHttp3TracerInterceptor();

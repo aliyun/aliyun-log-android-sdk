@@ -12,9 +12,9 @@ import static com.aliyun.sls.android.okhttp.OKHttp3Tracer.OK_HTTP_3_TRACER_INTER
  * @author gordon
  * @date 2022/12/1
  */
-public final class OkHttp3Utils {
+public final class OkHttp3Instrumentation {
 
-    private OkHttp3Utils() {
+    private OkHttp3Instrumentation() {
         //no instance
     }
 
@@ -31,8 +31,7 @@ public final class OkHttp3Utils {
         builder.addInterceptor(OK_HTTP_3_TRACER_INTERCEPTOR);
     }
 
-    public Call newCall(Request request) {
-        request = newRequest(request);
-        return OKHttp3Tracer.newCallFactory(null).newCall(request);
+    public static Call.Factory newCallFactory(OkHttpClient client) {
+        return OKHttp3Tracer.newCallFactory(client);
     }
 }

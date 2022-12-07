@@ -14,8 +14,9 @@ import org.objectweb.asm.tree.*
  */
 @AutoService(ClassTransformer::class)
 class OkHttp3Transformer : ClassTransformer {
+
     override fun transform(context: TransformContext, klass: ClassNode): ClassNode {
-        println("[SLS](3) transform: ${klass.name}, className: ${klass.className}")
+        println("[SLS](0.0.2) transform: ${klass.name}, className: ${klass.className}")
 
         if ("okhttp3/OkHttpClient" === klass.name) {
             return transformNewCall(context, klass)
@@ -26,30 +27,13 @@ class OkHttp3Transformer : ClassTransformer {
         }
 
         return klass
-
-
-//        newCall?.instructions?.findAll(Opcodes.INVOKESTATIC)?.forEach {
-//            println("sls transform, found instructions. start process")
-//            newCall.instructions?.apply {
-//                println("sls transform, start insert")
-//                insertBefore(
-//                    it,
-//                    MethodInsnNode(Opcodes.INVOKESTATIC, OKHTTP3_UTILS_CLAZZ, OKHTTP3_METHOD, OKHTTP3_PARAMETERS, false)
-//                )
-//                insertBefore(it, VarInsnNode(Opcodes.ASTORE, 1))
-//                insertBefore(it, VarInsnNode(Opcodes.ALOAD, 1))
-//
-//                println("sls transform, end insert")
-//            }
-//            println("sls transform, end process")
-//        }
-
-//        return klass
     }
 
     private fun transformNewCall(context: TransformContext, klass: ClassNode): ClassNode {
         println("[SLS] start transformNewCall: ${klass.className}")
 
+        // inject OkHttpClient.newCall(request) method.
+        // tag the active span
         val newCall = klass.methods.find {
             "${it.name}${it.desc}" == "newCall(Lokhttp3/Request;)Lokhttp3/Call;"
         }
@@ -77,6 +61,8 @@ class OkHttp3Transformer : ClassTransformer {
     private fun transformBuilder(context: TransformContext, klass: ClassNode): ClassNode {
         println("[SLS] start transformBuilder: ${klass.className}")
 
+        // inject the OkHttpClient.Builder() constructor.
+        // add interceptor.
         val builder = klass.methods.find {
             "${it.name}${it.desc}" == ".<init>()V" ||
                     "${it.name}${it.desc}" == ".<init>(Lokhttp3/OkHttpClient\$Builder;)V"
@@ -93,22 +79,12 @@ class OkHttp3Transformer : ClassTransformer {
                     insertBefore(it, newInsn)
                     println("[SLS] end transformBuilder: ${klass.className}")
                 }
-
-
-//                InsnList il = new InsnList();
-//                il.add(new FieldInsnNode(GETSTATIC, cn.name, "timer", "J"));
-//                il.add(new MethodInsnNode(INVOKESTATIC, "java/lang/System", "currentTimeMillis", "()J"));
-//                il.add(new InsnNode(LADD));
-//                il.add(new FieldInsnNode(PUTSTATIC, cn.name, "timer", "J"));
-//                instructions.insertBefore(item, il);
             }
         }
         return klass
     }
-
-
 }
 
-private const val OKHTTP3_UTILS_CLAZZ = "com/aliyun/sls/android/okhttp/OkHttp3Utils"
+private const val OKHTTP3_UTILS_CLAZZ = "com/aliyun/sls/android/okhttp/OkHttp3Instrumentation"
 private const val OKHTTP3_METHOD = "newRequest"
 private const val OKHTTP3_PARAMETERS = "(Lokhttp3/Request;)Lokhttp3/Request;"
