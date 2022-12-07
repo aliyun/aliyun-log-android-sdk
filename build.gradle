@@ -118,6 +118,10 @@ allprojects { project ->
             }
         }
 
+        if (project.plugins.hasPlugin('com.android.library')) {
+            artifact("$buildDir/outputs/aar/${moduleName}-release.aar")
+        }
+
         pom {
             name = moduleName
             url = 'https://github.com/aliyun/aliyun-log-android-sdk'
@@ -169,14 +173,19 @@ allprojects { project ->
                         }
                         def dependencyNode = dependenciesNode.appendNode('dependency')
                         dependencyNode.appendNode('groupId', it.group)
-                        dependencyNode.appendNode('artifactId', it.name)
+                        def depName = it.name
+                        if (depName.startsWith("aliyun_sls_")) {
+                            depName = depName.substring(7)
+                            depName = depName.replaceAll("_", "-")
+                        }
+                        dependencyNode.appendNode('artifactId', depName)
                         dependencyNode.appendNode('version', it.version)
                         if (name == "api" || name == "compile") {
                             dependencyNode.appendNode("scope", "compile")
                         } else { // implementation
                             dependencyNode.appendNode("scope", "runtime")
                         }
-                        println("============= dependenciesNode: ${it.group}:${it.name}:${it.version} ============= ")
+                        println("============= dependenciesNode: ${it.group}:${depName}:${it.version} ============= ")
                     }
                 }
             }
