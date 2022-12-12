@@ -171,6 +171,11 @@ allprojects { project ->
                             // 忽略无法识别的
                             return
                         }
+                        if (it.name.startsWith("aliyun_sls_")) {
+                            // 暂时忽略内部库之间的相关依赖
+                            return
+                        }
+
                         def dependencyNode = dependenciesNode.appendNode('dependency')
                         dependencyNode.appendNode('groupId', it.group)
                         def depName = it.name
