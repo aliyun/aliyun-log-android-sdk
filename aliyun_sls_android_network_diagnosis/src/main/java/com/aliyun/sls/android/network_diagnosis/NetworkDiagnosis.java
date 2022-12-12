@@ -46,6 +46,15 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
     }
     // endregion
 
+    // region global callback
+    @Override
+    public void registerCallback(Callback callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.registerCallback(callback);
+        }
+    }
+    // endregion
+
     // region http
     @Override
     public void http(String url) {

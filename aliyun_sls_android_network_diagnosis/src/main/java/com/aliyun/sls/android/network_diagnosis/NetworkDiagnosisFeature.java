@@ -24,6 +24,7 @@ import com.aliyun.sls.android.core.sender.SdkSender;
 import com.aliyun.sls.android.core.sender.Sender;
 import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.core.utils.AppUtils;
+import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.Callback;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProcessor;
 import com.aliyun.sls.android.ot.SpanBuilder;
@@ -168,6 +169,12 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         this.enableMultiplePortsDetect = enable;
     }
 
+    @Override
+    public void registerCallback(Callback callback) {
+        if (null != networkDiagnosisSender) {
+            networkDiagnosisSender.registerGlobalCallback(callback);
+        }
+    }
     @Override
     public void setCallback(Sender.Callback callback) {
         super.setCallback(callback);
@@ -374,11 +381,16 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     private static class NetworkDiagnosisSender extends SdkSender implements Logger, ISpanProcessor {
 
         private final SdkFeature feature;
+        private INetworkDiagnosis.Callback callback;
 
         public NetworkDiagnosisSender(Context context, SdkFeature feature) {
             super(context);
             TAG = "NetworkDiagnosisSender";
             this.feature = feature;
+        }
+
+        protected void registerGlobalCallback(INetworkDiagnosis.Callback callback) {
+            this.callback = callback;
         }
 
         @Override
@@ -440,6 +452,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         @Override
         public void report(Object context, String msg) {
             if (TextUtils.isEmpty(msg)) {
+                SLSLog.w(TAG, "msg is empty.");
                 return;
             }
 
@@ -453,6 +466,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
             final String method = object.optString("method");
             if (TextUtils.isEmpty(method)) {
+                SLSLog.w(TAG, "method is empty.");
                 return;
             }
 
@@ -467,6 +481,10 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 )
             );
             builder.build().end();
+
+            if (null != callback) {
+                callback.onComplete(Type.of(method), msg);
+            }
         }
 
         @Override

@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.view.View;
 import androidx.annotation.Nullable;
 import com.aliyun.sls.android.core.SLSLog;
+import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis;
+import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.Callback;
+import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.Type;
 import com.aliyun.sls.android.network_diagnosis.NetworkDiagnosis;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
@@ -77,6 +80,8 @@ public class NetworkExample extends BaseActivity {
         //adapter.init(config);
 
         NetworkDiagnosis.getInstance().setMultiplePortsDetect(true);
+        NetworkDiagnosis.getInstance().registerCallback(
+            (type, ret) -> SLSLog.d(TAG, String.format("global callback: {type: %s, ret: %s}", type.value, ret)));
 
         findViewById(R.id.example_send_http_text).setOnClickListener(v -> {
             printStatus("start http...");
