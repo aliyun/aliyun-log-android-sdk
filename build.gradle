@@ -3,7 +3,7 @@
 buildscript {
     ext {
         agp_version = "4.0.2"
-        booster_version = "4.13.0"
+        booster_version = "4.15.0"
         kotlin_version = "1.5.30"
     }
     repositories {
