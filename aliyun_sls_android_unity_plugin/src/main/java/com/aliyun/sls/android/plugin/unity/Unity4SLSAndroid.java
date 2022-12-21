@@ -10,10 +10,8 @@ import com.aliyun.sls.android.core.SLSAndroid;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.configuration.UserInfo;
-import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
-import com.aliyun.sls.android.producer.LogProducerResult;
 
 /**
  * @author gordon
