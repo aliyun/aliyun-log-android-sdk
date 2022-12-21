@@ -10,8 +10,10 @@ import com.aliyun.sls.android.core.SLSAndroid;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.configuration.UserInfo;
+import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
+import com.aliyun.sls.android.producer.LogProducerResult;
 
 /**
  * @author gordon
@@ -46,6 +48,14 @@ public final class Unity4SLSAndroid {
             configuration.enableCrashReporter = true;
         });
         hasInit.set(true);
+    }
+
+    public static void registerCredentialsCallback(CredentialsCallback callback) {
+        SLSAndroid.registerCredentialsCallback((feature, result) -> {
+            if (null != callback) {
+                callback.onCall(feature, result.name());
+            }
+        });
     }
 
     public static void setLogLevel(int level) {
