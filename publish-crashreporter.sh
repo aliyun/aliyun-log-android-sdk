@@ -1,6 +1,6 @@
 #!/bin/sh
 # 定义版本号
-version=2.0.3
+version=2.0.4
 moduleName=sls-android-crashreporter
 
 ./gradlew :aliyun_sls_android_crashreporter:clean -Pversion=${version} -PmoduleName=${moduleName}

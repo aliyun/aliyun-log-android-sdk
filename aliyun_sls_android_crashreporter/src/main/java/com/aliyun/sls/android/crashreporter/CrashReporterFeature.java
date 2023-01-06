@@ -115,6 +115,19 @@ public class CrashReporterFeature extends SdkFeature {
         }
     }
 
+    public void reportCustomLog(final String type, final String log) {
+        SpanBuilder builder = newSpanBuilder("crash");
+        builder.addAttribute(
+            Attribute.of(
+                Pair.create("t", "custom"),
+                Pair.create("ex.type", TextUtils.isEmpty(type) ? "log" : type),
+                Pair.create("ex.origin", TextUtils.isEmpty(log) ? "" : log)
+            )
+        );
+
+        builder.build().end();
+    }
+
     public void reportError(final String type, final LogLevel logLevel, final  String message, final String stacktrace) {
         if (null == crashApi || TextUtils.isEmpty(type)) {
             return;

@@ -39,6 +39,14 @@ public class CrashReporter {
         crashReporterFeature.setFeatureEnabled(enable);
     }
 
+    public static void reportCustomLog(String type, String log) {
+        if (null == crashReporterFeature) {
+            return;
+        }
+
+        crashReporterFeature.reportCustomLog(type, log);
+    }
+
     public static void reportError(final String stacktrace) {
         reportError("exception", stacktrace);
     }

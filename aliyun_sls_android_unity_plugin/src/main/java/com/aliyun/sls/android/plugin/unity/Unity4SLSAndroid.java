@@ -98,6 +98,10 @@ public final class Unity4SLSAndroid {
         SLSAndroid.clearExtra();
     }
 
+    public static void reportCustomLog(String type, String log) {
+        CrashReporter.reportCustomLog(type, log);
+    }
+
     public static void reportError(final String stacktrace) {
         reportError("exception", stacktrace);
     }
