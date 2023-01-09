@@ -30,8 +30,8 @@ import org.json.JSONObject;
  * @date 2022/9/8
  */
 public class OKHttp3TracerInterceptor implements Interceptor {
-    /* 50 KB*/
-    private static final long KB_50 = 50 * 1024;
+    /* 100 KB */
+    private static final long KB_100 = 100 * 1024;
 
     private OKHttp3InstrumentationDelegate delegate;
     private OkHttp3Configuration configuration = new OkHttp3Configuration();
@@ -178,7 +178,7 @@ public class OKHttp3TracerInterceptor implements Interceptor {
         final String message = response.message();
         String body = null;
         try {
-            final long maxLength = Math.min(KB_50, response.body().contentLength());
+            final long maxLength = Math.min(KB_100, response.body().contentLength());
             if (maxLength >= 0) {
                 body = response.peekBody(maxLength).string();
             }
@@ -187,7 +187,7 @@ public class OKHttp3TracerInterceptor implements Interceptor {
         }
 
         return Attribute.of(
-            Pair.create("http.response.code", code),
+            Pair.create("http.status_code", code),
             Pair.create("http.response.headers", TextUtils.isEmpty(headers) ? "" : headers),
             Pair.create("http.response.message", TextUtils.isEmpty(message) ? "" : message),
             Pair.create("http.response.body", TextUtils.isEmpty(body) ? "" : body)
