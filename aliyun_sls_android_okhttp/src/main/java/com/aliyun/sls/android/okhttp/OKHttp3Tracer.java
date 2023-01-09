@@ -1,7 +1,5 @@
 package com.aliyun.sls.android.okhttp;
 
-import com.aliyun.sls.android.ot.Span;
-import com.aliyun.sls.android.ot.context.ContextManager;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -26,6 +24,10 @@ public class OKHttp3Tracer {
         OK_HTTP_3_TRACER_INTERCEPTOR.registerOKHttp3InstrumentationDelegate(delegate);
     }
 
+    public static void updateOkHttp3Configuration(OkHttp3Configuration configuration) {
+        OK_HTTP_3_TRACER_INTERCEPTOR.updateConfiguration(configuration);
+    }
+
     private static class CallFactory implements Call.Factory {
         private final OkHttpClient client;
 
@@ -35,12 +37,7 @@ public class OKHttp3Tracer {
 
         @Override
         public Call newCall(Request request) {
-            Request.Builder builder = request.newBuilder();
-            final Span span = ContextManager.INSTANCE.activeSpan();
-            if (null != span) {
-                builder.tag(Span.class, span);
-            }
-            final Request requestCopy = builder.build();
+            final Request requestCopy = OkHttp3Instrumentation.newRequest(request);
             return client.newCall(requestCopy);
         }
     }

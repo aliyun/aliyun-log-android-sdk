@@ -17,6 +17,7 @@ import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.okhttp.OKHttp3InstrumentationDelegate;
 import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
 import com.aliyun.sls.android.okhttp.OKHttp3TracerInterceptor;
+import com.aliyun.sls.android.okhttp.OkHttp3Configuration;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
 import com.aliyun.sls.android.ot.Resource;
@@ -123,20 +124,29 @@ public class SLSDemoApplication extends MultiDexApplication {
             }
         });
 
-        OKHttp3TracerInterceptor okHttp3TracerInterceptor = new OKHttp3TracerInterceptor();
-        okHttp3TracerInterceptor.registerOKHttp3InstrumentationDelegate(new OKHttp3InstrumentationDelegate() {
-            @Override
-            public Map<String, String> injectCustomHeaders(Request request) {
-                // 返回自定义Header信息，该信息会插入到http request header 中
-                return null;
-            }
+        final OkHttp3Configuration configuration = new OkHttp3Configuration();
+        // 允许采集 http request header 信息，默认不采集
+        configuration.captureHeaders = true;
+        // 允许采集 http request body 信息，默认不采集
+        configuration.captureBody = true;
+        // 允许采集 http response 信息，默认不采集
+        configuration.captureResponse = true;
+        OKHttp3Tracer.updateOkHttp3Configuration(configuration);
 
-            @Override
-            public boolean shouldInstrument(Request request) {
-                // 是否对当前请求插入trace信息，返回true表示插入trace信息
-                // 如下表示对host中包含log.aliyuncs.com的请求都插入trace信息
-                return request.url().host().contains("log.aliyuncs.com");
-            }
-        });
+        //OKHttp3TracerInterceptor okHttp3TracerInterceptor = new OKHttp3TracerInterceptor();
+        //okHttp3TracerInterceptor.registerOKHttp3InstrumentationDelegate(new OKHttp3InstrumentationDelegate() {
+        //    @Override
+        //    public Map<String, String> injectCustomHeaders(Request request) {
+        //        // 返回自定义Header信息，该信息会插入到http request header 中
+        //        return null;
+        //    }
+        //
+        //    @Override
+        //    public boolean shouldInstrument(Request request) {
+        //        // 是否对当前请求插入trace信息，返回true表示插入trace信息
+        //        // 如下表示对host中包含log.aliyuncs.com的请求都插入trace信息
+        //        return request.url().host().contains("log.aliyuncs.com");
+        //    }
+        //});
     }
 }
