@@ -1,6 +1,7 @@
 package com.aliyun.sls.android.producer.example.example.network;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.content.Intent;
@@ -8,9 +9,6 @@ import android.os.Bundle;
 import android.view.View;
 import androidx.annotation.Nullable;
 import com.aliyun.sls.android.core.SLSLog;
-import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis;
-import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.Callback;
-import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.Type;
 import com.aliyun.sls.android.network_diagnosis.NetworkDiagnosis;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
@@ -54,6 +52,7 @@ public class NetworkExample extends BaseActivity {
         }
     };
     private int index = 0;
+    private int extIndex = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -127,6 +126,14 @@ public class NetworkExample extends BaseActivity {
 
         findViewById(R.id.example_policy_text).setOnClickListener(v -> {
             startActivity(new Intent(NetworkExample.this, NetworkWithPolicy.class));
+        });
+
+        findViewById(R.id.example_extension_update).setOnClickListener(v -> {
+            NetworkDiagnosis.getInstance().updateExtensions(new HashMap<String, String>() {
+                {
+                    put("ext_key", "ext_value " + (extIndex += 1));
+                }
+            });
         });
     }
 

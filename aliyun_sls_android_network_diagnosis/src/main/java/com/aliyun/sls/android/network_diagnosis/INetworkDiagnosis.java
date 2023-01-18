@@ -54,10 +54,10 @@ public interface INetworkDiagnosis {
      * @param enable true/false
      */
     void setMultiplePortsDetect(boolean enable);
-    // endregion
 
-    // region global callback
     void registerCallback(Callback callback);
+
+    void updateExtensions(Map<String, String> extension);
     // endregion
 
     // region http

@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.network_diagnosis;
 
+import java.util.Map;
+
 /**
  * @author gordon
  * @date 2022/7/22
@@ -44,15 +46,21 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
             networkDiagnosis.setPolicyDomain(domain);
         }
     }
-    // endregion
 
-    // region global callback
     @Override
     public void registerCallback(Callback callback) {
         if (checkNetworkDiagnosis()) {
             networkDiagnosis.registerCallback(callback);
         }
     }
+
+    @Override
+    public void updateExtensions(Map<String, String> extension) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.updateExtensions(extension);
+        }
+    }
+
     // endregion
 
     // region http

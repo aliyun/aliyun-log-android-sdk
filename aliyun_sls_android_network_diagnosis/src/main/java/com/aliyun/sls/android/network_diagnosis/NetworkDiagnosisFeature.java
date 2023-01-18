@@ -1,6 +1,8 @@
 package com.aliyun.sls.android.network_diagnosis;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.alibaba.netspeed.network.Diagnosis;
 import com.alibaba.netspeed.network.DnsConfig;
@@ -175,6 +177,17 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             networkDiagnosisSender.registerGlobalCallback(callback);
         }
     }
+
+    @Override
+    public void updateExtensions(Map<String, String> extension) {
+        if (null == extension) {
+            return;
+        }
+
+        final Map<String, String> extensionCopy = new HashMap<>(extension);
+        Diagnosis.updateExtension(extensionCopy);
+    }
+
     @Override
     public void setCallback(Sender.Callback callback) {
         super.setCallback(callback);
