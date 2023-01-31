@@ -92,8 +92,8 @@ dependencies {
 //    implementation 'com.aliyun.openservices:sls-android-network-diagnosis:2.0.8'
 //    implementation 'com.aliyun.openservices:sls-android-crashreporter:2.0.5'
 //    implementation 'com.aliyun.openservices:sls-android-blockdetection:1.0.2'
-//    implementation 'com.aliyun.openservices:sls-android-trace:1.0.3'
-//    implementation 'com.aliyun.openservices:sls-android-okhttp:1.0.5'
+//    implementation 'com.aliyun.openservices:sls-android-trace:1.0.4'
+//    implementation 'com.aliyun.openservices:sls-android-okhttp:1.0.6'
 
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
