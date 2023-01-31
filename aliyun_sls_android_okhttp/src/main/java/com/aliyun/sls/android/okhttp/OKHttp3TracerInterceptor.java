@@ -44,7 +44,8 @@ public class OKHttp3TracerInterceptor implements Interceptor {
         }
 
         Span parent = request.tag(Span.class);
-        SpanBuilder builder = Tracer.spanBuilder("HTTP " + request.method());
+        String spanName = nameSpan(request);
+        SpanBuilder builder = Tracer.spanBuilder(spanName);
         if (null != parent) {
             builder.setParent(parent);
         }
@@ -89,10 +90,33 @@ public class OKHttp3TracerInterceptor implements Interceptor {
             span.recordException(e);
             throw e;
         } finally {
+            customizeSpan(request, span);
             span.end();
         }
 
         return response;
+    }
+
+    private String nameSpan(Request request) {
+        final String defaultName = "HTTP " + request.method();
+        if (null == delegate || !delegate.shouldInstrument(request)) {
+            return defaultName;
+        }
+
+        String name = delegate.nameSpan(request);
+        if (TextUtils.isEmpty(name)) {
+            return defaultName;
+        }
+
+        return name;
+    }
+
+    private void customizeSpan(Request request, Span span) {
+        if (delegate == null || !delegate.shouldInstrument(request)) {
+            return;
+        }
+
+        delegate.customizeSpan(request, span);
     }
 
     private Attribute captureHeaders(Request request) {

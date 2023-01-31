@@ -21,6 +21,7 @@ import com.aliyun.sls.android.okhttp.OkHttp3Configuration;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
 import com.aliyun.sls.android.ot.Resource;
+import com.aliyun.sls.android.ot.Span;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
 import okhttp3.Request;
@@ -115,6 +116,16 @@ public class SLSDemoApplication extends MultiDexApplication {
                 headers.put("h_key_1", "h_value_1");
                 headers.put("h_key_2", "h_value_2");
                 return headers;
+            }
+
+            @Override
+            public String nameSpan(Request request) {
+                return request.method() + " " + request.url().encodedPath();
+            }
+
+            @Override
+            public void customizeSpan(Request request, Span span) {
+                span.setService(request.url().encodedPath());
             }
 
             @Override
