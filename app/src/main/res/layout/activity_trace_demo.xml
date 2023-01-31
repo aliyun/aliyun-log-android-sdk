@@ -64,10 +64,17 @@
 
             <Button
                 android:id="@+id/trace_add_links_demo"
-                android:layout_span="2"
+                android:layout_span="1"
                 android:padding="8dp"
                 android:textAllCaps="false"
                 android:text="addLink" />
+
+            <Button
+                android:id="@+id/trace_add_log_demo"
+                android:layout_span="1"
+                android:padding="8dp"
+                android:textAllCaps="false"
+                android:text="addLog" />
         </TableRow>
     </TableLayout>
 </LinearLayout>

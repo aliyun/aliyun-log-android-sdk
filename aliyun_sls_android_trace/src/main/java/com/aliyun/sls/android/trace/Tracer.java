@@ -38,8 +38,8 @@ public class Tracer {
         }
 
         Span span = spanBuilder("logs").build();
-        //span.start /= 1000;
-        //span.end /= 1000;
+        span.setStart(span.getStart() / 1000);
+        span.setEnd(span.getEnd() / 1000);
         log.putContents(span.toMap());
 
         return Tracer.traceFeature.addLog(log);

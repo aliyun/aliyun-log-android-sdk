@@ -48,6 +48,7 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
         findViewById(R.id.trace_add_event_demo).setOnClickListener(this);
         findViewById(R.id.trace_record_exception_demo).setOnClickListener(this);
         findViewById(R.id.trace_add_links_demo).setOnClickListener(this);
+        findViewById(R.id.trace_add_log_demo).setOnClickListener(this);
     }
 
     @Override
@@ -66,6 +67,8 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
             recordException();
         } else if (R.id.trace_add_links_demo == v.getId()) {
             addLink();
+        } else if (R.id.trace_add_log_demo == v.getId()) {
+            addLog();
         }
     }
 
@@ -306,6 +309,14 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
         Tracer.startSpan("span in add link").end();
 
         span.end();
+    }
+
+    private void addLog() {
+        Log log = new Log();
+        log.putContent("log_key_1", "log_value_1");
+        log.putContent("log_key_2", "log_value_2");
+        log.putContent("log_key_3", "log_value_3");
+        Tracer.log(log);
     }
 
     private void threadSleep() {

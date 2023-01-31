@@ -162,14 +162,22 @@ public class TraceFeature extends SdkFeature {
 
         @Override
         protected String provideEndpoint(Credentials credentials) {
-            return TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.endpoint) ?
-                super.provideEndpoint(credentials) : credentials.tracerCredentials.logCredentials.endpoint;
+            if (null == credentials.tracerCredentials.logCredentials) {
+                return super.provideEndpoint(credentials);
+            }
+
+            return !TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.endpoint) ?
+                credentials.tracerCredentials.logCredentials.endpoint : "";
         }
 
         @Override
         protected String provideProjectName(Credentials credentials) {
-            return TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.project) ?
-                super.provideEndpoint(credentials) : credentials.tracerCredentials.logCredentials.project;
+            if (null == credentials.tracerCredentials.logCredentials) {
+                return super.provideProjectName(credentials);
+            }
+
+            return !TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.project) ?
+                credentials.tracerCredentials.logCredentials.project : "";
         }
 
         @Override

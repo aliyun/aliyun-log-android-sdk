@@ -81,6 +81,7 @@ public class SLSDemoApplication extends MultiDexApplication {
 
                 configuration.enableCrashReporter = true;
                 configuration.enableTracer = true;
+                configuration.enableTracerLog = true;
                 configuration.enableNetworkDiagnosis = true;
 
                 UserInfo info = new UserInfo();
