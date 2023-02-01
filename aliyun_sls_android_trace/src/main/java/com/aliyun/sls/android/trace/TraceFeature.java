@@ -182,7 +182,17 @@ public class TraceFeature extends SdkFeature {
 
         @Override
         protected String provideLogstoreName(Credentials credentials) {
-            return String.format("%s-logs", credentials.tracerCredentials.instanceId);
+            final String defLogstoreName = String.format("%s-logs", credentials.tracerCredentials.instanceId);
+            if (null == credentials.tracerCredentials.logCredentials) {
+                return defLogstoreName;
+            }
+
+            // user can custom the logs logstore
+            if (!TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.logstore)) {
+                return credentials.tracerCredentials.logCredentials.logstore;
+            }
+
+            return defLogstoreName;
         }
 
     }
