@@ -51,8 +51,8 @@ public class Span {
     protected String traceID;
     protected String spanID;
     protected String parentSpanID;
-    protected long start;
-    protected long end;
+    protected Long start;
+    protected Long end;
     protected long duration;
     protected List<Attribute> attribute;
     protected List<Event> events;

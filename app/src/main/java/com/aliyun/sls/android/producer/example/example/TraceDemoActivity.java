@@ -2,6 +2,7 @@ package com.aliyun.sls.android.producer.example.example;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import android.os.Bundle;
 import android.os.Trace;
@@ -181,7 +182,7 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
     }
 
     private void reportStartupStatus() {
-        Tracer.spanBuilder("第三步：上报状态").build().end();
+        Tracer.spanBuilder("第三步：上报状态").build().setEnd(TimeUnit.MILLISECONDS.toNanos(System.currentTimeMillis() + 10 * 1000)).end();
         ApiClient.getCategory(new ApiCallback<List<ItemModel>>() {
             @Override
             public void onSuccess(List<ItemModel> itemModels) {
