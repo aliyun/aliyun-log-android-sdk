@@ -1,6 +1,7 @@
 package com.aliyun.sls.android.okhttp;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,11 +19,13 @@ import com.aliyun.sls.android.trace.Tracer;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.Buffer;
+import okio.BufferedSource;
 import org.json.JSONObject;
 
 /**
@@ -31,7 +34,7 @@ import org.json.JSONObject;
  */
 public class OKHttp3TracerInterceptor implements Interceptor {
     /* 100 KB */
-    private static final long KB_100 = 100 * 1024;
+    private static final int KB_100 = 100 * 1024;
 
     private OKHttp3InstrumentationDelegate delegate;
     private OkHttp3Configuration configuration = new OkHttp3Configuration();
@@ -202,10 +205,25 @@ public class OKHttp3TracerInterceptor implements Interceptor {
         final String message = response.message();
         String body = null;
         try {
-            final long maxLength = Math.min(KB_100, response.body().contentLength());
-            if (maxLength >= 0) {
-                body = response.peekBody(maxLength).string();
+            // !! response may not contains Content-Length header !!
+            //final long maxLength = Math.min(KB_100, response.body().contentLength());
+            //if (maxLength >= 0) {
+            //    body = response.peekBody(maxLength).string();
+            //}
+
+            BufferedSource source = response.body().source();
+            source.request(Integer.MAX_VALUE);
+            Buffer buffer = source.buffer();
+            Charset charset = Charset.forName("UTF-8");
+            MediaType contentType = response.body().contentType();
+            if (null != contentType) {
+                charset = contentType.charset(charset);
             }
+            body = buffer.clone().readString(charset);
+
+            // limit response body to 100 KB
+            final int maxLength = Math.min(KB_100, body.length());
+            body = body.substring(0, maxLength);
         } catch (IOException e) {
             // ignore
         }

@@ -120,11 +120,13 @@ public class SLSDemoApplication extends MultiDexApplication {
 
             @Override
             public String nameSpan(Request request) {
+                // 自定义 http request span 的名称
                 return request.method() + " " + request.url().encodedPath();
             }
 
             @Override
             public void customizeSpan(Request request, Span span) {
+                // 自定义 http request span
                 span.setService(request.url().encodedPath());
             }
 
