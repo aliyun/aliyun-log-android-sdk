@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import android.os.Bundle;
 import android.os.Trace;
+import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import androidx.annotation.Nullable;
@@ -18,6 +19,8 @@ import com.aliyun.sls.android.ot.Span;
 import com.aliyun.sls.android.ot.Span.StatusCode;
 import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.ot.context.Scope;
+import com.aliyun.sls.android.ot.logs.LogData;
+import com.aliyun.sls.android.ot.logs.LogLevel;
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
@@ -313,11 +316,21 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
     }
 
     private void addLog() {
-        Log log = new Log();
-        log.putContent("log_key_1", "log_value_1");
-        log.putContent("log_key_2", "log_value_2");
-        log.putContent("log_key_3", "log_value_3");
-        Tracer.log(log);
+        //Log log = new Log();
+        //log.putContent("log_key_1", "log_value_1");
+        //log.putContent("log_key_2", "log_value_2");
+        //log.putContent("log_key_3", "log_value_3");
+        //Tracer.log(log);
+
+        Tracer.log(LogData.builder()
+            .setLogLevel(LogLevel.ERROR)
+            .setSeverityText("ERROR")
+            .setAttribute(Attribute.of(
+                Pair.create("test1", "value1")
+            ))
+            .setLogContent("测试日志内容")
+            .build());
+
     }
 
     private void threadSleep() {

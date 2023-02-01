@@ -284,6 +284,10 @@ public class Span {
         }
     }
 
+    public List<Attribute> getAttribute() {
+        return attribute;
+    }
+
     public Span addResource(Resource r) {
         if (null == r) {
             return this;
@@ -293,6 +297,10 @@ public class Span {
             this.resource.merge(r);
             return this;
         }
+    }
+
+    public Resource getResource() {
+        return Resource.of(this.resource);
     }
     // endregion
 
