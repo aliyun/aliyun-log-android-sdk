@@ -72,9 +72,9 @@ public class LogData {
         return logRecords;
     }
 
-    public Map<String, String> toMap() {
-        Map<String, String> data = new LinkedHashMap<>();
-        data.put("resource", this.resource.toJson());
+    public JSONObject toJson() {
+        JSONObject data = new JSONObject();
+        JSONUtils.put(data, "resource", null != this.resource ? this.resource.toJson() : new JSONObject());
 
         JSONArray array = new JSONArray();
         JSONObject object = new JSONObject();
@@ -82,7 +82,7 @@ public class LogData {
         JSONUtils.put(object, "logRecords", Record.toJson(this.logRecords));
         array.put(object);
 
-        data.put("scopeLogs", array.toString());
+        JSONUtils.put(data, "scopeLogs", array);
         return data;
     }
 
@@ -97,7 +97,7 @@ public class LogData {
         private String logContent;
         private List<Attribute> attributes;
 
-        Builder() {
+        public Builder() {
         }
 
         public Builder setResource(Resource resource) {

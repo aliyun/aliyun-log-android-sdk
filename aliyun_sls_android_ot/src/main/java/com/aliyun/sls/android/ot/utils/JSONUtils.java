@@ -23,16 +23,11 @@ public class JSONUtils {
         return object;
     }
 
-    //public static JSONObject object(Pair<String, String> kv) {
-    //    //noinspection unchecked
-    //    return object(new Pair[] {kv});
-    //}
-
     @SafeVarargs
-    public static JSONObject object(Pair<String, String>... kvs) {
+    public static JSONObject object(Pair<String, Object>... kvs) {
         JSONObject object = new JSONObject();
         if (null != kvs) {
-            for (Pair<String, String> kv : kvs) {
+            for (Pair<String, Object> kv : kvs) {
                 if (TextUtils.isEmpty(kv.first)) {
                     continue;
                 }

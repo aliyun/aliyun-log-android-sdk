@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import android.util.Pair;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.utils.JSONUtils;
 import org.json.JSONArray;
@@ -61,15 +62,14 @@ public class Record {
         this.spanId = spanId;
     }
 
+    // region to json
     public JSONObject toJson() {
         JSONObject object = new JSONObject();
         JSONUtils.put(object, "timeUnixNano", timeUnixNano / 1000);
         JSONUtils.put(object, "severityNumber", severityNumber);
         JSONUtils.put(object, "severityText", severityText);
 
-        JSONObject body = new JSONObject();
-        JSONUtils.put(body, "stringValue", this.body.stringValue);
-        JSONUtils.put(object, "body", body);
+        JSONUtils.put(object, "body", JSONUtils.object(Pair.create("stringValue", this.body.stringValue)));
 
         JSONUtils.put(object, "severityText", severityText);
         JSONUtils.put(object, "attributes", Attribute.toJsonArray(this.attributes));
@@ -98,6 +98,7 @@ public class Record {
         }
         return array;
     }
+    // endregion
 
     public static class Body {
         protected String stringValue;

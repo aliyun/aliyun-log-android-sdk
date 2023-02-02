@@ -54,7 +54,7 @@ public class Scope {
         JSONObject object = new JSONObject();
         JSONUtils.put(object, "name", this.name);
         JSONUtils.put(object, "version", this.version);
-        JSONUtils.put(object, "attributes", Attribute.toJson(attributes));
+        JSONUtils.put(object, "attributes", Attribute.toJsonArray(attributes));
         return object;
     }
 }

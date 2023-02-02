@@ -100,8 +100,7 @@ public class Attribute implements Comparable<Attribute> {
         for (Attribute attribute : attributes) {
             object = new JSONObject();
             JSONUtils.put(object, "key", attribute.key);
-            //noinspection unchecked
-            JSONUtils.put(object, "value", JSONUtils.object(new Pair[] {Pair.create("stringValue", attribute.value)}));
+            JSONUtils.put(object, "value", JSONUtils.object(Pair.create("stringValue", attribute.value)));
             array.put(object);
         }
 

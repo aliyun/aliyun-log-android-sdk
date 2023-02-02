@@ -8,6 +8,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Pair;
 import com.aliyun.sls.android.ot.utils.JSONUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -112,13 +113,17 @@ public class Resource {
     }
     // endregion
 
-    public String toJson() {
+    public JSONObject toJson() {
         Collections.sort(this.attributes);
-        JSONObject object = new JSONObject();
+        JSONArray array = new JSONArray();
         for (Attribute attribute : this.attributes) {
-            JSONUtils.put(object, attribute.key, attribute.value);
+            array.put(
+                JSONUtils.object(
+                    Pair.create("key", attribute.key),
+                    Pair.create("value", JSONUtils.object(Pair.create("stringValue", attribute.value))))
+            );
         }
 
-        return object.toString();
+        return JSONUtils.object(Pair.create("attributes", array));
     }
 }

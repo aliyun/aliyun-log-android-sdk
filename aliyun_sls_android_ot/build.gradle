@@ -31,6 +31,10 @@ android {
 }
 
 dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation("org.skyscreamer:jsonassert:1.5.1")
+    testImplementation(project(":aliyun_sls_android_ot"))
+    
     implementation project(':aliyun_sls_android_producer')
 }
 

@@ -1,6 +1,7 @@
 package com.aliyun.sls.android.trace;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import android.text.TextUtils;
@@ -17,6 +18,7 @@ import com.aliyun.sls.android.ot.logs.LogData;
 import com.aliyun.sls.android.ot.logs.LogLevel;
 import com.aliyun.sls.android.ot.logs.Record;
 import com.aliyun.sls.android.producer.Log;
+import org.json.JSONObject;
 
 /**
  * @author gordon
@@ -94,7 +96,7 @@ public class Tracer {
         }
 
         final Log log = new Log();
-        log.putContents(logData.toMap());
+        log.putContent(logData.toJson());
         return Tracer.traceFeature.addLog(log);
     }
 
