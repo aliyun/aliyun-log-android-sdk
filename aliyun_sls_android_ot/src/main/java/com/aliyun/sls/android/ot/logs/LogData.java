@@ -89,7 +89,7 @@ public class LogData {
     public static class Builder {
         private Resource resource;
         private LogLevel logLevel = LogLevel.ERROR;
-        private String severityText = LogLevel.ERROR.name();
+        private String severityText;
         private Scope scope;
         private Long epochNanos;
         private String traceId;

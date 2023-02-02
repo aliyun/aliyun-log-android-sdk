@@ -1,7 +1,6 @@
 package com.aliyun.sls.android.trace;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import android.text.TextUtils;
@@ -18,7 +17,6 @@ import com.aliyun.sls.android.ot.logs.LogData;
 import com.aliyun.sls.android.ot.logs.LogLevel;
 import com.aliyun.sls.android.ot.logs.Record;
 import com.aliyun.sls.android.producer.Log;
-import org.json.JSONObject;
 
 /**
  * @author gordon
@@ -38,36 +36,42 @@ public class Tracer {
     }
 
     /**
-     * 写日志
-     *
-     * @param log
-     * @return
+     * 上报 Logs 到默认或指定的logstore
+     * @param logContent 日志内容
+     * @return success or fails
      */
-    public static boolean log(Log log) {
-        if (null == log) {
-            return false;
-        }
-
-        Span span = spanBuilder("logs").build();
-        span.setStart(span.getStart() / 1000);
-        span.setEnd(span.getEnd() / 1000);
-        log.putContents(span.toMap());
-
-        return Tracer.traceFeature.addLog(log);
-    }
-
     public static boolean log(String logContent) {
         return log(LogLevel.ERROR, logContent);
     }
 
+    /**
+     * 上报 Logs 到默认或指定的logstore
+     *
+     * @param level log level, {@link LogLevel#TRACE}, {@link LogLevel#DEBUG},  {@link LogLevel#WARN},  {@link LogLevel#ERROR}, {@link LogLevel#FATAL},
+     * @param logContent 日志内容
+     * @return success or fails
+     */
     public static boolean log(LogLevel level, String logContent) {
         return log(level, logContent, null);
     }
 
+    /**
+     * 上报 Logs 到默认或指定的logstore
+     *
+     * @param level log level, {@link LogLevel#TRACE}, {@link LogLevel#DEBUG},  {@link LogLevel#WARN},  {@link LogLevel#ERROR}, {@link LogLevel#FATAL},
+     * @param logContent 日志内容
+     * @param attributes 自定义属性 {@link Attribute}
+     * @return success or fails
+     */
     public static boolean log(LogLevel level, String logContent, List<Attribute> attributes) {
         return log(LogData.builder().setLogLevel(level).setLogContent(logContent).setAttribute(attributes).build());
     }
 
+    /**
+     * 上报 Logs 到默认或指定的logstore
+     * @param logData 通过 {@link com.aliyun.sls.android.ot.logs.LogData.Builder} 构造的LogData，提供最灵活的Log构造方式
+     * @return success or fails
+     */
     public static boolean log(LogData logData) {
         if (null == logData) {
             return false;
