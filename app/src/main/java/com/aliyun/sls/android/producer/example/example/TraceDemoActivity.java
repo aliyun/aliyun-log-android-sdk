@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import android.os.Bundle;
-import android.os.Trace;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,7 +20,6 @@ import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.ot.context.Scope;
 import com.aliyun.sls.android.ot.logs.LogData;
 import com.aliyun.sls.android.ot.logs.LogLevel;
-import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient.ApiCallback;
@@ -40,6 +38,7 @@ import okhttp3.Response;
  */
 public class TraceDemoActivity extends AppCompatActivity implements OnClickListener {
 
+    private int logIndex = 0;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,7 +184,7 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
     }
 
     private void reportStartupStatus() {
-        Tracer.spanBuilder("第三步：上报状态").build().setEnd(TimeUnit.MILLISECONDS.toNanos(System.currentTimeMillis() + 10 * 1000)).end();
+        Tracer.spanBuilder("第三步：上报状态").build().setEnd(TimeUnit.MILLISECONDS.toNanos(System.currentTimeMillis() + 20 * 1000)).end();
         ApiClient.getCategory(new ApiCallback<List<ItemModel>>() {
             @Override
             public void onSuccess(List<ItemModel> itemModels) {
@@ -228,9 +227,9 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
                 threadSleep();
                 Tracer.startSpan("电池温度检查").end();
 
-                Log log = new Log();
-                log.putContent("content", "状态检查正常");
-                Tracer.log(log);
+                //Log log = new Log();
+                //log.putContent("content", "状态检查正常");
+                //Tracer.log(log);
             });
             Tracer.withinSpan("开空调：1.2 电气信号检查", this::threadSleep);
         });
@@ -316,20 +315,24 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
     }
 
     private void addLog() {
-        //Log log = new Log();
-        //log.putContent("log_key_1", "log_value_1");
-        //log.putContent("log_key_2", "log_value_2");
-        //log.putContent("log_key_3", "log_value_3");
-        //Tracer.log(log);
+        Tracer.log("简单调用方式" + logIndex);
 
-        Tracer.log(LogData.builder()
-            .setLogLevel(LogLevel.ERROR)
-            .setSeverityText("ERROR")
-            .setAttribute(Attribute.of(
-                Pair.create("test1", "value1")
-            ))
-            .setLogContent("测试日志内容")
-            .build());
+        Tracer.log(LogLevel.DEBUG, "带日志等级的调用方式" + logIndex);
+
+        Tracer.log(LogLevel.WARN, "带扩展属性的调用方式" + logIndex, Attribute.of(Pair.create("商品ID", 10092392L)));
+
+        Tracer.log(
+            LogData.builder()
+                .setLogLevel(LogLevel.ERROR)
+                .setSeverityText("ERROR")
+                .setAttribute(
+                    Attribute.of(
+                        Pair.create("test1", "value1")
+                    )
+                )
+                .setLogContent("测试日志内容" + (logIndex++))
+                .build()
+        );
 
     }
 

@@ -12,6 +12,7 @@ import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.configuration.Credentials.NetworkDiagnosisCredentials;
 import com.aliyun.sls.android.core.configuration.Credentials.TracerCredentials;
+import com.aliyun.sls.android.core.configuration.Credentials.TracerCredentials.TracerLogCredentials;
 import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.okhttp.OKHttp3InstrumentationDelegate;
@@ -54,6 +55,11 @@ public class SLSDemoApplication extends MultiDexApplication {
         tracerCredentials.instanceId = "sls-mall";
         tracerCredentials.endpoint = "https://cn-beijing.log.aliyuncs.com";
         tracerCredentials.project = "qs-demos";
+        // 自定义 Trace Logs 的写入位置
+        TracerLogCredentials logCredentials = tracerCredentials.createLogCredentials();
+        logCredentials.endpoint = "https://cn-beijing.log.aliyuncs.com";
+        logCredentials.project = "qs-demos";
+        logCredentials.logstore = "sls-mall-custom-logs";
 
         NetworkDiagnosisCredentials networkDiagnosisCredentials = credentials.getNetworkDiagnosisCredentials();
         networkDiagnosisCredentials.secretKey = PreferenceUtils.getNetworkSecKey(this);
