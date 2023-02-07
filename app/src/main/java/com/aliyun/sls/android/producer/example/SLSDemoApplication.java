@@ -47,19 +47,19 @@ public class SLSDemoApplication extends MultiDexApplication {
         credentials.instanceId = "androd-dev-f1a8";
         credentials.endpoint = "https://cn-hangzhou.log.aliyuncs.com";
         credentials.project = "yuanbo-test-1";
-        credentials.accessKeyId = PreferenceUtils.getAccessKeyId(this);
-        credentials.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
-        credentials.securityToken = PreferenceUtils.getAccessKeyToken(this);
+        //credentials.accessKeyId = PreferenceUtils.getAccessKeyId(this);
+        //credentials.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
+        //credentials.securityToken = PreferenceUtils.getAccessKeyToken(this);
 
         TracerCredentials tracerCredentials = credentials.createTraceCredentials();
-        tracerCredentials.instanceId = "sls-mall";
+        //tracerCredentials.instanceId = "sls-mall";
         tracerCredentials.endpoint = "https://cn-beijing.log.aliyuncs.com";
         tracerCredentials.project = "qs-demos";
         // 自定义 Trace Logs 的写入位置
-        TracerLogCredentials logCredentials = tracerCredentials.createLogCredentials();
-        logCredentials.endpoint = "https://cn-beijing.log.aliyuncs.com";
-        logCredentials.project = "qs-demos";
-        logCredentials.logstore = "sls-mall-custom-logs";
+        //TracerLogCredentials logCredentials = tracerCredentials.createLogCredentials();
+        //logCredentials.endpoint = "https://cn-beijing.log.aliyuncs.com";
+        //logCredentials.project = "qs-demos";
+        //logCredentials.logstore = "sls-mall-custom-logs";
 
         NetworkDiagnosisCredentials networkDiagnosisCredentials = credentials.getNetworkDiagnosisCredentials();
         networkDiagnosisCredentials.secretKey = PreferenceUtils.getNetworkSecKey(this);
@@ -86,10 +86,11 @@ public class SLSDemoApplication extends MultiDexApplication {
                     }
                 };
 
-                configuration.enableCrashReporter = true;
+                //configuration.enableCrashReporter = true;
+                //configuration.enableNetworkDiagnosis = true;
                 configuration.enableTracer = true;
                 configuration.enableTracerLog = true;
-                configuration.enableNetworkDiagnosis = true;
+
 
                 UserInfo info = new UserInfo();
                 info.uid = "123321";
@@ -111,6 +112,15 @@ public class SLSDemoApplication extends MultiDexApplication {
                     credentials.accessKeyId = PreferenceUtils.getAccessKeyId(SLSDemoApplication.this);
                     credentials.accessKeySecret = PreferenceUtils.getAccessKeySecret(SLSDemoApplication.this);
                     credentials.securityToken = PreferenceUtils.getAccessKeyToken(SLSDemoApplication.this);
+
+                    TracerCredentials tracerCredentials = credentials.createTraceCredentials();
+                    tracerCredentials.instanceId = "sls-mall";
+
+                    TracerLogCredentials logCredentials = tracerCredentials.createLogCredentials();
+                    logCredentials.endpoint = "https://cn-beijing.log.aliyuncs.com";
+                    logCredentials.project = "qs-demos";
+                    logCredentials.logstore = "sls-mall-custom-logs";
+
                     SLSAndroid.setCredentials(credentials);
                 }
             }

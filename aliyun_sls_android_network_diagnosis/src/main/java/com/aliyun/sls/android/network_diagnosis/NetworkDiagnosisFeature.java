@@ -418,37 +418,61 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
         @Override
         protected String provideEndpoint(Credentials credentials) {
-            return super.provideEndpoint(credentials.networkDiagnosisCredentials);
+            NetworkDiagnosisCredentials diagnosisCredentials = credentials.networkDiagnosisCredentials;
+            if (null != diagnosisCredentials && !TextUtils.isEmpty(diagnosisCredentials.endpoint)) {
+                return super.provideEndpoint(diagnosisCredentials);
+            }
+
+            return super.provideEndpoint(credentials);
         }
 
         @Override
         protected String provideProjectName(Credentials credentials) {
-            return credentials.networkDiagnosisCredentials.project;
+            NetworkDiagnosisCredentials diagnosisCredentials = credentials.networkDiagnosisCredentials;
+            if (null != diagnosisCredentials && !TextUtils.isEmpty(diagnosisCredentials.project)) {
+                return super.provideProjectName(diagnosisCredentials);
+            }
+
+            return super.provideProjectName(credentials);
         }
 
         @Override
         protected String provideLogstoreName(Credentials credentials) {
+            if (null == credentials.networkDiagnosisCredentials) {
+                return null;
+            }
+
             return String.format("ipa-%s-raw", credentials.networkDiagnosisCredentials.instanceId);
         }
 
         @Override
         protected String provideAccessKeyId(Credentials credentials) {
-            return credentials.networkDiagnosisCredentials.accessKeyId;
+            NetworkDiagnosisCredentials diagnosisCredentials = credentials.networkDiagnosisCredentials;
+            if (null != diagnosisCredentials && !TextUtils.isEmpty(diagnosisCredentials.accessKeyId)) {
+                return super.provideAccessKeyId(diagnosisCredentials);
+            }
+
+            return super.provideAccessKeyId(credentials);
         }
 
         @Override
         protected String provideAccessKeySecret(Credentials credentials) {
-            return credentials.networkDiagnosisCredentials.accessKeySecret;
+            NetworkDiagnosisCredentials diagnosisCredentials = credentials.networkDiagnosisCredentials;
+            if (null != diagnosisCredentials && !TextUtils.isEmpty(diagnosisCredentials.accessKeySecret)) {
+                return super.provideAccessKeySecret(diagnosisCredentials);
+            }
+
+            return super.provideAccessKeySecret(credentials);
         }
 
         @Override
         protected String provideSecurityToken(Credentials credentials) {
-            return credentials.networkDiagnosisCredentials.securityToken;
-        }
+            NetworkDiagnosisCredentials diagnosisCredentials = credentials.networkDiagnosisCredentials;
+            if (null != diagnosisCredentials && !TextUtils.isEmpty(diagnosisCredentials.securityToken)) {
+                return super.provideSecurityToken(diagnosisCredentials);
+            }
 
-        @Override
-        protected void initLogProducer(Credentials credentials, String fileName) {
-            super.initLogProducer(credentials, fileName);
+            return super.provideSecurityToken(credentials);
         }
 
         @Override
@@ -498,11 +522,6 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             if (null != callback) {
                 callback.onComplete(Type.of(method), msg);
             }
-        }
-
-        @Override
-        public void setCredentials(Credentials credentials) {
-            super.setCredentials(credentials.networkDiagnosisCredentials);
         }
 
         @Override
