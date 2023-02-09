@@ -66,6 +66,7 @@ public class SLSDemoApplication extends MultiDexApplication {
         networkDiagnosisCredentials.endpoint = "https://cn-hangzhou.log.aliyuncs.com";
         networkDiagnosisCredentials.project = "zaiyun-test5";
 
+        SLSAndroid.setUtdid(this, "123123131232");
         SLSAndroid.setLogLevel(Log.VERBOSE);
         SLSAndroid.initialize(
             this,
@@ -87,7 +88,7 @@ public class SLSDemoApplication extends MultiDexApplication {
                 };
 
                 //configuration.enableCrashReporter = true;
-                //configuration.enableNetworkDiagnosis = true;
+                configuration.enableNetworkDiagnosis = true;
                 configuration.enableTracer = true;
                 configuration.enableTracerLog = true;
 
