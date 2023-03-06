@@ -8,7 +8,6 @@ import java.net.URL;
 
 import android.util.Log;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
-import com.aliyun.sls.android.producer.utils.Utils;
 
 public class LogProducerHttpTool {
     private static final String TAG = "LogProducerHttpTool";
@@ -19,9 +18,6 @@ public class LogProducerHttpTool {
 
     public static int android_http_post(String urlString, String method, String[] header, byte[] body) {
         try {
-            //if (!Utils.checkInternetConnection()) {
-            //    return -1;
-            //}
             URL url = new URL(urlString);
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
 
