@@ -61,6 +61,13 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
         }
     }
 
+    @Override
+    public void registerHttpCredentialCallback(HttpCredentialCallback callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.registerHttpCredentialCallback(callback);
+        }
+    }
+
     // endregion
 
     // region http
@@ -75,6 +82,12 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
     public void http(String url, Callback callback) {
         if (checkNetworkDiagnosis()) {
             networkDiagnosis.http(url, callback);
+        }
+    }
+
+    public void http(String url, Callback callback, HttpCredential credential) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.http(url, callback, credential);
         }
     }
     // endregion

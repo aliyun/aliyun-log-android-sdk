@@ -26,7 +26,6 @@ import com.aliyun.sls.android.core.sender.SdkSender;
 import com.aliyun.sls.android.core.sender.Sender;
 import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.core.utils.AppUtils;
-import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.Callback;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProcessor;
 import com.aliyun.sls.android.ot.SpanBuilder;
@@ -189,6 +188,22 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
 
     @Override
+    public void registerHttpCredentialCallback(HttpCredentialCallback callback) {
+        Diagnosis.registerHttpCredentialCallback((url, context) -> {
+            if (null != callback) {
+                HttpCredential credential = callback.getCredential(url, context);
+                if (null != credential) {
+                    return new com.alibaba.netspeed.network.HttpCredential(
+                        credential.getSslContext(),
+                        credential.getTrustManager()
+                    );
+                }
+            }
+            return null;
+        });
+    }
+
+    @Override
     public void setCallback(Sender.Callback callback) {
         super.setCallback(callback);
         if (null != networkDiagnosisSender) {
@@ -205,9 +220,19 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
 
     public void http(String url, Callback callback) {
+        this.http(url, callback, null);
+    }
+
+    @Override
+    public void http(String url, Callback callback, HttpCredential credential) {
         final HttpConfig config = new HttpConfig(
             TASK_ID_GENERATOR.generate(),
             url,
+            null,
+            null != credential ? new com.alibaba.netspeed.network.HttpCredential(
+                credential.getSslContext(),
+                credential.getTrustManager()
+            ) : null,
             (context, result) -> {
                 if (null != callback) {
                     callback.onComplete(Type.HTTP, result);
@@ -481,7 +506,8 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             config.setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
                 @Override
                 public String[] injectHeaders(String[] srcHeaders, int count) {
-                    return HttpHeader.getHeadersWithUA(srcHeaders, String.format("%s/%s", feature.name(), feature.version()));
+                    return HttpHeader.getHeadersWithUA(srcHeaders,
+                        String.format("%s/%s", feature.name(), feature.version()));
                 }
             });
         }

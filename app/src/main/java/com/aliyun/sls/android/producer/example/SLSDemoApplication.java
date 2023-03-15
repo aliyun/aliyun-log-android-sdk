@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.producer.example;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +89,7 @@ public class SLSDemoApplication extends MultiDexApplication {
                     }
                 };
 
-                //configuration.enableCrashReporter = true;
+                configuration.enableCrashReporter = true;
                 configuration.enableNetworkDiagnosis = true;
                 configuration.enableTracer = true;
                 configuration.enableTracerLog = true;
@@ -144,7 +146,7 @@ public class SLSDemoApplication extends MultiDexApplication {
             @Override
             public void customizeSpan(Request request, Span span) {
                 // 自定义 http request span
-                span.setService(request.url().encodedPath());
+                //span.setService(request.url().encodedPath());
             }
 
             @Override
@@ -179,5 +181,25 @@ public class SLSDemoApplication extends MultiDexApplication {
         //        return request.url().host().contains("log.aliyuncs.com");
         //    }
         //});
+
+        //redirectLog();
+    }
+
+    private void redirectLog() {
+        final File logFile = new File(getCacheDir() + "/logfile.log");
+        if (!logFile.exists()) {
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        String cmd = "logcat -b all -f " + logFile.getAbsolutePath() + "\n";
+        try {
+            Runtime.getRuntime().exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

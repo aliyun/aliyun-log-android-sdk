@@ -1,13 +1,25 @@
 package com.aliyun.sls.android.producer.example.example.network;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.network_diagnosis.NetworkDiagnosis;
 import com.aliyun.sls.android.producer.example.BaseActivity;
@@ -54,6 +66,7 @@ public class NetworkExample extends BaseActivity {
     private int index = 0;
     private int extIndex = 0;
 
+    @RequiresApi(api = VERSION_CODES.O)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,12 +95,20 @@ public class NetworkExample extends BaseActivity {
         NetworkDiagnosis.getInstance().registerCallback(
             (type, ret) -> SLSLog.d(TAG, String.format("global callback: {type: %s, ret: %s}", type.value, ret)));
 
+        //final HttpCredential credential = new HttpCredential(getSSLContext(NetworkExample.this), null);
+        //NetworkDiagnosis.getInstance().registerHttpCredentialCallback((url, context) -> credential);
+
         findViewById(R.id.example_send_http_text).setOnClickListener(v -> {
             printStatus("start http...");
             NetworkDiagnosis.getInstance().http("https://www.aliyun.com", (type, ret) -> {
                 SLSLog.d(TAG, String.format("http result: %s", ret));
                 printStatus(String.format("http result: %s", ret));
             });
+
+            //NetworkDiagnosis.getInstance().http("https://demo.ne.aliyuncs.com", (type, ret) -> {
+            //    SLSLog.d(TAG, String.format("http with credential result: %s", ret));
+            //    printStatus(String.format("http with credential result: %s", ret));
+            //}, credential);
         });
 
         findViewById(R.id.example_send_ping_text).setOnClickListener(v -> {
@@ -153,6 +174,42 @@ public class NetworkExample extends BaseActivity {
         }
 
         v.postDelayed(() -> auto(v), 5000);
+    }
+
+    @RequiresApi(api = VERSION_CODES.O)
+    private SSLContext getSSLContext(Context context) {
+        try {
+            // 服务器端需要验证的客户端证书
+            String KEY_STORE_TYPE_P12 = "PKCS12";
+            KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE_P12);
+
+            String p12Str = "";
+            byte[] p12Data = Base64.getDecoder().decode(p12Str);
+
+            InputStream ksIn = new ByteArrayInputStream(p12Data);
+            try {
+                keyStore.load(ksIn, "123".toCharArray());
+            } catch (Exception e) {
+                Log.e("Exception", e.getMessage(), e);
+            } finally {
+                try {
+                    ksIn.close();
+                } catch (Exception ignore) {
+                }
+            }
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
+                TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init((KeyStore)null);
+
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("X509");
+            keyManagerFactory.init(keyStore, "123".toCharArray());
+            sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
+            return sslContext;
+        } catch (Exception e) {
+            Log.e("tag", e.getMessage(), e);
+        }
+        return null;
     }
 
 }

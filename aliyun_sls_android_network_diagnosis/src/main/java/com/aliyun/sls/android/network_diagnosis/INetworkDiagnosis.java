@@ -3,6 +3,9 @@ package com.aliyun.sls.android.network_diagnosis;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
+
 /**
  * @author gordon
  * @date 2022/7/22
@@ -37,11 +40,32 @@ public interface INetworkDiagnosis {
             return ENUM_MAP.containsKey(value.toLowerCase()) ? ENUM_MAP.get(value) : UNKNOWN;
         }
 
-
     }
 
     interface Callback {
         void onComplete(Type type, String ret);
+    }
+
+    class HttpCredential {
+        private SSLContext sslContext;
+        private X509TrustManager trustManager;
+
+        public HttpCredential(SSLContext sslContext, X509TrustManager trustManager) {
+            this.sslContext = sslContext;
+            this.trustManager = trustManager;
+        }
+
+        public SSLContext getSslContext() {
+            return this.sslContext;
+        }
+
+        public X509TrustManager getTrustManager() {
+            return this.trustManager;
+        }
+    }
+
+    interface HttpCredentialCallback {
+        HttpCredential getCredential(String url, Object context);
     }
 
     // region setup
@@ -51,6 +75,7 @@ public interface INetworkDiagnosis {
 
     /**
      * Enable the multiple ports detect. Default is false, use the default port.
+     *
      * @param enable true/false
      */
     void setMultiplePortsDetect(boolean enable);
@@ -58,12 +83,16 @@ public interface INetworkDiagnosis {
     void registerCallback(Callback callback);
 
     void updateExtensions(Map<String, String> extension);
+
+    void registerHttpCredentialCallback(HttpCredentialCallback callback);
     // endregion
 
     // region http
     void http(String url);
 
     void http(String url, Callback callback);
+
+    void http(String url, Callback callback, HttpCredential credential);
     // endregion
 
     // region ping
