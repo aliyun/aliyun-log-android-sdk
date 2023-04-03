@@ -21,6 +21,11 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import com.aliyun.sls.android.core.SLSLog;
+import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.DnsRequest;
+import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.HttpRequest;
+import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.MtrRequest;
+import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.PingRequest;
+import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.TcpPingRequest;
 import com.aliyun.sls.android.network_diagnosis.NetworkDiagnosis;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.example.R;
@@ -72,74 +77,94 @@ public class NetworkExample extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network_example);
 
-        //SLSAdapter adapter = SLSAdapter.getInstance();
-        //adapter.addPlugin(new SLSNetDiagnosisPlugin());
-        //
-        //SLSConfig config = new SLSConfig(this);
-        //config.pluginAppId = this.pluginAppId;
-        //config.endpoint = this.endpoint;
-        //config.accessKeyId = this.accessKeyId;
-        //config.accessKeySecret = this.accessKeySecret;
-        ////config.siteId = "cn";
-        //
-        //config.userId = "test_user_id";
-        //config.userNick = "test_nick";
-        //config.addCustom("custom_key", "custom_value");
-        //config.addCustom("custom_key2", "custom_value2");
-        //
-        //config.debuggable = true;
-        //
-        //adapter.init(config);
+        final NetworkDiagnosis diagnosis = NetworkDiagnosis.getInstance();
 
-        NetworkDiagnosis.getInstance().setMultiplePortsDetect(true);
-        NetworkDiagnosis.getInstance().registerCallback(
+        // 开启多网卡支持
+        diagnosis.setMultiplePortsDetect(true);
+        // 注册全局回调
+        diagnosis.registerCallback(
             (type, ret) -> SLSLog.d(TAG, String.format("global callback: {type: %s, ret: %s}", type.value, ret)));
 
         //final HttpCredential credential = new HttpCredential(getSSLContext(NetworkExample.this), null);
         //NetworkDiagnosis.getInstance().registerHttpCredentialCallback((url, context) -> credential);
 
+        // http 探测
         findViewById(R.id.example_send_http_text).setOnClickListener(v -> {
             printStatus("start http...");
-            NetworkDiagnosis.getInstance().http("https://www.aliyun.com", (type, ret) -> {
-                SLSLog.d(TAG, String.format("http result: %s", ret));
-                printStatus(String.format("http result: %s", ret));
+
+            HttpRequest request = new HttpRequest();
+            // 可选参数
+            request.context = "<your http context id>";
+
+            request.domain = "https://www.aliyun.com";
+            diagnosis.http(request, response -> {
+                SLSLog.d(TAG, String.format("http result: %s", response.content));
+                printStatus(String.format("http result: %s", response.content));
+
             });
 
-            //NetworkDiagnosis.getInstance().http("https://demo.ne.aliyuncs.com", (type, ret) -> {
-            //    SLSLog.d(TAG, String.format("http with credential result: %s", ret));
-            //    printStatus(String.format("http with credential result: %s", ret));
-            //}, credential);
+            //request.credential = credential;
+            //diagnosis.http(request, response -> {
+            //    SLSLog.d(TAG, String.format("http with credential result: %s", response.content));
+            //    printStatus(String.format("http with credential result: %s", response.content));
+            //});
         });
 
+        // ping 探测
         findViewById(R.id.example_send_ping_text).setOnClickListener(v -> {
             printStatus("start ping...");
-            NetworkDiagnosis.getInstance().ping("www.aliyun.com", (type, ret) -> {
-                SLSLog.d(TAG, String.format("ping result: %s", ret));
-                printStatus(String.format("ping result: %s", ret));
+            PingRequest request = new PingRequest();
+            request.domain = "www.aliyun.com";
+            // 可选参数
+            request.context = "<your ping context id>";
+
+            diagnosis.ping(request, response -> {
+                SLSLog.d(TAG, String.format("ping result: %s", response.content));
+                printStatus(String.format("ping result: %s", response.content));
+
             });
         });
 
+        // tcp ping 探测
         findViewById(R.id.example_send_tcpping_text).setOnClickListener(v -> {
             printStatus("start tcp ping...");
-            NetworkDiagnosis.getInstance().tcpPing("www.aliyun.com", 80, (type, ret) -> {
-                SLSLog.d(TAG, String.format("tcp ping result: %s", ret));
-                printStatus(String.format("tcp ping result: %s", ret));
+            TcpPingRequest request = new TcpPingRequest();
+            request.domain = "www.aliyun.com";
+            request.port = 80;
+            // 可选参数
+            request.context = "<your tcp ping context id>";
+            diagnosis.tcpPing(request, response -> {
+                SLSLog.d(TAG, String.format("tcp ping result: %s", response.content));
+                printStatus(String.format("tcp ping result: %s", response.content));
+
             });
         });
 
+        // mtr 探测
         findViewById(R.id.example_send_mtr_text).setOnClickListener(v -> {
             printStatus("start mtr...");
-            NetworkDiagnosis.getInstance().mtr("www.aliyun.com", (type, ret) -> {
-                SLSLog.d(TAG, String.format("mtr result: %s", ret));
-                printStatus(String.format("mtr result: %s", ret));
+            MtrRequest request = new MtrRequest();
+            request.domain = "www.aliyun.com";
+            // 可选参数
+            request.context = "<your mtr context id>";
+
+            diagnosis.mtr(request, response -> {
+                SLSLog.d(TAG, String.format("mtr result: %s", response.content));
+                printStatus(String.format("mtr result: %s", response.content));
+
             });
         });
 
+        // dns 探测
         findViewById(R.id.example_send_dns_text).setOnClickListener(v -> {
             printStatus("start dns...");
-            NetworkDiagnosis.getInstance().dns("www.aliyun.com", (type, ret) -> {
-                SLSLog.d(TAG, String.format("dns result: %s", ret));
-                printStatus(String.format("dns result: %s", ret));
+            DnsRequest request = new DnsRequest();
+            request.domain = "www.aliyun.com";
+            // 可选参数
+            request.context = "<your dns context id>";
+            diagnosis.dns(request, response -> {
+                SLSLog.d(TAG, String.format("dns result: %s", response.content));
+                printStatus(String.format("dns result: %s", response.content));
             });
         });
 

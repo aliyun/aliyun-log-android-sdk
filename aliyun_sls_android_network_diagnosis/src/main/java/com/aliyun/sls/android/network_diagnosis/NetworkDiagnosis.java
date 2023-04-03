@@ -94,7 +94,6 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
         }
     }
 
-    @Deprecated
     @Override
     public void http(HttpRequest request) {
         if (checkNetworkDiagnosis()) {
@@ -102,7 +101,6 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
         }
     }
 
-    @Deprecated
     @Override
     public void http(HttpRequest request, Callback2 callback) {
         if (checkNetworkDiagnosis()) {
