@@ -118,7 +118,10 @@ public interface INetworkDiagnosis {
      */
     void setMultiplePortsDetect(boolean enable);
 
+    @Deprecated
     void registerCallback(Callback callback);
+
+    void registerCallback(Callback2 callback);
 
     void updateExtensions(Map<String, String> extension);
 

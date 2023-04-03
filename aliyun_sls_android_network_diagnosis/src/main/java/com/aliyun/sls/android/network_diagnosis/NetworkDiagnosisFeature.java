@@ -162,6 +162,15 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     @Override
     public void registerCallback(Callback callback) {
+        this.registerCallback(response -> {
+            if (null != callback) {
+                callback.onComplete(response.type, response.content);
+            }
+        });
+    }
+
+    @Override
+    public void registerCallback(Callback2 callback) {
         if (null != networkDiagnosisSender) {
             networkDiagnosisSender.registerGlobalCallback(callback);
         }
@@ -554,7 +563,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     private static class NetworkDiagnosisSender extends SdkSender implements Logger, ISpanProcessor {
 
         private final SdkFeature feature;
-        private INetworkDiagnosis.Callback callback;
+        private INetworkDiagnosis.Callback2 callback;
 
         public NetworkDiagnosisSender(Context context, SdkFeature feature) {
             super(context);
@@ -562,7 +571,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             this.feature = feature;
         }
 
-        protected void registerGlobalCallback(INetworkDiagnosis.Callback callback) {
+        protected void registerGlobalCallback(INetworkDiagnosis.Callback2 callback) {
             this.callback = callback;
         }
 
@@ -681,7 +690,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             builder.build().end();
 
             if (null != callback) {
-                callback.onComplete(Type.of(method), msg);
+                callback.onComplete(Response.response(context, Type.of(method), msg));
             }
         }
 
