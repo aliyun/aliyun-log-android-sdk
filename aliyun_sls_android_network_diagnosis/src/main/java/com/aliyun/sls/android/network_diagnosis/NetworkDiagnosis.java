@@ -71,6 +71,7 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
     // endregion
 
     // region http
+    @Deprecated
     @Override
     public void http(String url) {
         if (checkNetworkDiagnosis()) {
@@ -78,6 +79,7 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
         }
     }
 
+    @Deprecated
     @Override
     public void http(String url, Callback callback) {
         if (checkNetworkDiagnosis()) {
@@ -85,11 +87,29 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
         }
     }
 
+    @Deprecated
     public void http(String url, Callback callback, HttpCredential credential) {
         if (checkNetworkDiagnosis()) {
             networkDiagnosis.http(url, callback, credential);
         }
     }
+
+    @Deprecated
+    @Override
+    public void http(HttpRequest request) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.http(request);
+        }
+    }
+
+    @Deprecated
+    @Override
+    public void http(HttpRequest request, Callback2 callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.http(request, callback);
+        }
+    }
+
     // endregion
 
     // region ping
@@ -127,6 +147,21 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
             networkDiagnosis.ping(domain, size, maxTimes, timeout, callback);
         }
     }
+
+    @Override
+    public void ping(PingRequest pingRequest) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.ping(pingRequest);
+        }
+    }
+
+    @Override
+    public void ping(PingRequest pingRequest, Callback2 callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.ping(pingRequest, callback);
+        }
+    }
+
     // endregion
 
     // region tcp ping
@@ -157,6 +192,21 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
             networkDiagnosis.tcpPing(domain, port, maxTimes, timeout, callback);
         }
     }
+
+    @Override
+    public void tcpPing(TcpPingRequest request) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.tcpPing(request);
+        }
+    }
+
+    @Override
+    public void tcpPing(TcpPingRequest request, Callback2 callback2) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.tcpPing(request, callback2);
+        }
+    }
+
     // endregion
 
     // region mtr
@@ -201,6 +251,21 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
             networkDiagnosis.mtr(domain, maxTTL, maxPaths, maxTimes, timeout, callback);
         }
     }
+
+    @Override
+    public void mtr(MtrRequest request) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.mtr(request);
+        }
+    }
+
+    @Override
+    public void mtr(MtrRequest request, Callback2 callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.mtr(request, callback);
+        }
+    }
+
     // endregion
 
     // region dns
@@ -238,5 +303,20 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
             networkDiagnosis.dns(nameServer, domain, type, timeout, callback);
         }
     }
+
+    @Override
+    public void dns(DnsRequest dnsRequest) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.dns(dnsRequest);
+        }
+    }
+
+    @Override
+    public void dns(DnsRequest dnsRequest, Callback2 callback) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.dns(dnsRequest, callback);
+        }
+    }
+
     // endregion
 }
