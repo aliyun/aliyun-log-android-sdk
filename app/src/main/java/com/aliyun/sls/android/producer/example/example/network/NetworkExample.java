@@ -82,8 +82,8 @@ public class NetworkExample extends BaseActivity {
         // 开启多网卡支持
         diagnosis.setMultiplePortsDetect(true);
         // 注册全局回调
-        diagnosis.registerCallback(
-            (type, ret) -> SLSLog.d(TAG, String.format("global callback: {type: %s, ret: %s}", type.value, ret)));
+        diagnosis.registerCallback(response -> SLSLog.d(TAG,
+            String.format("global callback: {type: %s, ret: %s}", response.type.value, response.content)));
 
         //final HttpCredential credential = new HttpCredential(getSSLContext(NetworkExample.this), null);
         //NetworkDiagnosis.getInstance().registerHttpCredentialCallback((url, context) -> credential);
