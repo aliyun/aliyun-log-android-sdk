@@ -4,13 +4,15 @@ import android.content.Context;
 import android.text.TextUtils;
 import com.aliyun.sls.android.producer.internal.HttpHeader;
 import com.aliyun.sls.android.producer.internal.LogProducerHttpHeaderInjector;
-import com.aliyun.sls.android.producer.utils.SoLoader;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 import com.aliyun.sls.android.producer.utils.Utils;
 
 @SuppressWarnings({"AlibabaLowerCamelCaseVariableNaming", "unused"})
 public class LogProducerConfig {
-    private static boolean hasSoLoaded = false;
+    static {
+        System.loadLibrary("sls_producer");
+    }
+
     private final long config;
     private final Context context;
     private String endpoint;
@@ -52,11 +54,6 @@ public class LogProducerConfig {
 
     // @formatter:off
     public LogProducerConfig(Context context, String endpoint, String project, String logstore, String accessKeyId, String accessKeySecret, String securityToken) throws LogProducerException {
-        if (!hasSoLoaded) {
-            SoLoader.instance().loadLibrary(context, "sls_producer");
-            hasSoLoaded = true;
-        }
-
         this.context = context;
         config = create_log_producer_config();
         if (config == 0) {
