@@ -95,6 +95,8 @@ public class NetworkExample extends BaseActivity {
             HttpRequest request = new HttpRequest();
             // 可选参数
             request.context = "<your http context id>";
+            request.headerOnly = true;
+            request.downloadBytesLimit = 1024;
 
             request.domain = "https://www.aliyun.com";
             diagnosis.http(request, response -> {

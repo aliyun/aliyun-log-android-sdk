@@ -16,6 +16,9 @@ public interface INetworkDiagnosis {
     int DEFAULT_TIMEOUT = 2 * 1000;
     int DEFAULT_MAX_TIMES = 10;
 
+    boolean DEFAULT_HTTP_HEADER_ONLY = false;
+    int DEFAULT_HTTP_DOWNLOAD_BYTES_LIMIT = 64 * 1024; // 64KB
+
     int DEFAULT_MTR_MAX_TTL = 30;
     int DEFAULT_MTR_MAX_PATH = 1;
 
@@ -135,9 +138,15 @@ public interface INetworkDiagnosis {
         public Object context;
     }
 
-    class HttpRequest extends Request {
+    class HttpRequest extends PingRequest {
         public String ip;
         public HttpCredential credential;
+        public boolean headerOnly = DEFAULT_HTTP_HEADER_ONLY;
+        public int downloadBytesLimit = DEFAULT_HTTP_DOWNLOAD_BYTES_LIMIT;
+
+        public HttpRequest() {
+            timeout = 15 * DEFAULT_TIMEOUT; // timeout 30s
+        }
     }
 
     @Deprecated

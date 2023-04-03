@@ -258,6 +258,9 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             TASK_ID_GENERATOR.generate(),
             request.domain,
             request.ip,
+            request.timeout,
+            request.downloadBytesLimit,
+            request.headerOnly,
             null != request.credential ? new com.alibaba.netspeed.network.HttpCredential(
                 request.credential.getSslContext(),
                 request.credential.getTrustManager()
