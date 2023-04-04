@@ -10,6 +10,8 @@ import com.aliyun.sls.android.core.SLSAndroid;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.configuration.UserInfo;
+import com.aliyun.sls.android.crashreporter.CrashReporter;
+import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
 
 /**
  * @author gordon
@@ -44,6 +46,14 @@ public final class Unity4SLSAndroid {
             configuration.enableCrashReporter = true;
         });
         hasInit.set(true);
+    }
+
+    public static void registerCredentialsCallback(CredentialsCallback callback) {
+        SLSAndroid.registerCredentialsCallback((feature, result) -> {
+            if (null != callback) {
+                callback.onCall(feature, result.name());
+            }
+        });
     }
 
     public static void setLogLevel(int level) {
@@ -86,6 +96,61 @@ public final class Unity4SLSAndroid {
 
     public static void clearExtra() {
         SLSAndroid.clearExtra();
+    }
+
+    public static void reportCustomLog(String type, String log) {
+        CrashReporter.reportCustomLog(type, log);
+    }
+
+    public static void reportError(final String stacktrace) {
+        reportError("exception", stacktrace);
+    }
+
+    public static void reportError(final String type, final String stacktrace) {
+        reportError(type, "", stacktrace);
+    }
+
+    public static void reportError(final String type, final String message, final String stacktrace) {
+        reportError(type, LogLevel.LOG_ERROR, message, stacktrace);
+    }
+
+    public static void reportError(
+        final String type,
+        final LogLevel level,
+        final String message,
+        final String stacktrace
+    ) {
+        CrashReporter.reportError(type, level, message, stacktrace);
+    }
+
+    public static void reportLuaError(
+        final String message,
+        final String stacktrace
+    ) {
+        reportLuaError(LogLevel.LOG_ERROR, message, stacktrace);
+    }
+
+    public static void reportLuaError(
+        final LogLevel level,
+        final String message,
+        final String stacktrace
+    ) {
+        reportError("lua", level, message, stacktrace);
+    }
+
+    public static void reportCSharpError(
+        final String message,
+        final String stacktrace
+    ) {
+        reportCSharpError(LogLevel.LOG_ERROR, message, stacktrace);
+    }
+
+    public static void reportCSharpError(
+        final LogLevel level,
+        final String message,
+        final String stacktrace
+    ) {
+        reportError("csharp", level, message, stacktrace);
     }
 
     public String helloFromAndroid(String appid) {

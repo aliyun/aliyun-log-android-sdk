@@ -34,6 +34,21 @@ public final class Utdid {
         return Holder.INSTANCE;
     }
 
+    public synchronized void setUtdid(Context context, String utdid) {
+        if (null == context || TextUtils.isEmpty(utdid)) {
+            return;
+        }
+
+        try {
+            Lock.lock(context);
+            Storage.getInstance().setUtdid(context, utdid);
+        } catch (Throwable t) {
+            // ignore
+        } finally {
+            Lock.unlock();
+        }
+    }
+
     public synchronized String getUtdid(Context context) {
         String utdid = Storage.getInstance().getUtdid(context);
         if (!TextUtils.isEmpty(utdid)) {

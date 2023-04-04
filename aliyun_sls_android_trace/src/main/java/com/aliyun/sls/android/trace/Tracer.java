@@ -1,12 +1,21 @@
 package com.aliyun.sls.android.trace;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.text.TextUtils;
+import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProcessor;
 import com.aliyun.sls.android.ot.ISpanProvider;
+import com.aliyun.sls.android.ot.Resource;
 import com.aliyun.sls.android.ot.Span;
 import com.aliyun.sls.android.ot.Span.StatusCode;
 import com.aliyun.sls.android.ot.SpanBuilder;
 import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.ot.context.Scope;
+import com.aliyun.sls.android.ot.logs.LogData;
+import com.aliyun.sls.android.ot.logs.LogLevel;
+import com.aliyun.sls.android.ot.logs.Record;
 import com.aliyun.sls.android.producer.Log;
 
 /**
@@ -27,21 +36,71 @@ public class Tracer {
     }
 
     /**
-     * 写日志
-     *
-     * @param log
-     * @return
+     * 上报 Logs 到默认或指定的logstore
+     * @param logContent 日志内容
+     * @return success or fails
      */
-    public static boolean log(Log log) {
-        if (null == log) {
+    public static boolean log(String logContent) {
+        return log(LogLevel.ERROR, logContent);
+    }
+
+    /**
+     * 上报 Logs 到默认或指定的logstore
+     *
+     * @param level log level, {@link LogLevel#TRACE}, {@link LogLevel#DEBUG},  {@link LogLevel#WARN},  {@link LogLevel#ERROR}, {@link LogLevel#FATAL},
+     * @param logContent 日志内容
+     * @return success or fails
+     */
+    public static boolean log(LogLevel level, String logContent) {
+        return log(level, logContent, null);
+    }
+
+    /**
+     * 上报 Logs 到默认或指定的logstore
+     *
+     * @param level log level, {@link LogLevel#TRACE}, {@link LogLevel#DEBUG},  {@link LogLevel#WARN},  {@link LogLevel#ERROR}, {@link LogLevel#FATAL},
+     * @param logContent 日志内容
+     * @param attributes 自定义属性 {@link Attribute}
+     * @return success or fails
+     */
+    public static boolean log(LogLevel level, String logContent, List<Attribute> attributes) {
+        return log(LogData.builder().setLogLevel(level).setLogContent(logContent).setAttribute(attributes).build());
+    }
+
+    /**
+     * 上报 Logs 到默认或指定的logstore
+     * @param logData 通过 {@link com.aliyun.sls.android.ot.logs.LogData.Builder} 构造的LogData，提供最灵活的Log构造方式
+     * @return success or fails
+     */
+    public static boolean log(LogData logData) {
+        if (null == logData) {
             return false;
         }
 
-        Span span = spanBuilder("logs").build();
-        //span.start /= 1000;
-        //span.end /= 1000;
-        log.putContents(span.toMap());
+        Span span = ContextManager.INSTANCE.activeSpan();
+        if (null == span) {
+            span = spanBuilder("logs").build();
+        }
 
+        Resource r = logData.getResource();
+        if (null == r) {
+            r = Resource.getDefault();
+        }
+        logData.setResource(r.merge(span.getResource()));
+
+        final List<Attribute> attributes = new ArrayList<>(span.getAttribute());
+        for (Record record : logData.getLogRecords()) {
+            record.addAttribute(attributes);
+            if (TextUtils.isEmpty(record.getTraceId())) {
+                record.setTraceId(span.getTraceId());
+            }
+            if (TextUtils.isEmpty(record.getSpanId())) {
+                record.setSpanId(span.getSpanId());
+            }
+        }
+
+        final Log log = new Log();
+        log.putContent(logData.toJson());
         return Tracer.traceFeature.addLog(log);
     }
 
@@ -104,7 +163,8 @@ public class Tracer {
             r.run();
         } catch (Throwable t) {
             span.setStatus(StatusCode.ERROR);
-            span.setStatusMessage(String.format("exception: {name: %s, reason: %s}", t.getClass().getName(), t.getMessage()));
+            span.setStatusMessage(
+                String.format("exception: {name: %s, reason: %s}", t.getClass().getName(), t.getMessage()));
 
             span.recordException(t);
         } finally {

@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import com.aliyun.sls.android.blockdetection.BlockDetection;
+import com.aliyun.sls.android.core.SLSAndroid;
+import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
 import com.aliyun.sls.android.crashreporter.JNICrash;
@@ -49,7 +51,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 R.id.native_crash, R.id.native_heap_corruption, R.id.native_fd_leak,
                 R.id.native_abort, R.id.native_stack_overflow, R.id.native_oom,
                 R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr, R.id.custom_log,
-                R.id.jank, R.id.switchFeature, R.id.switchBlockFeature
+                R.id.jank, R.id.switchFeature, R.id.switchBlockFeature, R.id.dynamic_update
         };
         for (int btnId : btnIds) {
             findViewById(btnId).setOnClickListener(this);
@@ -206,6 +208,12 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                     BlockDetection.setEnabled(true);
                     view.setTag(true);
                 }
+                break;
+            }
+            case R.id.dynamic_update: {
+                Credentials credentials = new Credentials();
+                credentials.instanceId = "ios-dev-ea64";
+                SLSAndroid.setCredentials(credentials);
                 break;
             }
 

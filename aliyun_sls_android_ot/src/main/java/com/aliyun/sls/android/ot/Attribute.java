@@ -1,9 +1,13 @@
 package com.aliyun.sls.android.ot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.util.Pair;
+import com.aliyun.sls.android.ot.utils.JSONUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * @author gordon
@@ -62,5 +66,44 @@ public class Attribute implements Comparable<Attribute> {
     @Override
     public int compareTo(Attribute o) {
         return this.key.compareTo(o.key);
+    }
+
+    public JSONObject toJson() {
+        JSONObject object = new JSONObject();
+        JSONUtils.put(object, this.key, this.value);
+        return object;
+    }
+
+    public static JSONObject toJson(List<Attribute> attributes) {
+        if (null == attributes) {
+            return null;
+        }
+
+        Collections.sort(attributes);
+
+        JSONObject object = new JSONObject();
+        for (Attribute attribute : attributes) {
+            JSONUtils.put(object, attribute.key, attribute.value);
+        }
+        return object;
+    }
+
+    public static JSONArray toJsonArray(List<Attribute> attributes) {
+        if (null == attributes) {
+            return null;
+        }
+
+        Collections.sort(attributes);
+
+        JSONArray array = new JSONArray();
+        JSONObject object;
+        for (Attribute attribute : attributes) {
+            object = new JSONObject();
+            JSONUtils.put(object, "key", attribute.key);
+            JSONUtils.put(object, "value", JSONUtils.object(Pair.create("stringValue", attribute.value)));
+            array.put(object);
+        }
+
+        return array;
     }
 }

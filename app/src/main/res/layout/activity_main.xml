@@ -34,6 +34,16 @@
             <Button android:text="Demo" android:padding="8dp" android:id="@+id/main_trace_demo"/>
         </TableRow>
 
+
+        <TableRow>
+            <TextView android:text="kotlin" android:textAlignment="center" android:layout_span="3"/>
+        </TableRow>
+
+        <TableRow>
+            <Button android:text="trace demo" android:padding="8dp" android:id="@+id/main_kotlin_trace"/>
+
+        </TableRow>
+
     </TableLayout>
 
 </LinearLayout>

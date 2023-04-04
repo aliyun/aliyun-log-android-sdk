@@ -1,6 +1,8 @@
 package com.aliyun.sls.android.network_diagnosis;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.alibaba.netspeed.network.Diagnosis;
 import com.alibaba.netspeed.network.DnsConfig;
@@ -41,18 +43,9 @@ import org.json.JSONObject;
 public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagnosis {
     private static final String TAG = "NetworkDiagnosisFeature";
 
-    public static final int DEFAULT_PING_SIZE = 64;
-    public static final int DEFAULT_TIMEOUT = 2 * 1000;
-    public static final int DEFAULT_MAX_TIMES = 10;
-
-    public static final int DEFAULT_MTR_MAX_TTL = 30;
-    public static final int DEFAULT_MTR_MAX_PATH = 1;
-
-    public static final String DNS_TYPE_IPv4 = "A";
-    public static final String DNS_TYPE_IPv6 = "AAAA";
-
     private static final TaskIdGenerator TASK_ID_GENERATOR = new TaskIdGenerator();
     private NetworkDiagnosisSender networkDiagnosisSender;
+    private boolean enableMultiplePortsDetect = false;
 
     @Override
     public String name() {
@@ -163,6 +156,53 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
 
     @Override
+    public void setMultiplePortsDetect(boolean enable) {
+        this.enableMultiplePortsDetect = enable;
+    }
+
+    @Override
+    public void registerCallback(Callback callback) {
+        this.registerCallback(response -> {
+            if (null != callback) {
+                callback.onComplete(response.type, response.content);
+            }
+        });
+    }
+
+    @Override
+    public void registerCallback(Callback2 callback) {
+        if (null != networkDiagnosisSender) {
+            networkDiagnosisSender.registerGlobalCallback(callback);
+        }
+    }
+
+    @Override
+    public void updateExtensions(Map<String, String> extension) {
+        if (null == extension) {
+            return;
+        }
+
+        final Map<String, String> extensionCopy = new HashMap<>(extension);
+        Diagnosis.updateExtension(extensionCopy);
+    }
+
+    @Override
+    public void registerHttpCredentialCallback(HttpCredentialCallback callback) {
+        Diagnosis.registerHttpCredentialCallback((url, context) -> {
+            if (null != callback) {
+                HttpCredential credential = callback.getCredential(url, context);
+                if (null != credential) {
+                    return new com.alibaba.netspeed.network.HttpCredential(
+                        credential.getSslContext(),
+                        credential.getTrustManager()
+                    );
+                }
+            }
+            return null;
+        });
+    }
+
+    @Override
     public void setCallback(Sender.Callback callback) {
         super.setCallback(callback);
         if (null != networkDiagnosisSender) {
@@ -173,44 +213,95 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     // endregion
 
     // region http
+    @Deprecated
     @Override
     public void http(String url) {
         this.http(url, null);
     }
 
+    @Deprecated
+    @Override
     public void http(String url, Callback callback) {
-        Diagnosis.startHttpPing(
-            new HttpConfig(
-                TASK_ID_GENERATOR.generate(),
-                url,
-                (context, result) -> {
-                    if (null != callback) {
-                        callback.onComplete(Type.HTTP, result);
-                    }
-                    return 0;
-                },
-                this
-            )
+        this.http(url, callback, null);
+    }
+
+    @Override
+    @Deprecated
+    public void http(String url, Callback callback, HttpCredential credential) {
+        HttpRequest request = new HttpRequest();
+        request.domain = url;
+        request.credential = credential;
+        request.context = this;
+
+        http(request, response -> {
+            if (null != callback) {
+                callback.onComplete(response.type, response.content);
+            }
+        });
+    }
+
+    @Override
+    public void http(HttpRequest request) {
+        this.http(request, null);
+    }
+
+    @Override
+    public void http(HttpRequest request, Callback2 callback) {
+        if (null == request || TextUtils.isEmpty(request.domain)) {
+            if (null != callback) {
+                callback.onComplete(Response.error("HttpRequest is null or domain is empty."));
+            }
+            return;
+        }
+
+        final HttpConfig config = new HttpConfig(
+            TASK_ID_GENERATOR.generate(),
+            request.domain,
+            request.ip,
+            request.timeout,
+            request.downloadBytesLimit,
+            request.headerOnly,
+            null != request.credential ? new com.alibaba.netspeed.network.HttpCredential(
+                request.credential.getSslContext(),
+                request.credential.getTrustManager()
+            ) : null,
+            (context, result) -> {
+                if (null != callback) {
+                    Response response = new Response();
+                    response.context = context;
+                    response.type = Type.HTTP;
+                    response.content = result;
+                    callback.onComplete(response);
+                }
+                return 0;
+            },
+            request.context
         );
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        Diagnosis.startHttpPing(config);
     }
     // endregion
 
     // region ping
+    @Deprecated
     @Override
     public void ping(String domain) {
         this.ping(domain, null);
     }
 
+    @Deprecated
     @Override
     public void ping(String domain, Callback callback) {
         this.ping(domain, DEFAULT_PING_SIZE, callback);
     }
 
+    @Deprecated
     @Override
     public void ping(String domain, int size, Callback callback) {
         this.ping(domain, size, DEFAULT_MAX_TIMES, DEFAULT_TIMEOUT, callback);
     }
 
+    @Deprecated
     @Override
     public void ping(String domain, int maxTimes, int timeout, Callback callback) {
         this.ping(domain, DEFAULT_PING_SIZE, maxTimes, timeout, callback);
@@ -218,22 +309,49 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     @Override
     public void ping(String domain, int size, int maxTimes, int timeout, Callback callback) {
-        Diagnosis.startPing(
-            new PingConfig(
-                TASK_ID_GENERATOR.generate(),
-                domain,
-                size,
-                maxTimes,
-                timeout,
-                (context, result) -> {
-                    if (null != callback) {
-                        callback.onComplete(Type.PING, result);
-                    }
-                    return 0;
-                },
-                this
-            )
+        PingRequest request = new PingRequest();
+        request.domain = domain;
+        request.size = size;
+        request.maxTimes = maxTimes;
+        request.timeout = timeout;
+        request.context = this;
+
+        ping(request, response -> {
+            if (null != callback) {
+                callback.onComplete(response.type, response.content);
+            }
+        });
+    }
+
+    public void ping(PingRequest pingRequest) {
+        this.ping(pingRequest, null);
+    }
+
+    public void ping(PingRequest pingRequest, Callback2 callback) {
+        if (null == pingRequest || TextUtils.isEmpty(pingRequest.domain)) {
+            if (null != callback) {
+                callback.onComplete(Response.error("PingRequest is null or domain is empty."));
+            }
+            return;
+        }
+
+        final PingConfig config = new PingConfig(
+            TASK_ID_GENERATOR.generate(),
+            pingRequest.domain,
+            pingRequest.size,
+            pingRequest.maxTimes,
+            pingRequest.timeout,
+            (context, result) -> {
+                if (null != callback) {
+                    callback.onComplete(Response.response(context, Type.PING, result));
+                }
+                return 0;
+            },
+            pingRequest.context
         );
+
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        Diagnosis.startPing(config);
     }
     // endregion
 
@@ -255,23 +373,48 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     @Override
     public void tcpPing(String domain, int port, int maxTimes, int timeout, Callback callback) {
-        Diagnosis.startTcpPing(
-            new TcpPingConfig(
-                TASK_ID_GENERATOR.generate(),
-                domain,
-                port,
-                maxTimes,
-                timeout,
-                (context, result) -> {
-                    if (null != callback) {
-                        callback.onComplete(Type.TCPPING, result);
-                    }
-                    return 0;
-                },
-                this
-            )
-        );
+        TcpPingRequest request = new TcpPingRequest();
+        request.domain = domain;
+        request.port = port;
+        request.maxTimes = maxTimes;
+        request.timeout = timeout;
+        request.context = this;
+
+        this.tcpPing(request, response -> callback.onComplete(response.type, response.content));
     }
+
+    @Override
+    public void tcpPing(TcpPingRequest request) {
+        this.tcpPing(request, null);
+    }
+
+    @Override
+    public void tcpPing(TcpPingRequest request, Callback2 callback) {
+        if (null == request || TextUtils.isEmpty(request.domain) || INVALID == request.port) {
+            if (null != callback) {
+                callback.onComplete(Response.error("TcpPingRequest is null or domain is empty or port is INVALID."));
+            }
+            return;
+        }
+
+        final TcpPingConfig config = new TcpPingConfig(
+            TASK_ID_GENERATOR.generate(),
+            request.domain,
+            request.port,
+            request.maxTimes,
+            request.timeout,
+            (context, result) -> {
+                if (null != callback) {
+                    callback.onComplete(Response.response(context, Type.TCPPING, result));
+                }
+                return 0;
+            },
+            request.context
+        );
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        Diagnosis.startTcpPing(config);
+    }
+
     // endregion
 
     // region mtr
@@ -302,23 +445,51 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     @Override
     public void mtr(String domain, int maxTTL, int maxPaths, int maxTimes, int timeout, Callback callback) {
-        Diagnosis.startMtr(
-            new MtrConfig(
-                TASK_ID_GENERATOR.generate(),
-                domain,
-                maxTTL,
-                maxPaths,
-                maxTimes,
-                timeout,
-                (context, result) -> {
-                    if (null != callback) {
-                        callback.onComplete(Type.MTR, result);
-                    }
-                    return 0;
-                },
-                this
-            )
+        MtrRequest request = new MtrRequest();
+        request.domain = domain;
+        request.maxTTL = maxTTL;
+        request.maxPaths = maxPaths;
+        request.maxTimes = maxTimes;
+        request.timeout = timeout;
+        request.context = this;
+
+        this.mtr(request, response -> {
+            if (null != callback) {
+                callback.onComplete(response.type, response.content);
+            }
+        });
+    }
+
+    public void mtr(MtrRequest request) {
+        this.mtr(request, null);
+    }
+
+    public void mtr(MtrRequest request, Callback2 callback) {
+        if (null == request || TextUtils.isEmpty(request.domain)) {
+            if (null != callback) {
+                callback.onComplete(Response.error("MtrRequest is null or domain is empty."));
+            }
+            return;
+        }
+
+        final MtrConfig config = new MtrConfig(
+            TASK_ID_GENERATOR.generate(),
+            request.domain,
+            request.maxTTL,
+            request.maxPaths,
+            request.maxTimes,
+            request.timeout,
+            (context, result) -> {
+                if (null != callback) {
+                    callback.onComplete(Response.response(context, Type.MTR, result));
+                }
+                return 0;
+            },
+            request.context
         );
+
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        Diagnosis.startMtr(config);
     }
     // endregion
 
@@ -345,33 +516,66 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     @Override
     public void dns(String nameServer, String domain, String type, int timeout, Callback callback) {
-        Diagnosis.startDns(
-            new DnsConfig(
-                TASK_ID_GENERATOR.generate(),
-                nameServer,
-                domain,
-                type,
-                timeout,
-                (context, result) -> {
-                    if (null != callback) {
-                        callback.onComplete(Type.DNS, result);
-                    }
-                    return 0;
-                },
-                this
-            )
+        DnsRequest request = new DnsRequest();
+        request.nameServer = nameServer;
+        request.domain = domain;
+        request.type = type;
+        request.timeout = timeout;
+        request.context = context;
+
+        this.dns(request, response -> {
+            if (null != callback) {
+                callback.onComplete(response.type, response.content);
+            }
+        });
+    }
+
+    @Override
+    public void dns(DnsRequest dnsRequest) {
+        this.dns(dnsRequest, null);
+    }
+
+    @Override
+    public void dns(DnsRequest dnsRequest, Callback2 callback) {
+        if (null == dnsRequest || TextUtils.isEmpty(dnsRequest.domain)) {
+            if (null != callback) {
+                callback.onComplete(Response.error("DnsRequest is null or domain is empty."));
+            }
+            return;
+        }
+
+        final DnsConfig config = new DnsConfig(
+            TASK_ID_GENERATOR.generate(),
+            dnsRequest.nameServer,
+            dnsRequest.domain,
+            dnsRequest.type,
+            dnsRequest.timeout,
+            (context, result) -> {
+                if (null != callback) {
+                    callback.onComplete(Response.response(context, Type.DNS, result));
+                }
+                return 0;
+            },
+            dnsRequest.context
         );
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        Diagnosis.startDns(config);
     }
     // endregion
 
     private static class NetworkDiagnosisSender extends SdkSender implements Logger, ISpanProcessor {
 
         private final SdkFeature feature;
+        private INetworkDiagnosis.Callback2 callback;
 
         public NetworkDiagnosisSender(Context context, SdkFeature feature) {
             super(context);
             TAG = "NetworkDiagnosisSender";
             this.feature = feature;
+        }
+
+        protected void registerGlobalCallback(INetworkDiagnosis.Callback2 callback) {
+            this.callback = callback;
         }
 
         @Override
@@ -386,37 +590,61 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
         @Override
         protected String provideEndpoint(Credentials credentials) {
-            return super.provideEndpoint(credentials.networkDiagnosisCredentials);
+            NetworkDiagnosisCredentials diagnosisCredentials = credentials.networkDiagnosisCredentials;
+            if (null != diagnosisCredentials && !TextUtils.isEmpty(diagnosisCredentials.endpoint)) {
+                return super.provideEndpoint(diagnosisCredentials);
+            }
+
+            return super.provideEndpoint(credentials);
         }
 
         @Override
         protected String provideProjectName(Credentials credentials) {
-            return credentials.networkDiagnosisCredentials.project;
+            NetworkDiagnosisCredentials diagnosisCredentials = credentials.networkDiagnosisCredentials;
+            if (null != diagnosisCredentials && !TextUtils.isEmpty(diagnosisCredentials.project)) {
+                return super.provideProjectName(diagnosisCredentials);
+            }
+
+            return super.provideProjectName(credentials);
         }
 
         @Override
         protected String provideLogstoreName(Credentials credentials) {
+            if (null == credentials.networkDiagnosisCredentials) {
+                return null;
+            }
+
             return String.format("ipa-%s-raw", credentials.networkDiagnosisCredentials.instanceId);
         }
 
         @Override
         protected String provideAccessKeyId(Credentials credentials) {
-            return credentials.networkDiagnosisCredentials.accessKeyId;
+            NetworkDiagnosisCredentials diagnosisCredentials = credentials.networkDiagnosisCredentials;
+            if (null != diagnosisCredentials && !TextUtils.isEmpty(diagnosisCredentials.accessKeyId)) {
+                return super.provideAccessKeyId(diagnosisCredentials);
+            }
+
+            return super.provideAccessKeyId(credentials);
         }
 
         @Override
         protected String provideAccessKeySecret(Credentials credentials) {
-            return credentials.networkDiagnosisCredentials.accessKeySecret;
+            NetworkDiagnosisCredentials diagnosisCredentials = credentials.networkDiagnosisCredentials;
+            if (null != diagnosisCredentials && !TextUtils.isEmpty(diagnosisCredentials.accessKeySecret)) {
+                return super.provideAccessKeySecret(diagnosisCredentials);
+            }
+
+            return super.provideAccessKeySecret(credentials);
         }
 
         @Override
         protected String provideSecurityToken(Credentials credentials) {
-            return credentials.networkDiagnosisCredentials.securityToken;
-        }
+            NetworkDiagnosisCredentials diagnosisCredentials = credentials.networkDiagnosisCredentials;
+            if (null != diagnosisCredentials && !TextUtils.isEmpty(diagnosisCredentials.securityToken)) {
+                return super.provideSecurityToken(diagnosisCredentials);
+            }
 
-        @Override
-        protected void initLogProducer(Credentials credentials, String fileName) {
-            super.initLogProducer(credentials, fileName);
+            return super.provideSecurityToken(credentials);
         }
 
         @Override
@@ -425,7 +653,8 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             config.setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
                 @Override
                 public String[] injectHeaders(String[] srcHeaders, int count) {
-                    return HttpHeader.getHeadersWithUA(srcHeaders, String.format("%s/%s", feature.name(), feature.version()));
+                    return HttpHeader.getHeadersWithUA(srcHeaders,
+                        String.format("%s/%s", feature.name(), feature.version()));
                 }
             });
         }
@@ -433,6 +662,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         @Override
         public void report(Object context, String msg) {
             if (TextUtils.isEmpty(msg)) {
+                SLSLog.w(TAG, "msg is empty.");
                 return;
             }
 
@@ -446,6 +676,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
             final String method = object.optString("method");
             if (TextUtils.isEmpty(method)) {
+                SLSLog.w(TAG, "method is empty.");
                 return;
             }
 
@@ -460,11 +691,10 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 )
             );
             builder.build().end();
-        }
 
-        @Override
-        public void setCredentials(Credentials credentials) {
-            super.setCredentials(credentials.networkDiagnosisCredentials);
+            if (null != callback) {
+                callback.onComplete(Response.response(context, Type.of(method), msg));
+            }
         }
 
         @Override

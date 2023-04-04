@@ -17,7 +17,9 @@ public class RecordableSpan extends Span {
     @Override
     public boolean end() {
         synchronized (lock) {
-            this.end = TimeUtils.instance.now();
+            if (null == this.end) {
+                this.end = TimeUtils.instance.now();
+            }
         }
 
         boolean ret = super.end();

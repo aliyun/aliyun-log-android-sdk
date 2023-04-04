@@ -5,8 +5,10 @@ import android.text.TextUtils;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
+import com.aliyun.sls.android.core.configuration.Credentials.TracerCredentials.TracerLogCredentials;
 import com.aliyun.sls.android.core.feature.SdkFeature;
 import com.aliyun.sls.android.core.sender.SdkSender;
+import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.internal.HttpHeader;
@@ -78,6 +80,28 @@ public class TraceFeature extends SdkFeature {
 
     }
 
+    @Override
+    public void setCredentials(Credentials credentials) {
+        super.setCredentials(credentials);
+        if (null != traceSender) {
+            traceSender.setCredentials(credentials);
+        }
+        if (null != traceLogSender) {
+            traceLogSender.setCredentials(credentials);
+        }
+    }
+
+    @Override
+    public void setCallback(Callback callback) {
+        super.setCallback(callback);
+        if (null != traceSender) {
+            traceSender.setCallback(callback);
+        }
+        if (null != traceLogSender) {
+            traceLogSender.setCallback(callback);
+        }
+    }
+
     private static class TraceSender extends SdkSender {
         private final SdkFeature feature;
 
@@ -99,37 +123,63 @@ public class TraceFeature extends SdkFeature {
 
         @Override
         protected String provideEndpoint(Credentials credentials) {
-            return super.provideEndpoint(credentials.tracerCredentials);
+            if (null != credentials.tracerCredentials && !TextUtils.isEmpty(credentials.tracerCredentials.endpoint)) {
+                return super.provideEndpoint(credentials.tracerCredentials);
+            }
+
+            return super.provideEndpoint(credentials);
         }
 
         @Override
         protected String provideProjectName(Credentials credentials) {
-            return credentials.tracerCredentials.project;
+            if (null != credentials.tracerCredentials && !TextUtils.isEmpty(credentials.tracerCredentials.project)) {
+                return super.provideProjectName(credentials.tracerCredentials);
+            }
+
+            return super.provideProjectName(credentials);
         }
 
         @Override
         protected String provideLogstoreName(Credentials credentials) {
-            return credentials.tracerCredentials.logstore;
+            if (null != credentials.tracerCredentials && !TextUtils.isEmpty(credentials.tracerCredentials.instanceId)) {
+                return String.format("%s-traces", credentials.tracerCredentials.instanceId);
+            } else {
+                if (!TextUtils.isEmpty(credentials.instanceId)) {
+                    return String.format("%s-traces", credentials.instanceId);
+                } else {
+                    return null;
+                }
+            }
         }
 
         @Override
         protected String provideAccessKeyId(Credentials credentials) {
-            return credentials.tracerCredentials.accessKeyId;
+            if (null != credentials.tracerCredentials && !TextUtils.isEmpty(
+                credentials.tracerCredentials.accessKeyId)) {
+                return super.provideAccessKeyId(credentials.tracerCredentials);
+            }
+
+            return super.provideAccessKeyId(credentials);
         }
 
         @Override
         protected String provideAccessKeySecret(Credentials credentials) {
-            return credentials.tracerCredentials.accessKeySecret;
+            if (null != credentials.tracerCredentials && !TextUtils.isEmpty(
+                credentials.tracerCredentials.accessKeySecret)) {
+                return super.provideAccessKeySecret(credentials.tracerCredentials);
+            }
+
+            return super.provideAccessKeySecret(credentials);
         }
 
         @Override
         protected String provideSecurityToken(Credentials credentials) {
-            return credentials.tracerCredentials.securityToken;
-        }
+            if (null != credentials.tracerCredentials && !TextUtils.isEmpty(
+                credentials.tracerCredentials.securityToken)) {
+                return super.provideSecurityToken(credentials.tracerCredentials);
+            }
 
-        @Override
-        protected void initLogProducer(Credentials credentials, String fileName) {
-            super.initLogProducer(credentials, fileName);
+            return super.provideSecurityToken(credentials);
         }
 
         @Override
@@ -138,14 +188,10 @@ public class TraceFeature extends SdkFeature {
             config.setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
                 @Override
                 public String[] injectHeaders(String[] srcHeaders, int count) {
-                    return HttpHeader.getHeadersWithUA(srcHeaders, String.format("%s/%s", feature.name(), feature.version()));
+                    return HttpHeader.getHeadersWithUA(srcHeaders,
+                        String.format("%s/%s", feature.name(), feature.version()));
                 }
             });
-        }
-
-        @Override
-        public void setCredentials(Credentials credentials) {
-            super.setCredentials(credentials.tracerCredentials);
         }
     }
 
@@ -162,21 +208,50 @@ public class TraceFeature extends SdkFeature {
 
         @Override
         protected String provideEndpoint(Credentials credentials) {
-            return TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.endpoint) ?
-                super.provideEndpoint(credentials) : credentials.tracerCredentials.logCredentials.endpoint;
+            if (null != credentials.tracerCredentials) {
+                TracerLogCredentials logsCredentials = credentials.tracerCredentials.logCredentials;
+                if (null != logsCredentials && !TextUtils.isEmpty(logsCredentials.endpoint)) {
+                    return logsCredentials.endpoint;
+                }
+            }
+
+            return super.provideEndpoint(credentials);
         }
 
         @Override
         protected String provideProjectName(Credentials credentials) {
-            return TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.project) ?
-                super.provideEndpoint(credentials) : credentials.tracerCredentials.logCredentials.project;
+            if (null != credentials.tracerCredentials) {
+                TracerLogCredentials logsCredentials = credentials.tracerCredentials.logCredentials;
+                if (null != logsCredentials && !TextUtils.isEmpty(logsCredentials.project)) {
+                    return logsCredentials.project;
+                }
+            }
+
+            return super.provideProjectName(credentials);
         }
 
         @Override
         protected String provideLogstoreName(Credentials credentials) {
-            return TextUtils.isEmpty(credentials.tracerCredentials.logCredentials.logstore) ?
-                super.provideEndpoint(credentials) : credentials.tracerCredentials.logCredentials.logstore;
-        }
+            if (null != credentials.tracerCredentials) {
+                TracerLogCredentials logsCredentials = credentials.tracerCredentials.logCredentials;
+                // use user custom logstore first
+                if (null != logsCredentials && !TextUtils.isEmpty(logsCredentials.logstore)) {
+                    return logsCredentials.logstore;
+                }
 
+                // then use the tracer credentials instanceId
+                if (!TextUtils.isEmpty(credentials.tracerCredentials.instanceId)) {
+                    return String.format("%s-logs", credentials.tracerCredentials.instanceId);
+                }
+            }
+
+            // last use the root credentials instanceId
+            if (!TextUtils.isEmpty(credentials.instanceId)) {
+                return String.format("%s-logs", credentials.instanceId);
+            }
+
+            // or return null
+            return null;
+        }
     }
 }

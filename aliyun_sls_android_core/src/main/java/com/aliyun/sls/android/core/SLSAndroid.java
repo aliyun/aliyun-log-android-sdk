@@ -344,6 +344,10 @@ public final class SLSAndroid {
     public static void clearExtra() {
         extraProvider.clearExtra();
     }
+    
+    public static void setUtdid(Context context, String utdid) {
+        Utdid.getInstance().setUtdid(context, utdid);
+    }
     // endregion
 
     // region stop

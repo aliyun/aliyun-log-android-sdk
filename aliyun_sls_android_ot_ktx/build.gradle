@@ -1,0 +1,55 @@
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'kotlin-android'
+//apply plugin:  'org.jetbrains.kotlin.jvm'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0.1"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        abortOnError false
+    }
+    sourceSets {
+        main.jniLibs.srcDirs = ['libs']
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:2.8.9'
+    testImplementation 'com.vmlens:concurrent-junit:1.0.2'
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+
+    implementation project(':aliyun_sls_android_ot')
+    implementation project(':aliyun_sls_android_trace')
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+}
+
+ext {
+    moduleVersion = android.defaultConfig.versionName
+    moduleName = 'sls-android-ot-ktx'
+}
+
+//====以下是将android library上传到jcenter的脚本
+apply from: "${project.rootProject.file('maven-publish.gradle')}"

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="0,1,2">
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/trace_ktx_runblocking"
+                android:padding="8dp"
+                android:text="runBlocking"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/trace_ktx_launch"
+                android:padding="8dp"
+                android:text="launch"
+                android:textAllCaps="false" />
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:id="@+id/trace_ktx_with_context"
+                android:padding="8dp"
+                android:text="withContext"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/trace_ktx_async"
+                android:padding="8dp"
+                android:text="async"
+                android:textAllCaps="false" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/trace_ktx_await"
+                android:padding="8dp"
+                android:text="await"
+                android:textAllCaps="false" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/trace_ktx_demo_start_engine"
+                android:layout_span="2"
+                android:padding="8dp"
+                android:text="Demo1: 启动引擎"
+                android:textAllCaps="false" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/trace_ktx_demo_start_air_conditioner"
+                android:layout_span="2"
+                android:padding="8dp"
+                android:text="Demo2: 远程打开空调"
+                android:textAllCaps="false" />
+        </TableRow>
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/trace_ktx_demo_crash"
+                android:layout_span="2"
+                android:padding="8dp"
+                android:text="Demo3: 移动运维监控"
+                android:textAllCaps="false" />
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

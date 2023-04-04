@@ -99,8 +99,11 @@ public class CrashReporterFeature extends SdkFeature {
             return;
         }
 
-        CustomInfo customInfo = new CustomInfo(credentials.instanceId);
-        crashApi.updateCustomInfo(customInfo);
+        if (TextUtils.isEmpty(credentials.instanceId)) {
+            return;
+        }
+
+        crashApi.updateCustomInfo(createCrashBundle(configuration, credentials));
     }
 
     @Override
@@ -113,6 +116,19 @@ public class CrashReporterFeature extends SdkFeature {
             crashApi.disableLog(LogType.UNEXP);
             SLSLog.d(TAG, "CrashReporterFeature disabled.");
         }
+    }
+
+    public void reportCustomLog(final String type, final String log) {
+        SpanBuilder builder = newSpanBuilder("crash");
+        builder.addAttribute(
+            Attribute.of(
+                Pair.create("t", "custom"),
+                Pair.create("ex.type", TextUtils.isEmpty(type) ? "log" : type),
+                Pair.create("ex.origin", TextUtils.isEmpty(log) ? "" : log)
+            )
+        );
+
+        builder.build().end();
     }
 
     public void reportError(final String type, final LogLevel logLevel, final  String message, final String stacktrace) {
@@ -137,12 +153,13 @@ public class CrashReporterFeature extends SdkFeature {
         crashApi.generateCustomLog(errorInfo);
     }
 
-    private void initCrashApi(Context context, Credentials credentials, Configuration configuration) {
+    private Bundle createCrashBundle(Configuration configuration, Credentials credentials) {
         final String appId = credentials.instanceId;
         //final File rootPath = new File(context.getFilesDir(), "sls_crash_reporter");
         String fileDirName = context.getFilesDir().getName();
 
         final Bundle args = new Bundle();
+        args.putString("mAppId", getAppIdByInstanceId(appId));
         args.putBoolean("mDebug", configuration.debuggable && AppUtils.debuggable(context));
         // 路径配置
         args.putBoolean("mBackupLogs", false);
@@ -183,6 +200,13 @@ public class CrashReporterFeature extends SdkFeature {
         args.putInt("mMaxCustomLogFilesCount", Integer.MAX_VALUE);
         args.putInt("mMaxCustomLogCountPerTypePerDay", Integer.MAX_VALUE);
         args.putInt("mMaxUploadCustomLogCountPerDay", Integer.MAX_VALUE);
+
+        return args;
+    }
+
+    private void initCrashApi(Context context, Credentials credentials, Configuration configuration) {
+        final String appId = credentials.instanceId;
+        final Bundle args = createCrashBundle(configuration, credentials);
 
         crashApi = CrashApi.createInstanceEx(context, getAppIdByInstanceId(appId), false, args, new ICrashClient() {
             @Override
@@ -520,6 +544,8 @@ public class CrashReporterFeature extends SdkFeature {
             setTraceId(span.getTraceId());
             if (!TextUtils.isEmpty(span.getParentSpanId())) {
                 setSpanId(span.getParentSpanId());
+            } else {
+                setSpanId(span.getSpanId());
             }
         }
     }

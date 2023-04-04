@@ -9,6 +9,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
 import com.aliyun.sls.android.core.utils.JsonUtil;
+import com.aliyun.sls.android.ot.Span;
+import com.aliyun.sls.android.ot.Span.StatusCode;
+import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.producer.example.example.trace.model.CartItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ErrorModel;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
@@ -141,11 +144,27 @@ public class ApiClient {
     }
 
     public static void createOrder(ApiCallback<Boolean> callback) {
+        final Span parent = ContextManager.INSTANCE.activeSpan();
         ThreadUtils.exec(() -> {
-            HttpTool.get(API_BASE, API_ORDER_CREATE, response -> {
+            final Span createOrder = Tracer.spanBuilder("请求：创建订单").setParent(parent).setActive(true).build();
+            HttpTool.post(API_BASE, API_ORDER_CREATE, null, response -> {
                 if (response.success()) {
-                    postInMainThread(() -> callback.onSuccess(true));
+                    createOrder.end();
+                    final Span span = Tracer.spanBuilder("请求：清空购物车").setParent(parent).setActive(true).build();
+                    HttpTool.delete(API_BASE, API_CART, response1 -> {
+                        if (response1.success()) {
+                            postInMainThread(() -> callback.onSuccess(true));
+                        } else {
+                            span.setStatus(StatusCode.ERROR);
+                            span.setStatusMessage(response1.error);
+                        }
+                        span.end();
+                    });
                     return;
+                } else {
+                    createOrder.setStatus(StatusCode.ERROR);
+                    createOrder.setStatusMessage(response.error);
+                    createOrder.end();
                 }
 
                 postError(response, callback);
@@ -168,6 +187,6 @@ public class ApiClient {
     }
 
     private static String base64(String content) {
-        return Base64.encodeToString(content.getBytes(Charset.forName("UTF-8")), Base64.DEFAULT);
+        return Base64.encodeToString(content.getBytes(Charset.forName("UTF-8")), Base64.DEFAULT).trim();
     }
 }

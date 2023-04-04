@@ -178,13 +178,16 @@ public class SdkSender extends NoOpSender implements ISpanProcessor {
         }
 
         // update ak
-        if (TextUtils.isEmpty(credentials.securityToken)) {
-            if (!TextUtils.isEmpty(credentials.accessKeyId) && !TextUtils.isEmpty(credentials.accessKeySecret)) {
-                config.setAccessKeyId(credentials.accessKeyId);
-                config.setAccessKeySecret(credentials.accessKeySecret);
+        final String accessKeyId = provideAccessKeyId(credentials);
+        final String accessKeySecret = provideAccessKeySecret(credentials);
+        final String accessToken = provideSecurityToken(credentials);
+        if (TextUtils.isEmpty(accessToken)) {
+            if (!TextUtils.isEmpty(accessKeyId) && !TextUtils.isEmpty(accessKeySecret)) {
+                config.setAccessKeyId(accessKeyId);
+                config.setAccessKeySecret(accessKeySecret);
             }
         } else {
-            if (!TextUtils.isEmpty(credentials.accessKeyId) && !TextUtils.isEmpty(credentials.accessKeySecret)) {
+            if (!TextUtils.isEmpty(accessKeyId) && !TextUtils.isEmpty(accessKeySecret)) {
                 config.resetSecurityToken(
                     credentials.accessKeyId,
                     credentials.accessKeySecret,
@@ -194,14 +197,17 @@ public class SdkSender extends NoOpSender implements ISpanProcessor {
         }
 
         // update endpoint, project, logstore
-        if (null != credentials.endpoint && !TextUtils.isEmpty(credentials.endpoint)) {
-            config.setEndpoint(credentials.endpoint);
+        final String endpoint = provideEndpoint(credentials);
+        final String project = provideProjectName(credentials);
+        final String logstore = provideLogstoreName(credentials);
+        if (!TextUtils.isEmpty(endpoint)) {
+            config.setEndpoint(endpoint);
         }
-        if (!TextUtils.isEmpty(credentials.project)) {
-            config.setProject(credentials.project);
+        if (!TextUtils.isEmpty(project)) {
+            config.setProject(project);
         }
-        if (!TextUtils.isEmpty(credentials.instanceId)) {
-            config.setLogstore(getLogstoreByInstanceId(credentials.instanceId));
+        if (!TextUtils.isEmpty(logstore)) {
+            config.setLogstore(logstore);
         }
     }
 

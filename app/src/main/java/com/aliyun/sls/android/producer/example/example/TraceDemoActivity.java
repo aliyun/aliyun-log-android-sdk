@@ -2,9 +2,10 @@ package com.aliyun.sls.android.producer.example.example;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import android.os.Bundle;
-import android.os.Trace;
+import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import androidx.annotation.Nullable;
@@ -17,7 +18,8 @@ import com.aliyun.sls.android.ot.Span;
 import com.aliyun.sls.android.ot.Span.StatusCode;
 import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.ot.context.Scope;
-import com.aliyun.sls.android.producer.Log;
+import com.aliyun.sls.android.ot.logs.LogData;
+import com.aliyun.sls.android.ot.logs.LogLevel;
 import com.aliyun.sls.android.producer.example.R;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient.ApiCallback;
@@ -36,6 +38,7 @@ import okhttp3.Response;
  */
 public class TraceDemoActivity extends AppCompatActivity implements OnClickListener {
 
+    private int logIndex = 0;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +51,7 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
         findViewById(R.id.trace_add_event_demo).setOnClickListener(this);
         findViewById(R.id.trace_record_exception_demo).setOnClickListener(this);
         findViewById(R.id.trace_add_links_demo).setOnClickListener(this);
+        findViewById(R.id.trace_add_log_demo).setOnClickListener(this);
     }
 
     @Override
@@ -66,6 +70,8 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
             recordException();
         } else if (R.id.trace_add_links_demo == v.getId()) {
             addLink();
+        } else if (R.id.trace_add_log_demo == v.getId()) {
+            addLog();
         }
     }
 
@@ -178,7 +184,7 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
     }
 
     private void reportStartupStatus() {
-        Tracer.spanBuilder("第三步：上报状态").build().end();
+        Tracer.spanBuilder("第三步：上报状态").build().setEnd(TimeUnit.MILLISECONDS.toNanos(System.currentTimeMillis() + 20 * 1000)).end();
         ApiClient.getCategory(new ApiCallback<List<ItemModel>>() {
             @Override
             public void onSuccess(List<ItemModel> itemModels) {
@@ -221,9 +227,9 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
                 threadSleep();
                 Tracer.startSpan("电池温度检查").end();
 
-                Log log = new Log();
-                log.putContent("content", "状态检查正常");
-                Tracer.log(log);
+                //Log log = new Log();
+                //log.putContent("content", "状态检查正常");
+                //Tracer.log(log);
             });
             Tracer.withinSpan("开空调：1.2 电气信号检查", this::threadSleep);
         });
@@ -296,11 +302,38 @@ public class TraceDemoActivity extends AppCompatActivity implements OnClickListe
     }
 
     private void addLink() {
-        Span span = Tracer.startSpan("add link", true).addLink(Link.create("1592d2f276d0908d1031940e5aeb6821", "5d84c8144e511d29"));
+        Span span = Tracer.startSpan("add link", true)
+            .addLink(
+                Link.create(
+                "3997030938be98a32d17da3609eaceca",
+                "fb5a457b7548b6f4")
+            );
 
         Tracer.startSpan("span in add link").end();
 
         span.end();
+    }
+
+    private void addLog() {
+        Tracer.log("简单调用方式" + logIndex);
+
+        Tracer.log(LogLevel.DEBUG, "带日志等级的调用方式" + logIndex);
+
+        Tracer.log(LogLevel.WARN, "带扩展属性的调用方式" + logIndex, Attribute.of(Pair.create("商品ID", 10092392L)));
+
+        Tracer.log(
+            LogData.builder()
+                .setLogLevel(LogLevel.ERROR)
+                .setSeverityText("ERROR")
+                .setAttribute(
+                    Attribute.of(
+                        Pair.create("test1", "value1")
+                    )
+                )
+                .setLogContent("测试日志内容" + (logIndex++))
+                .build()
+        );
+
     }
 
     private void threadSleep() {

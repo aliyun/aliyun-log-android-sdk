@@ -4,18 +4,21 @@ import android.content.Context;
 import android.text.TextUtils;
 import com.aliyun.sls.android.producer.internal.HttpHeader;
 import com.aliyun.sls.android.producer.internal.LogProducerHttpHeaderInjector;
-import com.aliyun.sls.android.producer.utils.SoLoader;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 import com.aliyun.sls.android.producer.utils.Utils;
 
 @SuppressWarnings({"AlibabaLowerCamelCaseVariableNaming", "unused"})
 public class LogProducerConfig {
-    private static boolean hasSoLoaded = false;
+    static {
+        System.loadLibrary("sls_producer");
+    }
+
     private final long config;
     private final Context context;
     private String endpoint;
     private String project;
     private String logstore;
+    private boolean enablePersistent = false;
 
     public LogProducerConfig() throws LogProducerException {
         this(Utils.getContext());
@@ -51,11 +54,6 @@ public class LogProducerConfig {
 
     // @formatter:off
     public LogProducerConfig(Context context, String endpoint, String project, String logstore, String accessKeyId, String accessKeySecret, String securityToken) throws LogProducerException {
-        if (!hasSoLoaded) {
-            SoLoader.instance().loadLibrary(context, "sls_producer");
-            hasSoLoaded = true;
-        }
-
         this.context = context;
         config = create_log_producer_config();
         if (config == 0) {
@@ -237,11 +235,21 @@ public class LogProducerConfig {
     }
 
     public void setSendThreadCount(int num) {
+        // force set 1 send thread
+        if (enablePersistent && 1 != num) {
+            num = 1;
+        }
         log_producer_config_set_send_thread_count(config, num);
     }
 
     public void setPersistent(int num) {
+        this.enablePersistent = 1 == num;
         log_producer_config_set_persistent(config, num);
+
+        // force set 1 send thread
+        if (enablePersistent) {
+            setSendThreadCount(1);
+        }
     }
 
     public void setPersistentFilePath(String path) {

@@ -436,6 +436,43 @@
 
             </TableLayout>
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="其他"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+            </LinearLayout>
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <Button
+                        android:id="@+id/dynamic_update"
+                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginLeft="3dp"
+                        android:layout_marginRight="3dp"
+                        android:layout_weight="3"
+                        android:background="@drawable/button_background"
+                        android:text="Block"
+                        android:textAppearance="@style/TextAppearance.AppCompat"/>
+
+                </TableRow>
+
+            </TableLayout>
+
         </LinearLayout>
 
     </LinearLayout>

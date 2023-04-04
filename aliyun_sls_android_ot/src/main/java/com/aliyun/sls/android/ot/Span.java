@@ -51,8 +51,8 @@ public class Span {
     protected String traceID;
     protected String spanID;
     protected String parentSpanID;
-    protected long start;
-    protected long end;
+    protected Long start;
+    protected Long end;
     protected long duration;
     protected List<Attribute> attribute;
     protected List<Event> events;
@@ -189,6 +189,10 @@ public class Span {
     }
 
     public Span setParent(Span span) {
+        if (null == span) {
+            return this;
+        }
+
         synchronized (lock) {
             this.parentSpanID = span.spanID;
             this.traceID = span.traceID;
@@ -248,6 +252,10 @@ public class Span {
 
     // region attribute & resource
     public Span addAttribute(Attribute attribute) {
+        if (null == attribute) {
+            return this;
+        }
+
         synchronized (lock) {
             this.attribute.add(attribute);
             return this;
@@ -255,6 +263,10 @@ public class Span {
     }
 
     public Span addAttribute(Attribute... attributes) {
+        if (null == attributes) {
+            return this;
+        }
+
         synchronized (lock) {
             this.addAttribute(Arrays.asList(attributes));
             return this;
@@ -262,21 +274,33 @@ public class Span {
     }
 
     public Span addAttribute(List<Attribute> attributes) {
+        if (null == attributes) {
+            return this;
+        }
+
         synchronized (lock) {
             this.attribute.addAll(attributes);
             return this;
         }
     }
 
-    public Span addResource(Resource r) {
-        synchronized (lock) {
-            if (null == r) {
-                return this;
-            }
+    public List<Attribute> getAttribute() {
+        return attribute;
+    }
 
+    public Span addResource(Resource r) {
+        if (null == r) {
+            return this;
+        }
+
+        synchronized (lock) {
             this.resource.merge(r);
             return this;
         }
+    }
+
+    public Resource getResource() {
+        return Resource.of(this.resource);
     }
     // endregion
 
@@ -473,4 +497,22 @@ public class Span {
         }
     }
     // endregion
+
+    @Override
+    public String toString() {
+        return "Span{" +
+            "name='" + name + '\'' +
+            ", kind=" + kind +
+            ", traceID='" + traceID + '\'' +
+            ", spanID='" + spanID + '\'' +
+            ", parentSpanID='" + parentSpanID + '\'' +
+            ", start=" + start +
+            ", end=" + end +
+            ", duration=" + duration +
+            ", statusCode=" + statusCode +
+            ", statusMessage='" + statusMessage + '\'' +
+            ", service='" + service + '\'' +
+            ", finished=" + finished +
+            '}';
+    }
 }

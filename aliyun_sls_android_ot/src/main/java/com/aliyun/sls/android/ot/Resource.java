@@ -1,11 +1,15 @@
 package com.aliyun.sls.android.ot;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Pair;
+import com.aliyun.sls.android.ot.utils.JSONUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * @author gordon
@@ -77,6 +81,16 @@ public class Resource {
         }
         return resource;
     }
+
+    public static Resource of(Resource resource) {
+        Resource newResource = new Resource();
+        if (null == resource) {
+            return newResource;
+        }
+
+        newResource.attributes.addAll(resource.attributes);
+        return newResource;
+    }
     // endregion
 
     // region operation
@@ -98,4 +112,18 @@ public class Resource {
         }
     }
     // endregion
+
+    public JSONObject toJson() {
+        Collections.sort(this.attributes);
+        JSONArray array = new JSONArray();
+        for (Attribute attribute : this.attributes) {
+            array.put(
+                JSONUtils.object(
+                    Pair.create("key", attribute.key),
+                    Pair.create("value", JSONUtils.object(Pair.create("stringValue", attribute.value))))
+            );
+        }
+
+        return JSONUtils.object(Pair.create("attributes", array));
+    }
 }
