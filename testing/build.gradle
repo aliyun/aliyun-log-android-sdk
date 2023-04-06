@@ -31,10 +31,10 @@ android {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:2.8.9'
-    testImplementation 'com.vmlens:concurrent-junit:1.0.2'
-    api 'org.json:json:20140107'
+    api 'junit:junit:4.13.2'
+    api 'org.mockito:mockito-core:4.7.0'
+    api 'com.vmlens:concurrent-junit:1.0.2'
 
+    api 'org.json:json:20140107'
     api 'androidx.annotation:annotation:1.2.0'
 }

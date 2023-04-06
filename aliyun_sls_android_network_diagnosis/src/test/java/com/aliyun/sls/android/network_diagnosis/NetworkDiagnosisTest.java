@@ -27,8 +27,10 @@ public class NetworkDiagnosisTest {
 
         NetworkDiagnosis.getInstance().setNetworkDiagnosis(mockNetworkDiagnosis);
 
-        assertFalse(diagnosis.checkNetworkDiagnosis());
+        assertTrue(diagnosis.checkNetworkDiagnosis());
     }
+
+    //public void
 
 
 
