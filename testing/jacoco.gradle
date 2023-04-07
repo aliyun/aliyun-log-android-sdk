@@ -43,7 +43,9 @@ task codeCoverageReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
             excludes: androidExclusion
     ))
 
-    getSourceDirectories().setFrom(files((project.projectDir).toString() + "/src"))
+    def mainSrc = "${project.projectDir}/src/main/java"
+    getAdditionalSourceDirs().setFrom(files([mainSrc]))
+    getSourceDirectories().setFrom(files([mainSrc]))
     getExecutionData().setFrom(files("$buildDir/jacoco/testDebugUnitTest.exec"))
 }
 
