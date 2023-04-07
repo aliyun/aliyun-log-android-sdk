@@ -31,15 +31,10 @@ android {
 }
 
 dependencies {
-    testImplementation project(':testing')
-    testImplementation project(':aliyun_sls_android_network_diagnosis')
-
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-//    implementation project(':testing')
     implementation project(":aliyun_sls_android_producer")
     implementation project(":aliyun_sls_android_core")
     implementation project(":aliyun_sls_android_ot")
-    implementation 'androidx.annotation:annotation:1.2.0'
 }
 
 ext {

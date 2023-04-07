@@ -91,4 +91,3 @@ lint/tmp/
 
 #scan
 scan.py
-diff_sec*

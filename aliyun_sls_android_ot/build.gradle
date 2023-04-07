@@ -9,7 +9,7 @@ android {
         versionCode 1
         versionName "1.0.7"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -31,15 +31,10 @@ android {
 }
 
 dependencies {
-    testImplementation project(':testing')
-//    implementation project(':testing')
-
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:2.8.9'
-    testImplementation 'com.vmlens:concurrent-junit:1.0.2'
-
     testImplementation("org.skyscreamer:jsonassert:1.5.1")
     testImplementation(project(":aliyun_sls_android_ot"))
+    
     implementation project(':aliyun_sls_android_producer')
 }
 
