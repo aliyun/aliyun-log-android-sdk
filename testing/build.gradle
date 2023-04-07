@@ -7,7 +7,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0.7"
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,22 +31,10 @@ android {
 }
 
 dependencies {
-    testImplementation project(':testing')
-//    implementation project(':testing')
+    api 'junit:junit:4.13.2'
+    api 'org.mockito:mockito-core:4.7.0'
+    api 'com.vmlens:concurrent-junit:1.0.2'
 
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:2.8.9'
-    testImplementation 'com.vmlens:concurrent-junit:1.0.2'
-
-    testImplementation("org.skyscreamer:jsonassert:1.5.1")
-    testImplementation(project(":aliyun_sls_android_ot"))
-    implementation project(':aliyun_sls_android_producer')
+    api 'org.json:json:20140107'
+    api 'androidx.annotation:annotation:1.2.0'
 }
-
-ext {
-    moduleVersion = android.defaultConfig.versionName
-    moduleName = 'sls-android-ot'
-}
-
-//====以下是将android library上传到jcenter的脚本
-apply from: "${project.rootProject.file('maven-publish.gradle')}"

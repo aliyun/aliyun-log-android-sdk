@@ -17,6 +17,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Pair;
+import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
@@ -45,7 +46,14 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     private static final TaskIdGenerator TASK_ID_GENERATOR = new TaskIdGenerator();
     private NetworkDiagnosisSender networkDiagnosisSender;
-    private boolean enableMultiplePortsDetect = false;
+    @VisibleForTesting
+    public boolean enableMultiplePortsDetect = false;
+
+    private IDiagnosis diagnosis;
+
+    public NetworkDiagnosisFeature() {
+        this.diagnosis = new NetSpeedDiagnosis();
+    }
 
     @Override
     public String name() {
@@ -68,7 +76,13 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         super.onInitSender(context, credentials, configuration);
     }
 
-    private String getIPAIdBySecretKey(String secretKey) {
+    @VisibleForTesting
+    public void setDiagnosis(IDiagnosis diagnosis) {
+        this.diagnosis = diagnosis;
+    }
+
+    @VisibleForTesting
+    public String getIPAIdBySecretKey(String secretKey) {
         @SuppressWarnings("CharsetObjectCanBeUsed")
         String decode = new String(
             Base64.decode(
@@ -98,18 +112,18 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(networkDiagnosisCredentials.secretKey);
         }
 
-        Diagnosis.init(
+        diagnosis.init(
             networkDiagnosisCredentials.secretKey,
             Utdid.getInstance().getUtdid(context),
             networkDiagnosisCredentials.siteId,
             networkDiagnosisCredentials.extension
         );
-        Diagnosis.enableDebug(configuration.debuggable && AppUtils.debuggable(context));
+        diagnosis.enableDebug(configuration.debuggable && AppUtils.debuggable(context));
 
         networkDiagnosisSender = new NetworkDiagnosisSender(context, this);
         networkDiagnosisSender.initialize(credentials);
 
-        Diagnosis.registerLogger(this, networkDiagnosisSender);
+        diagnosis.registerLogger(this, networkDiagnosisSender);
 
         NetworkDiagnosis.getInstance().setNetworkDiagnosis(this);
     }
@@ -147,12 +161,12 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
-        Diagnosis.setPolicyDomain(domain);
+        diagnosis.setPolicyDomain(domain);
     }
 
     @Override
     public void disableExNetworkInfo() {
-        Diagnosis.disableExNetworkInfo();
+        diagnosis.disableExNetworkInfo();
     }
 
     @Override
@@ -183,12 +197,12 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         }
 
         final Map<String, String> extensionCopy = new HashMap<>(extension);
-        Diagnosis.updateExtension(extensionCopy);
+        diagnosis.updateExtension(extensionCopy);
     }
 
     @Override
     public void registerHttpCredentialCallback(HttpCredentialCallback callback) {
-        Diagnosis.registerHttpCredentialCallback((url, context) -> {
+        diagnosis.registerHttpCredentialCallback((url, context) -> {
             if (null != callback) {
                 HttpCredential credential = callback.getCredential(url, context);
                 if (null != credential) {
@@ -254,7 +268,14 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
-        final HttpConfig config = new HttpConfig(
+        final HttpConfig config = createHttpConfigFromHttpRequest(request, callback);
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        diagnosis.startHttpPing(config);
+    }
+
+    @VisibleForTesting
+    public HttpConfig createHttpConfigFromHttpRequest(HttpRequest request, Callback2 callback) {
+        return new HttpConfig(
             TASK_ID_GENERATOR.generate(),
             request.domain,
             request.ip,
@@ -277,8 +298,6 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             },
             request.context
         );
-        config.setMultiplePortsDetect(enableMultiplePortsDetect);
-        Diagnosis.startHttpPing(config);
     }
     // endregion
 
@@ -335,7 +354,15 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
-        final PingConfig config = new PingConfig(
+        final PingConfig config = createPingConfigFromPingRequest(pingRequest, callback);
+
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        diagnosis.startPing(config);
+    }
+
+    @VisibleForTesting
+    public PingConfig createPingConfigFromPingRequest(PingRequest pingRequest, Callback2 callback) {
+        return new PingConfig(
             TASK_ID_GENERATOR.generate(),
             pingRequest.domain,
             pingRequest.size,
@@ -349,9 +376,6 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             },
             pingRequest.context
         );
-
-        config.setMultiplePortsDetect(enableMultiplePortsDetect);
-        Diagnosis.startPing(config);
     }
     // endregion
 
@@ -397,7 +421,14 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
-        final TcpPingConfig config = new TcpPingConfig(
+        final TcpPingConfig config = createTcpPingConfigFromTcpPingRequest(request, callback);
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        diagnosis.startTcpPing(config);
+    }
+
+    @VisibleForTesting
+    public TcpPingConfig createTcpPingConfigFromTcpPingRequest(TcpPingRequest request, Callback2 callback) {
+        return new TcpPingConfig(
             TASK_ID_GENERATOR.generate(),
             request.domain,
             request.port,
@@ -411,8 +442,6 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             },
             request.context
         );
-        config.setMultiplePortsDetect(enableMultiplePortsDetect);
-        Diagnosis.startTcpPing(config);
     }
 
     // endregion
@@ -472,7 +501,15 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
-        final MtrConfig config = new MtrConfig(
+        final MtrConfig config = createMtrConfigFromMtrRequest(request, callback);
+
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        diagnosis.startMtr(config);
+    }
+
+    @VisibleForTesting
+    public MtrConfig createMtrConfigFromMtrRequest(MtrRequest request, Callback2 callback) {
+        return new MtrConfig(
             TASK_ID_GENERATOR.generate(),
             request.domain,
             request.maxTTL,
@@ -487,9 +524,6 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             },
             request.context
         );
-
-        config.setMultiplePortsDetect(enableMultiplePortsDetect);
-        Diagnosis.startMtr(config);
     }
     // endregion
 
@@ -544,7 +578,14 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
-        final DnsConfig config = new DnsConfig(
+        final DnsConfig config = createDnsConfigFromDnsRequest(dnsRequest, callback);
+        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        diagnosis.startDns(config);
+    }
+
+    @VisibleForTesting
+    public DnsConfig createDnsConfigFromDnsRequest(DnsRequest dnsRequest, Callback2 callback) {
+        return new DnsConfig(
             TASK_ID_GENERATOR.generate(),
             dnsRequest.nameServer,
             dnsRequest.domain,
@@ -558,8 +599,6 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             },
             dnsRequest.context
         );
-        config.setMultiplePortsDetect(enableMultiplePortsDetect);
-        Diagnosis.startDns(config);
     }
     // endregion
 
