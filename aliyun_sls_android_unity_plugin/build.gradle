@@ -32,4 +32,5 @@ dependencies {
     implementation project(':aliyun_sls_android_core')
     implementation project(':aliyun_sls_android_ot')
     implementation project(':aliyun_sls_android_crashreporter')
+    implementation project(':aliyun_sls_android_network_diagnosis')
 }
