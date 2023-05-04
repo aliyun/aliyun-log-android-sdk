@@ -21,6 +21,7 @@ import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.core.utils.AppUtils;
 import com.aliyun.sls.android.core.utils.DeviceUtils;
 import com.aliyun.sls.android.core.utils.JsonUtil;
+import com.aliyun.sls.android.core.utils.PrivacyUtils;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
 import com.aliyun.sls.android.ot.Resource;
@@ -42,11 +43,28 @@ public final class SLSAndroid {
     // region initialize
     private final static AtomicBoolean hasInitialized = new AtomicBoolean(false);
 
+    public static boolean preInit(
+        final Context context,
+        final Credentials credentials,
+        final OptionConfiguration optionConfiguration) {
+        return internalInit(context, credentials, optionConfiguration, true);
+    }
+
     public static boolean initialize(
         final Context context,
         final Credentials credentials,
         final OptionConfiguration optionConfiguration
     ) {
+        return internalInit(context, credentials, optionConfiguration, false);
+    }
+
+    private static boolean internalInit(
+        final Context context,
+        final Credentials credentials,
+        final OptionConfiguration optionConfiguration,
+        final boolean preInit) {
+        PrivacyUtils.setEnablePrivacy(preInit);
+
         SLSLog.i(TAG, "start init SLS Android SDK.");
         if (null == optionConfiguration) {
             SLSLog.w(TAG, "OptionConfiguration must not be null.");
@@ -68,7 +86,8 @@ public final class SLSAndroid {
                 config.setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
                     @Override
                     public String[] injectHeaders(String[] srcHeaders, int count) {
-                        return HttpHeader.getHeadersWithUA(srcHeaders, String.format("apm/%s", BuildConfig.VERSION_NAME));
+                        return HttpHeader.getHeadersWithUA(srcHeaders,
+                            String.format("apm/%s", BuildConfig.VERSION_NAME));
                     }
                 });
             }
@@ -97,16 +116,17 @@ public final class SLSAndroid {
         configuration.spanProvider = new ISpanProvider() {
             @Override
             public Resource provideResource() {
+                final boolean enablePrivacy = PrivacyUtils.isEnablePrivacy();
                 Resource resource = Resource.of(
                     Pair.create("device.id", Utdid.getInstance().getUtdid(context)),
                     Pair.create("app.version", AppUtils.getAppVersion(context)),
                     Pair.create("app.versionCode", AppUtils.getAppVersionCode(context)),
                     Pair.create("app.name", AppUtils.getAppName(context)),
-                    Pair.create("device.resolution", DeviceUtils.getResolution(context)),
-                    Pair.create("net.access", DeviceUtils.getAccessName(context)),
-                    Pair.create("net.access_subtype", DeviceUtils.getAccessSubTypeName(context)),
-                    Pair.create("carrier", DeviceUtils.getCarrier(context)),
-                    Pair.create("os.root", DeviceUtils.isRoot())
+                    Pair.create("device.resolution", enablePrivacy ? DeviceUtils.getResolution(context): ""),
+                    Pair.create("net.access", enablePrivacy ? DeviceUtils.getAccessName(context) : ""),
+                    Pair.create("net.access_subtype", enablePrivacy ? DeviceUtils.getAccessSubTypeName(context) : ""),
+                    Pair.create("carrier", enablePrivacy ? DeviceUtils.getCarrier(context) : ""),
+                    Pair.create("os.root", enablePrivacy ? DeviceUtils.isRoot() : "")
                 );
 
                 if (null != userSpanProvider) {
@@ -172,7 +192,8 @@ public final class SLSAndroid {
 
                 for (Entry<String, Object> entry : extras.entrySet()) {
                     if (entry.getValue() instanceof Map) {
-                        attributes.add(Attribute.of("extras." + entry.getKey(), JsonUtil.fromMap((Map)entry.getValue())));
+                        attributes.add(
+                            Attribute.of("extras." + entry.getKey(), JsonUtil.fromMap((Map)entry.getValue())));
                     } else {
                         attributes.add(Attribute.of("extras." + entry.getKey(), entry.getValue().toString()));
                     }
@@ -219,7 +240,8 @@ public final class SLSAndroid {
             return;
         }
 
-        initFeature(context, credentials, configuration, "com.aliyun.sls.android.network_diagnosis.NetworkDiagnosisFeature");
+        initFeature(context, credentials, configuration,
+            "com.aliyun.sls.android.network_diagnosis.NetworkDiagnosisFeature");
     }
 
     private static void initTracerFeature(
@@ -344,7 +366,7 @@ public final class SLSAndroid {
     public static void clearExtra() {
         extraProvider.clearExtra();
     }
-    
+
     public static void setUtdid(Context context, String utdid) {
         Utdid.getInstance().setUtdid(context, utdid);
     }
