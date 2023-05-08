@@ -81,7 +81,7 @@ public class BlockDetectionFeature extends SdkFeature {
     }
 
     @Override
-    protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
+    protected void onPreInit(Context context, Credentials credentials, Configuration configuration) {
         final String appId = "sls-" + credentials.instanceId;
         final boolean debuggable = configuration.debuggable && AppUtils.debuggable(context);
 
@@ -142,6 +142,11 @@ public class BlockDetectionFeature extends SdkFeature {
         pa.start();
 
         BlockDetection.setBlockDetectionFeature(this);
+    }
+
+    @Override
+    protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
+
     }
 
     @Override

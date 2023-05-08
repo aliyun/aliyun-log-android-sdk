@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.os.Handler;
 import android.util.Log;
 import androidx.multidex.MultiDexApplication;
 import com.aliyun.sls.android.core.SLSAndroid;
+import com.aliyun.sls.android.core.SLSAndroid.OptionConfiguration;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.configuration.Credentials.NetworkDiagnosisCredentials;
@@ -19,7 +21,6 @@ import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.okhttp.OKHttp3InstrumentationDelegate;
 import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
-import com.aliyun.sls.android.okhttp.OKHttp3TracerInterceptor;
 import com.aliyun.sls.android.okhttp.OkHttp3Configuration;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
@@ -70,38 +71,43 @@ public class SLSDemoApplication extends MultiDexApplication {
 
         SLSAndroid.setUtdid(this, "123123131232");
         SLSAndroid.setLogLevel(Log.VERBOSE);
-        SLSAndroid.initialize(
-            this,
-            credentials,
-            configuration -> {
-                configuration.debuggable = true;
-                configuration.spanProvider = new ISpanProvider() {
-                    @Override
-                    public Resource provideResource() {
-                        return Resource.of("other_resource_key", "other_resource_value");
-                    }
+        final OptionConfiguration optionConfiguration = configuration -> {
+            configuration.debuggable = true;
+            configuration.spanProvider = new ISpanProvider() {
+                @Override
+                public Resource provideResource() {
+                    return Resource.of("other_resource_key", "other_resource_value");
+                }
 
-                    @Override
-                    public List<Attribute> provideAttribute() {
-                        List<Attribute> attributes = new ArrayList<>();
-                        attributes.add(Attribute.of("other_attribute_key", "other_attribute_value"));
-                        return attributes;
-                    }
-                };
+                @Override
+                public List<Attribute> provideAttribute() {
+                    List<Attribute> attributes = new ArrayList<>();
+                    attributes.add(Attribute.of("other_attribute_key", "other_attribute_value"));
+                    return attributes;
+                }
+            };
 
-                configuration.enableCrashReporter = true;
-                configuration.enableNetworkDiagnosis = true;
-                configuration.enableTracer = true;
-                configuration.enableTracerLog = true;
+            configuration.enableCrashReporter = true;
+            configuration.enableNetworkDiagnosis = true;
+            configuration.enableTracer = true;
+            configuration.enableTracerLog = true;
 
+            UserInfo info = new UserInfo();
+            info.uid = "123321";
+            info.channel = "dev";
+            info.addExt("ext_key", "ext_value");
+            configuration.userInfo = info;
+        };
 
-                UserInfo info = new UserInfo();
-                info.uid = "123321";
-                info.channel = "dev";
-                info.addExt("ext_key", "ext_value");
-                configuration.userInfo = info;
-            }
+        // 预初始化，功能可正常使用，但敏感信息不会采集
+        SLSAndroid.preInit(this, credentials, optionConfiguration);
+
+        // 10 秒后完整初始化，模拟获得用户授权
+        new Handler(getMainLooper()).postDelayed(
+            () -> SLSAndroid.initialize(SLSDemoApplication.this, credentials, optionConfiguration),
+            10 * 1000
         );
+
         SLSAndroid.setExtra("extra_key", "extra_value");
         SLSAndroid.setExtra("extra_key2", "extra_value2");
         SLSAndroid.registerCredentialsCallback(new Callback() {

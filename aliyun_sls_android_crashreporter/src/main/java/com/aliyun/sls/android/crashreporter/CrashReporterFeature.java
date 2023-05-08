@@ -69,12 +69,16 @@ public class CrashReporterFeature extends SdkFeature {
     }
 
     @Override
-    protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
+    protected void onPreInit(Context context, Credentials credentials, Configuration configuration) {
         this.configuration = configuration;
         this.credentials = credentials;
 
         this.initCrashApi(context, credentials, configuration);
         CrashReporter.setCrashReporterFeature(this);
+    }
+
+    @Override
+    protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
     }
 
     @Override

@@ -22,6 +22,11 @@ public class NoOpFeature implements Feature {
     }
 
     @Override
+    public void preInit(Context context, Credentials credentials, Configuration configuration) {
+
+    }
+
+    @Override
     public void initialize(Context context, Credentials credentials, Configuration configuration) {
 
     }

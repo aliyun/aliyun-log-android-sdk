@@ -15,6 +15,8 @@ public interface Feature {
 
     String version();
 
+    void preInit(Context context, Credentials credentials, Configuration configuration);
+
     void initialize(Context context, Credentials credentials, Configuration configuration);
 
     boolean isInitialize();

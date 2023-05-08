@@ -87,7 +87,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
 
     @Override
-    protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
+    protected void onPreInit(Context context, Credentials credentials, Configuration configuration) {
         final NetworkDiagnosisCredentials networkDiagnosisCredentials = credentials.networkDiagnosisCredentials;
         if (null == networkDiagnosisCredentials) {
             SLSLog.w(TAG, "NetworkDiagnosisCredentials must not be null.");
@@ -98,12 +98,13 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(networkDiagnosisCredentials.secretKey);
         }
 
-        Diagnosis.init(
+        Diagnosis.preInit(
             networkDiagnosisCredentials.secretKey,
             Utdid.getInstance().getUtdid(context),
             networkDiagnosisCredentials.siteId,
             networkDiagnosisCredentials.extension
         );
+
         Diagnosis.enableDebug(configuration.debuggable && AppUtils.debuggable(context));
 
         networkDiagnosisSender = new NetworkDiagnosisSender(context, this);
@@ -112,6 +113,22 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         Diagnosis.registerLogger(this, networkDiagnosisSender);
 
         NetworkDiagnosis.getInstance().setNetworkDiagnosis(this);
+    }
+
+    @Override
+    protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
+        final NetworkDiagnosisCredentials networkDiagnosisCredentials = credentials.networkDiagnosisCredentials;
+        if (null == networkDiagnosisCredentials) {
+            SLSLog.w(TAG, "NetworkDiagnosisCredentials must not be null.");
+            return;
+        }
+
+        Diagnosis.init(
+            networkDiagnosisCredentials.secretKey,
+            Utdid.getInstance().getUtdid(context),
+            networkDiagnosisCredentials.siteId,
+            networkDiagnosisCredentials.extension
+        );
     }
 
     @Override

@@ -27,7 +27,6 @@ import com.aliyun.sls.android.ot.ISpanProvider;
 import com.aliyun.sls.android.ot.Resource;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.internal.HttpHeader;
-import com.aliyun.sls.android.producer.internal.LogProducerHttpHeaderInjector;
 
 /**
  * @author gordon
@@ -41,13 +40,14 @@ public final class SLSAndroid {
     private static final ExtraProvider extraProvider = new ExtraProvider();
 
     // region initialize
+    private final static AtomicBoolean hasPreInit = new AtomicBoolean(false);
     private final static AtomicBoolean hasInitialized = new AtomicBoolean(false);
 
     public static boolean preInit(
         final Context context,
         final Credentials credentials,
         final OptionConfiguration optionConfiguration) {
-        return internalInit(context, credentials, optionConfiguration, true);
+        return internalPreInit(context, credentials, optionConfiguration);
     }
 
     public static boolean initialize(
@@ -55,24 +55,23 @@ public final class SLSAndroid {
         final Credentials credentials,
         final OptionConfiguration optionConfiguration
     ) {
-        return internalInit(context, credentials, optionConfiguration, false);
+        return internalInitialize(context, credentials, optionConfiguration);
     }
 
-    private static boolean internalInit(
+    private static boolean internalPreInit(
         final Context context,
         final Credentials credentials,
-        final OptionConfiguration optionConfiguration,
-        final boolean preInit) {
-        PrivacyUtils.setEnablePrivacy(preInit);
+        final OptionConfiguration optionConfiguration) {
+        PrivacyUtils.setEnablePrivacy(false);
 
-        SLSLog.i(TAG, "start init SLS Android SDK.");
+        SLSLog.i(TAG, "start pre init SLS Android SDK.");
         if (null == optionConfiguration) {
             SLSLog.w(TAG, "OptionConfiguration must not be null.");
             return false;
         }
 
-        if (hasInitialized.get()) {
-            SLSLog.w(TAG, "SLSAndroid has been initialized.");
+        if (hasPreInit.get()) {
+            SLSLog.w(TAG, "SLSAndroid has been pre initialized.");
             return false;
         }
 
@@ -83,13 +82,10 @@ public final class SLSAndroid {
             @Override
             protected void provideLogProducerConfig(LogProducerConfig config) {
                 super.provideLogProducerConfig(config);
-                config.setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
-                    @Override
-                    public String[] injectHeaders(String[] srcHeaders, int count) {
-                        return HttpHeader.getHeadersWithUA(srcHeaders,
-                            String.format("apm/%s", BuildConfig.VERSION_NAME));
-                    }
-                });
+                config.setHttpHeaderInjector(
+                    (srcHeaders, count) ->
+                        HttpHeader.getHeadersWithUA(srcHeaders, String.format("apm/%s", BuildConfig.VERSION_NAME))
+                );
             }
         });
         optionConfiguration.onConfiguration(configuration);
@@ -99,14 +95,49 @@ public final class SLSAndroid {
             initializeSdkSender(applicationContext);
         }
 
-        initCrashReporterFeature(applicationContext, credentials, configuration);
-        initBlockDetectionFeature(applicationContext, credentials, configuration);
-        initNetworkDiagnosisFeature(applicationContext, credentials, configuration);
-        initTracerFeature(applicationContext, credentials, configuration);
+        if (configuration.enableCrashReporter) {
+            preInitFeature(applicationContext, credentials, configuration, "com.aliyun.sls.android.crashreporter.CrashReporterFeature");
+        }
+        if (configuration.enableBlockDetection) {
+            preInitFeature(applicationContext, credentials, configuration, "com.aliyun.sls.android.blockdetection.BlockDetectionFeature");
+        }
+        if (configuration.enableNetworkDiagnosis) {
+            preInitFeature(applicationContext, credentials, configuration, "com.aliyun.sls.android.network_diagnosis.NetworkDiagnosisFeature");
+        }
+        if (configuration.enableTracer) {
+            preInitFeature(applicationContext, credentials, configuration, "com.aliyun.sls.android.trace.TraceFeature");
+        }
 
-        hasInitialized.set(true);
+        hasPreInit.set(true);
 
         Runtime.getRuntime().addShutdownHook(new Thread(SLSAndroid::stop, "SLS_ANDROID_SHUTDOWN"));
+        SLSLog.i(TAG, "SLS Android pre initialize success.");
+        return true;
+    }
+
+    private static boolean internalInitialize(
+        final Context context,
+        final Credentials credentials,
+        final OptionConfiguration optionConfiguration) {
+        internalPreInit(context, credentials, optionConfiguration);
+
+        SLSLog.i(TAG, "start init SLS Android SDK.");
+        if (null == optionConfiguration) {
+            SLSLog.w(TAG, "OptionConfiguration must not be null.");
+            return false;
+        }
+
+        PrivacyUtils.setEnablePrivacy(true);
+
+        if (hasInitialized.get()) {
+            SLSLog.w(TAG, "SLSAndroid has been initialized.");
+            return false;
+        }
+
+        final Context applicationContext = context.getApplicationContext();
+        initFeatures(applicationContext, credentials, configuration);
+        hasInitialized.set(true);
+
         SLSLog.i(TAG, "SLS Android initialize success.");
         return true;
     }
@@ -122,7 +153,7 @@ public final class SLSAndroid {
                     Pair.create("app.version", AppUtils.getAppVersion(context)),
                     Pair.create("app.versionCode", AppUtils.getAppVersionCode(context)),
                     Pair.create("app.name", AppUtils.getAppName(context)),
-                    Pair.create("device.resolution", enablePrivacy ? DeviceUtils.getResolution(context): ""),
+                    Pair.create("device.resolution", enablePrivacy ? DeviceUtils.getResolution(context) : ""),
                     Pair.create("net.access", enablePrivacy ? DeviceUtils.getAccessName(context) : ""),
                     Pair.create("net.access_subtype", enablePrivacy ? DeviceUtils.getAccessSubTypeName(context) : ""),
                     Pair.create("carrier", enablePrivacy ? DeviceUtils.getCarrier(context) : ""),
@@ -207,82 +238,43 @@ public final class SLSAndroid {
         spanProcessor.initialize(credentials);
     }
 
-    private static void initCrashReporterFeature(
-        final Context context,
-        final Credentials credentials,
-        final Configuration configuration
-    ) {
-        if (!configuration.enableCrashReporter) {
-            return;
-        }
-
-        initFeature(context, credentials, configuration, "com.aliyun.sls.android.crashreporter.CrashReporterFeature");
-    }
-
-    private static void initBlockDetectionFeature(
-        final Context context,
-        final Credentials credentials,
-        final Configuration configuration
-    ) {
-        if (!configuration.enableBlockDetection) {
-            return;
-        }
-
-        initFeature(context, credentials, configuration, "com.aliyun.sls.android.blockdetection.BlockDetectionFeature");
-    }
-
-    private static void initNetworkDiagnosisFeature(
-        final Context context,
-        final Credentials credentials,
-        final Configuration configuration
-    ) {
-        if (!configuration.enableNetworkDiagnosis) {
-            return;
-        }
-
-        initFeature(context, credentials, configuration,
-            "com.aliyun.sls.android.network_diagnosis.NetworkDiagnosisFeature");
-    }
-
-    private static void initTracerFeature(
-        final Context context,
-        final Credentials credentials,
-        final Configuration configuration
-    ) {
-        if (!configuration.enableTracer) {
-            return;
-        }
-
-        initFeature(context, credentials, configuration, "com.aliyun.sls.android.trace.TraceFeature");
-    }
-
-    private static boolean initFeature(
+    private static void preInitFeature(
         final Context context,
         final Credentials credentials,
         final Configuration configuration,
         final String clazzName
     ) {
-        SLSLog.i(TAG, "start init feature: " + clazzName);
+        SLSLog.i(TAG, "start pre init feature: " + clazzName);
         try {
             Feature feature = (Feature)Class.forName(clazzName).newInstance();
             if (null == feature) {
-                return false;
+                return;
             }
-            feature.initialize(context, credentials, configuration);
+
+            feature.preInit(context, credentials, configuration);
             features.add(feature);
-            SLSLog.i(TAG, "init feature success, feature: " + clazzName);
-            return true;
+            SLSLog.i(TAG, "pre init feature success, feature: " + clazzName);
         } catch (Throwable e) {
             e.printStackTrace();
-            SLSLog.w(TAG, "init feature error. feature: " + clazzName + ", error: " + e.getMessage());
-            return false;
+            SLSLog.w(TAG, "pre init feature error. feature: " + clazzName + ", error: " + e.getMessage());
         }
     }
 
+    private static void initFeatures(
+        final Context context,
+        final Credentials credentials,
+        final Configuration configuration
+    ) {
+        SLSLog.i(TAG, "start init features");
+
+        for (Feature feature : features) {
+            feature.initialize(context, credentials, configuration);
+            SLSLog.i(TAG, "init feature success, feature: " + feature.name());
+        }
+    }
     // endregion
 
     // region setter
-
     /**
      * Sets this library log level
      *

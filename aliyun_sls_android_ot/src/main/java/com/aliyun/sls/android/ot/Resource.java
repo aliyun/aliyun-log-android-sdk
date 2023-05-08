@@ -29,6 +29,7 @@ public class Resource {
         DEFAULT.add("device.model.identifier", Build.MODEL);
         DEFAULT.add("device.model.name", Build.PRODUCT);
         DEFAULT.add("device.manufacturer", Build.MANUFACTURER);
+        DEFAULT.add("device.brand", Build.BRAND);
 
         // os specification, ref: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/os.md
         DEFAULT.add("os.type", "Linux");

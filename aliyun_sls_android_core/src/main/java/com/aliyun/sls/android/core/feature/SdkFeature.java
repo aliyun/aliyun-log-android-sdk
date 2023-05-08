@@ -13,6 +13,7 @@ import com.aliyun.sls.android.ot.SpanBuilder;
  */
 public abstract class SdkFeature extends NoOpFeature {
 
+    private final AtomicBoolean hasPreInit = new AtomicBoolean(false);
     private final AtomicBoolean hasInitialize = new AtomicBoolean(false);
     protected Context context;
     protected Configuration configuration;
@@ -32,14 +33,26 @@ public abstract class SdkFeature extends NoOpFeature {
     }
 
     @Override
-    public final void initialize(Context context, Credentials credentials, Configuration configuration) {
-        if (hasInitialize.get()) {
+    public void preInit(Context context, Credentials credentials, Configuration configuration) {
+        if (hasPreInit.get()) {
             return;
         }
         this.context = null != context ? context.getApplicationContext() : null;
         this.configuration = configuration;
 
         onInitSender(context, credentials, configuration);
+        onPreInit(context, credentials, configuration);
+
+        hasPreInit.set(true);
+    }
+
+    @Override
+    public final void initialize(Context context, Credentials credentials, Configuration configuration) {
+        if (hasInitialize.get()) {
+            return;
+        }
+
+        preInit(context, credentials, configuration);
         onInitialize(context, credentials, configuration);
         hasInitialize.set(true);
         onPostInitialize(context);
@@ -49,6 +62,7 @@ public abstract class SdkFeature extends NoOpFeature {
 
     }
 
+    protected abstract void onPreInit(Context context, Credentials credentials, Configuration configuration);
     protected abstract void onInitialize(Context context, Credentials credentials, Configuration configuration);
 
     protected abstract void onPostInitialize(Context context);

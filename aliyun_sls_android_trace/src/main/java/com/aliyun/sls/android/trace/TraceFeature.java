@@ -34,7 +34,7 @@ public class TraceFeature extends SdkFeature {
     }
 
     @Override
-    protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
+    protected void onPreInit(Context context, Credentials credentials, Configuration configuration) {
         if (null == credentials || null == credentials.tracerCredentials) {
             SLSLog.w(TAG, "TraceCredentials must not be null.");
             return;
@@ -51,6 +51,11 @@ public class TraceFeature extends SdkFeature {
         Tracer.spanProcessor = traceSender;
         Tracer.spanProvider = configuration.spanProvider;
         Tracer.setTraceFeature(this);
+    }
+
+    @Override
+    protected void onInitialize(Context context, Credentials credentials, Configuration configuration) {
+
     }
 
     boolean addLog(Log log) {
