@@ -122,13 +122,22 @@ public class SLSDemoApplication extends MultiDexApplication {
                     credentials.accessKeySecret = PreferenceUtils.getAccessKeySecret(SLSDemoApplication.this);
                     credentials.securityToken = PreferenceUtils.getAccessKeyToken(SLSDemoApplication.this);
 
+                    // 如果仅是更新 AK 的话，可以不对TracerCredentials进行更新
                     TracerCredentials tracerCredentials = credentials.createTraceCredentials();
+                    tracerCredentials.securityToken = credentials.securityToken;
                     tracerCredentials.instanceId = "sls-mall";
 
                     TracerLogCredentials logCredentials = tracerCredentials.createLogCredentials();
                     logCredentials.endpoint = "https://cn-beijing.log.aliyuncs.com";
                     logCredentials.project = "qs-demos";
                     logCredentials.logstore = "sls-mall-custom-logs";
+
+                    // 如果是仅更新 AK 的话，可以不对NetworkDiagnosisCredentials进行更新
+                    //NetworkDiagnosisCredentials networkDiagnosisCredentials = credentials.getNetworkDiagnosisCredentials();
+                    //networkDiagnosisCredentials.accessKeyId = credentials.accessKeyId;
+                    //networkDiagnosisCredentials.accessKeySecret = credentials.accessKeySecret;
+                    //networkDiagnosisCredentials.securityToken = credentials.securityToken;
+                    //networkDiagnosisCredentials.secretKey = PreferenceUtils.getNetworkSecKey(SLSDemoApplication.this);
 
                     SLSAndroid.setCredentials(credentials);
                 }

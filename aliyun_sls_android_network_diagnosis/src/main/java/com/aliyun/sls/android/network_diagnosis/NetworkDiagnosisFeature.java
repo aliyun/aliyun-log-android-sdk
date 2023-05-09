@@ -155,6 +155,11 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
+        // set instanceId to network diagnosis credentials that will be used in sender.provideLogstoreName() method.
+        if (null != credentials.networkDiagnosisCredentials && !TextUtils.isEmpty(credentials.networkDiagnosisCredentials.secretKey)) {
+            credentials.networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(credentials.networkDiagnosisCredentials.secretKey);
+        }
+
         networkDiagnosisSender.setCredentials(credentials);
     }
 
@@ -628,7 +633,8 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
         @Override
         protected String provideLogstoreName(Credentials credentials) {
-            if (null == credentials.networkDiagnosisCredentials) {
+            // instanceId must not be null or empty
+            if (null == credentials.networkDiagnosisCredentials || TextUtils.isEmpty(credentials.networkDiagnosisCredentials.instanceId)) {
                 return null;
             }
 
