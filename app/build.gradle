@@ -3,8 +3,6 @@ apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
-/* 👇👇👇👇 应用 Booster 插件 👇👇👇👇 */
-apply plugin: 'com.didiglobal.booster'
 
 android {
     compileSdkVersion 29

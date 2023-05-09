@@ -3,7 +3,6 @@
 buildscript {
     ext {
         agp_version = "4.0.2"
-        booster_version = "4.15.0"
         kotlin_version = "1.5.30"
     }
     repositories {
@@ -22,10 +21,6 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
-
-        /* 👇👇👇👇 引用 Booster Gradle 插件 👇👇👇👇 */
-        classpath "com.didiglobal.booster:booster-gradle-plugin:$booster_version"
-        classpath "com.aliyun.openservices:sls-android-gradle-plugin:0.0.3"
     }
 }
 
