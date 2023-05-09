@@ -136,6 +136,7 @@ public interface INetworkDiagnosis {
     class Request {
         public String domain;
         public Object context;
+        public boolean multiplePortsDetect = true;
     }
 
     class HttpRequest extends PingRequest {
@@ -234,8 +235,21 @@ public interface INetworkDiagnosis {
     void mtr(String domain, int maxTTL, int maxPaths, int maxTimes, int timeout, Callback callback);
 
     class MtrRequest extends PingRequest {
+        public enum Protocol {
+            ALL("all"),
+            ICMP("icmp"),
+            UDP("udp");
+
+            public final String protocol;
+
+            Protocol(String protocol) {
+                this.protocol = protocol;
+            }
+        }
+
         public int maxTTL = DEFAULT_MTR_MAX_TTL;
         public int maxPaths = DEFAULT_MTR_MAX_PATH;
+        public Protocol protocol = Protocol.ALL;
     }
 
     void mtr(MtrRequest request);

@@ -294,7 +294,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             },
             request.context
         );
-        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        config.setMultiplePortsDetect(enableMultiplePortsDetect || request.multiplePortsDetect);
         Diagnosis.startHttpPing(config);
     }
     // endregion
@@ -367,7 +367,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             pingRequest.context
         );
 
-        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        config.setMultiplePortsDetect(enableMultiplePortsDetect || pingRequest.multiplePortsDetect);
         Diagnosis.startPing(config);
     }
     // endregion
@@ -428,7 +428,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             },
             request.context
         );
-        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        config.setMultiplePortsDetect(enableMultiplePortsDetect || request.multiplePortsDetect);
         Diagnosis.startTcpPing(config);
     }
 
@@ -504,8 +504,9 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             },
             request.context
         );
+        config.protocol = request.protocol.protocol;
 
-        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        config.setMultiplePortsDetect(enableMultiplePortsDetect || request.multiplePortsDetect);
         Diagnosis.startMtr(config);
     }
     // endregion
@@ -575,7 +576,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             },
             dnsRequest.context
         );
-        config.setMultiplePortsDetect(enableMultiplePortsDetect);
+        config.setMultiplePortsDetect(enableMultiplePortsDetect || dnsRequest.multiplePortsDetect);
         Diagnosis.startDns(config);
     }
     // endregion
