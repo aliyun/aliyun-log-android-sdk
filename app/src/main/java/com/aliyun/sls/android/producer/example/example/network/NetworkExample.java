@@ -24,6 +24,7 @@ import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.DnsRequest;
 import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.HttpRequest;
 import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.MtrRequest;
+import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.MtrRequest.Protocol;
 import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.PingRequest;
 import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.TcpPingRequest;
 import com.aliyun.sls.android.network_diagnosis.NetworkDiagnosis;
@@ -118,6 +119,7 @@ public class NetworkExample extends BaseActivity {
             PingRequest request = new PingRequest();
             request.domain = "www.aliyun.com";
             // 可选参数
+            request.multiplePortsDetect = true; // 多网卡探测 s
             request.context = "<your ping context id>";
 
             diagnosis.ping(request, response -> {
@@ -148,6 +150,7 @@ public class NetworkExample extends BaseActivity {
             MtrRequest request = new MtrRequest();
             request.domain = "www.aliyun.com";
             // 可选参数
+            request.protocol = Protocol.ICMP;
             request.context = "<your mtr context id>";
 
             diagnosis.mtr(request, response -> {
