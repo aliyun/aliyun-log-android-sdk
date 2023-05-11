@@ -92,3 +92,4 @@ lint/tmp/
 #scan
 scan.py
 diff_*
+push_scan.py

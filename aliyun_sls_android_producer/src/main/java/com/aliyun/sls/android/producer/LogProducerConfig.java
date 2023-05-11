@@ -1,9 +1,12 @@
 package com.aliyun.sls.android.producer;
 
+import java.io.File;
+
 import android.content.Context;
 import android.text.TextUtils;
 import com.aliyun.sls.android.producer.internal.HttpHeader;
 import com.aliyun.sls.android.producer.internal.LogProducerHttpHeaderInjector;
+import com.aliyun.sls.android.producer.utils.ProcessUtils;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 import com.aliyun.sls.android.producer.utils.Utils;
 
@@ -253,7 +256,26 @@ public class LogProducerConfig {
     }
 
     public void setPersistentFilePath(String path) {
+        path = getNewPath(path);
         log_producer_config_set_persistent_file_path(config, path);
+    }
+
+    private String getNewPath(String path) {
+        if (null == context || ProcessUtils.isMainProcess(context)) {
+            return path;
+        }
+
+        String processName = ProcessUtils.getCurrentProcessName(context);
+        if (TextUtils.isEmpty(processName)) {
+            return path;
+        }
+
+        File newPath = new File(path, processName);
+        if (!newPath.exists()) {
+            boolean ignored = newPath.mkdirs();
+        }
+
+        return newPath.getAbsolutePath();
     }
 
     public void setPersistentForceFlush(int num) {
