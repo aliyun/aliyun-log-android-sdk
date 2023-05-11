@@ -1,6 +1,6 @@
 #!/bin/sh
 # 定义版本号
-version=1.0.6
+version=1.0.7
 moduleName=sls-android-trace
 
 ./gradlew :aliyun_sls_android_trace:clean -Pversion=${version} -PmoduleName=${moduleName}

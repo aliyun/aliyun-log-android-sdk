@@ -1,6 +1,6 @@
 #!/bin/sh
 # 定义版本号
-version=1.0.2
+version=1.0.3
 moduleName=sls-android-blockdetection
 
 ./gradlew :aliyun_sls_android_blockdetection:clean -Pversion=${version} -PmoduleName=${moduleName}

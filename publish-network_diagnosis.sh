@@ -1,6 +1,6 @@
 #!/bin/sh
 # 定义版本号
-version=2.0.12
+version=2.0.13
 moduleName=sls-android-network-diagnosis
 
 ./gradlew :aliyun_sls_android_network_diagnosis:clean -Pversion=${version} -PmoduleName=${moduleName}
