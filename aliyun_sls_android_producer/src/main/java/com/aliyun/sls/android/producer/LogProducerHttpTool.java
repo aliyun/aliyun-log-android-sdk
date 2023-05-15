@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import android.text.TextUtils;
 import android.util.Log;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 
@@ -61,7 +62,15 @@ public class LogProducerHttpTool {
                 response.append(inputLine);
             }
             in.close();
-            Log.w(TAG, "code: " + responseCode + ", response: " + response.toString());
+
+            // if 400 response code and x-log-requestid in response header, this request may be blocked.
+            // we should return -1 that sdk will re-upload data to sls
+            if (400 == responseCode && TextUtils.isEmpty(httpConn.getHeaderField("x-log-requestid"))) {
+                Log.w(TAG, "request may have been blocked. it will be retried. errorCode: " + response);
+                return -1;
+            }
+
+            Log.w(TAG, "code: " + responseCode + ", response: " + response);
             return responseCode;
         } catch (Exception ex) {
             Log.w(TAG, "exception: " + ex.getLocalizedMessage());
