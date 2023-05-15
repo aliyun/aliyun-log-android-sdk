@@ -256,11 +256,25 @@ public class LogProducerConfig {
     }
 
     public void setPersistentFilePath(String path) {
-        path = getNewPath(path);
+        if (TextUtils.isEmpty(path)) {
+            return;
+        }
+
+        // create parent folder if no exists
+        createParentFolderIfNotExists(path);
+
+        path = createNewPathIfInProcess(path);
         log_producer_config_set_persistent_file_path(config, path);
     }
 
-    private String getNewPath(String path) {
+    private void createParentFolderIfNotExists(String path) {
+        File parent = new File(path.substring(0, path.lastIndexOf(File.separator)));
+        if (!parent.exists()) {
+            boolean ignored = parent.mkdirs();
+        }
+    }
+
+    private String createNewPathIfInProcess(String path) {
         if (null == context || ProcessUtils.isMainProcess(context)) {
             return path;
         }
@@ -270,12 +284,13 @@ public class LogProducerConfig {
             return path;
         }
 
-        File newPath = new File(path, processName);
-        if (!newPath.exists()) {
-            boolean ignored = newPath.mkdirs();
+        File parent = new File(path.substring(0, path.lastIndexOf(File.separator)), processName);
+        String lastPath = path.substring(path.lastIndexOf(File.separator)+1);
+        if (!parent.exists()) {
+            boolean ignored = parent.mkdirs();
         }
 
-        return newPath.getAbsolutePath();
+        return new File(parent, lastPath).getAbsolutePath();
     }
 
     public void setPersistentForceFlush(int num) {

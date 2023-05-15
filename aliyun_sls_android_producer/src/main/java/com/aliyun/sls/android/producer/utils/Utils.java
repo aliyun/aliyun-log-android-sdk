@@ -17,6 +17,13 @@ public final class Utils {
     }
 
     public static Context getContext() {
+        // if context not set from content provider, we get context from activity again.
+        // under multi-process, content provider may not get the context.
+        // cache the context will be performance friendly.
+        if (null == context) {
+            context = ContextUtils.getApplication();
+        }
+
         return context;
     }
 
