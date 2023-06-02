@@ -126,6 +126,11 @@ public class ProducerExample extends BaseActivity {
                     // compressedBytes: 日志压缩字节数
                     android.util.Log.e(TAG, String.format("resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", resultCode, reqId, errorMessage, logBytes, compressedBytes));
                     printStatus(String.format("send log resultCode: %s, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
+
+                    final LogProducerResult result = LogProducerResult.fromInt(resultCode);
+                    if (LogProducerResult.LOG_PRODUCER_SEND_UNAUTHORIZED == result || LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID == result) {
+                        // 需要更新 AK 或者 SDK 的初始化参数
+                    }
                 }
             };
             // 需要关注日志的发送成功或失败状态时, 第二个参数需要传入一个 callbak

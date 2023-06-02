@@ -83,11 +83,11 @@ dependencies {
     implementation project(':aliyun_sls_android_okhttp')
     implementation project(':aliyun_sls_android_ot_ktx')
 
-//    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.12'
+//    implementation 'com.aliyun.openservices:aliyun-log-android-sdk:2.6.13'
 //    implementation 'com.aliyun.openservices:sls-android-core:1.0.8'
 //    implementation 'com.aliyun.openservices:sls-android-ot:1.0.8'
 //    implementation 'com.aliyun.openservices:sls-android-ot-ktx:1.0.1'
-//    implementation 'com.aliyun.openservices:sls-android-network-diagnosis:2.0.13'
+//    implementation 'com.aliyun.openservices:sls-android-network-diagnosis:2.0.14'
 //    implementation 'com.aliyun.openservices:sls-android-crashreporter:2.0.6'
 //    implementation 'com.aliyun.openservices:sls-android-blockdetection:1.0.3'
 //    implementation 'com.aliyun.openservices:sls-android-trace:1.0.7'
