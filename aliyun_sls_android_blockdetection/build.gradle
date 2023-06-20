@@ -14,8 +14,11 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            testCoverageEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled = false
         }
     }
     compileOptions {
@@ -31,6 +34,8 @@ android {
 }
 
 dependencies {
+    testImplementation project(':testable')
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(":aliyun_sls_android_core")
     implementation project(":aliyun_sls_android_ot")
@@ -43,3 +48,6 @@ ext {
 
 //====以下是将android library上传到jcenter的脚本
 apply from: "${project.rootProject.file('maven-publish.gradle')}"
+
+//====jacoco coverage reporter
+apply from: "${project.rootProject.file('jacoco.gradle')}"
