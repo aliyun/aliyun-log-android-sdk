@@ -137,6 +137,7 @@ public interface INetworkDiagnosis {
         public String domain;
         public Object context;
         public boolean multiplePortsDetect = true;
+        public Map<String, String> extension;
     }
 
     class HttpRequest extends PingRequest {
