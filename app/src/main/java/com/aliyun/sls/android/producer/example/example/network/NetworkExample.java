@@ -98,6 +98,12 @@ public class NetworkExample extends BaseActivity {
             request.context = "<your http context id>";
             request.headerOnly = true;
             request.downloadBytesLimit = 1024;
+            // 可选参数，设置当次网络探测的扩展业务参数
+            request.extension = new HashMap<String, String>() {
+                {
+                    put("custom_key", "custom_value");
+                }
+            };
 
             request.domain = "https://www.aliyun.com";
             diagnosis.http(request, response -> {
@@ -121,6 +127,12 @@ public class NetworkExample extends BaseActivity {
             // 可选参数
             request.multiplePortsDetect = true; // 多网卡探测 s
             request.context = "<your ping context id>";
+            // 可选参数，设置当次网络探测的扩展业务参数
+            request.extension = new HashMap<String, String>() {
+                {
+                    put("custom_key", "custom_value");
+                }
+            };
 
             diagnosis.ping(request, response -> {
                 SLSLog.d(TAG, String.format("ping result: %s", response.content));
@@ -137,6 +149,13 @@ public class NetworkExample extends BaseActivity {
             request.port = 80;
             // 可选参数
             request.context = "<your tcp ping context id>";
+            // 可选参数，设置当次网络探测的扩展业务参数
+            request.extension = new HashMap<String, String>() {
+                {
+                    put("custom_key", "custom_value");
+                }
+            };
+
             diagnosis.tcpPing(request, response -> {
                 SLSLog.d(TAG, String.format("tcp ping result: %s", response.content));
                 printStatus(String.format("tcp ping result: %s", response.content));
@@ -152,6 +171,12 @@ public class NetworkExample extends BaseActivity {
             // 可选参数
             request.protocol = Protocol.ICMP;
             request.context = "<your mtr context id>";
+            // 可选参数，设置当次网络探测的扩展业务参数
+            request.extension = new HashMap<String, String>() {
+                {
+                    put("custom_key", "custom_value");
+                }
+            };
 
             diagnosis.mtr(request, response -> {
                 SLSLog.d(TAG, String.format("mtr result: %s", response.content));
@@ -167,6 +192,12 @@ public class NetworkExample extends BaseActivity {
             request.domain = "www.aliyun.com";
             // 可选参数
             request.context = "<your dns context id>";
+            // 可选参数，设置当次网络探测的扩展业务参数
+            request.extension = new HashMap<String, String>() {
+                {
+                    put("custom_key", "custom_value");
+                }
+            };
             diagnosis.dns(request, response -> {
                 SLSLog.d(TAG, String.format("dns result: %s", response.content));
                 printStatus(String.format("dns result: %s", response.content));

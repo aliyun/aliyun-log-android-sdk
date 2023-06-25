@@ -66,8 +66,8 @@ public class SLSDemoApplication extends MultiDexApplication {
 
         NetworkDiagnosisCredentials networkDiagnosisCredentials = credentials.getNetworkDiagnosisCredentials();
         networkDiagnosisCredentials.secretKey = PreferenceUtils.getNetworkSecKey(this);
-        networkDiagnosisCredentials.endpoint = "https://cn-hangzhou.log.aliyuncs.com";
-        networkDiagnosisCredentials.project = "zaiyun-test5";
+        networkDiagnosisCredentials.endpoint = "https://cn-beijing.log.aliyuncs.com";
+        networkDiagnosisCredentials.project = "mobile-demo-beijing-b";
 
         SLSAndroid.setUtdid(this, "123123131232");
         SLSAndroid.setLogLevel(Log.VERBOSE);

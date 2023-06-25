@@ -300,6 +300,9 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             request.context
         );
         config.setMultiplePortsDetect(enableMultiplePortsDetect || request.multiplePortsDetect);
+        if (null != request.extension) {
+            config.setDetectExtension(new HashMap<>(request.extension));
+        }
         Diagnosis.startHttpPing(config);
     }
     // endregion
@@ -373,6 +376,9 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         );
 
         config.setMultiplePortsDetect(enableMultiplePortsDetect || pingRequest.multiplePortsDetect);
+        if (null != pingRequest.extension) {
+            config.setDetectExtension(new HashMap<>(pingRequest.extension));
+        }
         Diagnosis.startPing(config);
     }
     // endregion
@@ -434,6 +440,9 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             request.context
         );
         config.setMultiplePortsDetect(enableMultiplePortsDetect || request.multiplePortsDetect);
+        if (null != request.extension) {
+            config.setDetectExtension(new HashMap<>(request.extension));
+        }
         Diagnosis.startTcpPing(config);
     }
 
@@ -512,6 +521,9 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         config.protocol = request.protocol.protocol;
 
         config.setMultiplePortsDetect(enableMultiplePortsDetect || request.multiplePortsDetect);
+        if (null != request.extension) {
+            config.setDetectExtension(new HashMap<>(request.extension));
+        }
         Diagnosis.startMtr(config);
     }
     // endregion
@@ -582,6 +594,9 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             dnsRequest.context
         );
         config.setMultiplePortsDetect(enableMultiplePortsDetect || dnsRequest.multiplePortsDetect);
+        if (null != dnsRequest.extension) {
+            config.setDetectExtension(new HashMap<>(dnsRequest.extension));
+        }
         Diagnosis.startDns(config);
     }
     // endregion
