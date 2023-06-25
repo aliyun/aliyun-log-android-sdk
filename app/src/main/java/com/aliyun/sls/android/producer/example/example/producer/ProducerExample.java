@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
+import com.aliyun.sls.android.producer.LogProducerConfig.CompressType;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.BaseActivity;
@@ -111,6 +112,8 @@ public class ProducerExample extends BaseActivity {
             // 本地最多缓存的日志数，不建议超过1M，通常设置为65536即可
             config.setPersistentMaxLogCount(65536);
             config.logProducerDebug();
+
+            config.setCompressType(CompressType.ZSTD);
 
             /**
              * 以下为通过 LogProducerConfig 构造一个 LogProducerClient 实例

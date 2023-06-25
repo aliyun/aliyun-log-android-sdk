@@ -16,10 +16,6 @@
 # define LOG_CPP_END
 #endif
 
-#ifndef LOG_C_ENABLE_ZSTD
-#define LOG_C_ENABLE_ZSTD
-#endif
-
 typedef int log_status_t;
 
 struct _post_log_result
