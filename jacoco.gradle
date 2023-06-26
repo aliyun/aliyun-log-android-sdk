@@ -28,7 +28,7 @@ def androidExclusion = [
         '**/*Module*.*'
 ]
 
-task jacocoCoverageTestReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
+task jacocoTestReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
     group = "Reporting"
     description = "Generate Jacoco coverage reports after running tests."
     reports {
@@ -47,7 +47,7 @@ task jacocoCoverageTestReport(type: JacocoReport, dependsOn: 'testDebugUnitTest'
     getSourceDirectories().setFrom(files((project.projectDir).toString() + "/src"))
     getExecutionData().setFrom(files("$buildDir/jacoco/testDebugUnitTest.exec"))
 }
-//task getCoverage(type: Exec, dependsOn: 'jacocoCoverageTestReport') {
+//task getCoverage(type: Exec, dependsOn: 'jacocoTestReport') {
 //    group = "Reporting"
 //    commandLine "open", "$buildDir/reports/jacoco/codeCoverageReport/html/index.html"
 //}

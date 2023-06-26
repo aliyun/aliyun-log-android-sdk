@@ -17,6 +17,8 @@ buildscript {
         // aliyun maven
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
+
+        maven { url 'http://mvnrepo.alibaba-inc.com/mvn/repository' }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${agp_version}"
