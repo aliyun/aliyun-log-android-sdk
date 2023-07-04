@@ -23,6 +23,7 @@ import com.aliyun.sls.android.producer.Log;
  * @date 2022/9/6
  */
 public class Tracer {
+    //@VisibleForTesting
     static ISpanProcessor spanProcessor;
     static ISpanProvider spanProvider;
     static TraceFeature traceFeature;

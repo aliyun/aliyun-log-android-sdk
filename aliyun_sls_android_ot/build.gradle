@@ -32,8 +32,6 @@ android {
 
 dependencies {
     testImplementation(project(':testable'))
-//    testImplementation 'junit:junit:4.13.2'
-//    testImplementation("org.skyscreamer:jsonassert:1.5.1")
     testImplementation(project(":aliyun_sls_android_ot"))
     
     implementation project(':aliyun_sls_android_producer')
@@ -48,4 +46,5 @@ ext {
 apply from: "${project.rootProject.file('maven-publish.gradle')}"
 
 //====jacoco coverage reporter
-apply from: "${project.rootProject.file('jacoco.gradle')}"
+//apply from: "${project.rootProject.file('jacoco.gradle')}"
+apply from: "${project.rootProject.file('jacoco/modules.gradle')}"

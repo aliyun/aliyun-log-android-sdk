@@ -286,3 +286,5 @@ nexusPublishing {
         }
     }
 }
+
+apply from: 'jacoco/project.gradle'

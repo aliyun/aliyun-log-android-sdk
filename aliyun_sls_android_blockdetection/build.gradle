@@ -35,6 +35,7 @@ android {
 
 dependencies {
     testImplementation project(':testable')
+    testImplementation(project(":aliyun_sls_android_blockdetection"))
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(":aliyun_sls_android_core")
@@ -50,4 +51,5 @@ ext {
 apply from: "${project.rootProject.file('maven-publish.gradle')}"
 
 //====jacoco coverage reporter
-apply from: "${project.rootProject.file('jacoco.gradle')}"
+//apply from: "${project.rootProject.file('jacoco.gradle')}"
+apply from: "${project.rootProject.file('jacoco/modules.gradle')}"
