@@ -2,7 +2,7 @@
 
 buildscript {
     ext {
-        agp_version = "4.0.2"
+        agp_version = "4.2.2"
         kotlin_version = "1.5.30"
     }
     repositories {
@@ -20,7 +20,10 @@ buildscript {
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
 
         // internal alibaba maven
-        maven { url 'http://mvnrepo.alibaba-inc.com/mvn/repository' }
+        maven {
+            allowInsecureProtocol = true
+            url 'http://mvnrepo.alibaba-inc.com/mvn/repository'
+        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${agp_version}"

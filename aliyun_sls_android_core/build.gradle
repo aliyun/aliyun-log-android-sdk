@@ -9,6 +9,9 @@ android {
         versionCode 1
         versionName "1.0.8"
 
+        buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
