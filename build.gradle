@@ -6,19 +6,20 @@ buildscript {
         kotlin_version = "1.5.30"
     }
     repositories {
-        google()
-        jcenter()
-        mavenLocal()
-        mavenCentral()
-        gradlePluginPortal()
+        // sonatype
         maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
         maven { url 'https://oss.sonatype.org/content/repositories/public/' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-        // aliyun maven
-        maven { url 'https://maven.aliyun.com/repository/google' }
-        maven { url 'https://maven.aliyun.com/repository/jcenter' }
-        maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
 
+        // aliyun maven
+        // mirror of google()
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        // mirror of central & jcenter
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        // mirror of gradlePluginPortal
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+
+        // internal alibaba maven
         maven { url 'http://mvnrepo.alibaba-inc.com/mvn/repository' }
     }
     dependencies {
@@ -30,24 +31,11 @@ buildscript {
     }
 }
 
-//allprojects {
-//    repositories {
-//        // google()
-//        // jcenter()
-//        maven { url 'https://maven.aliyun.com/repository/google' }
-//        maven { url 'https://maven.aliyun.com/repository/jcenter' }
-//        maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
-//
-//        maven { url 'http://mvnrepo.alibaba-inc.com/mvn/repository' }
-//    }
-//}
-
 plugins {
     id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 }
 
 allprojects { project ->
-//    apply plugin: 'java'
     apply plugin: 'maven-publish'
 
     def moduleName = findProperty('moduleName').with { it != DEFAULT_VERSION ? it : null } ?: DEFAULT_VERSION
@@ -55,14 +43,21 @@ allprojects { project ->
     version = findProperty('version').with { it != DEFAULT_VERSION ? it : null } ?: DEFAULT_VERSION
 
     repositories {
-        google()
-//        jcenter()
-        mavenLocal()
-        mavenCentral()
-        gradlePluginPortal()
+        // sonatype
         maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
         maven { url 'https://oss.sonatype.org/content/repositories/public/' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+
+        // aliyun maven
+        // mirror of google()
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        // mirror of central & jcenter
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        // mirror of gradlePluginPortal
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+
+        // internal alibaba maven
+        maven { url 'http://mvnrepo.alibaba-inc.com/mvn/repository' }
     }
 
     task packageSources(type: Jar) {
@@ -240,33 +235,39 @@ allprojects { project ->
 //    delete rootProject.buildDir
 //}
 
-def HashMap getAccount(){
+def HashMap getSonatypeUserAccount() {
     HashMap accountMap = new HashMap()
     def parsedSettingsXml
-    def settingsFile = '/home/admin/software/apache-maven-3.9.3/conf/settings.xml'
+    def settingsFile = "/home/admin/settings.xml"
     def defaultSettingsFile = System.getProperty("user.home") + "/.m2/settings.xml"
 
-    if(file(settingsFile).exists()||file(defaultSettingsFile).exists()){
-        if(file(settingsFile).exists()){
+    println("============= getSonatypeUserAccount. settingsFile: ${settingsFile}, exists: ${file(settingsFile).exists()} ============= ")
+    println("============= getSonatypeUserAccount. defaultSettingsFile: ${defaultSettingsFile}, exists: ${file(defaultSettingsFile).exists()} ============= ")
+
+    if (file(settingsFile).exists() || file(defaultSettingsFile).exists()) {
+        if (file(settingsFile).exists()) {
+            println("============= getSonatypeUserAccount. settingsFile exists ============= ")
             parsedSettingsXml = (new XmlParser()).parse(settingsFile);
-        }else if(file(defaultSettingsFile).exists()){
+        } else if (file(defaultSettingsFile).exists()) {
+            println("============= getSonatypeUserAccount. defaultSettingsFile exists ============= ")
             parsedSettingsXml = (new XmlParser()).parse(defaultSettingsFile);
         }
 
-        parsedSettingsXml.servers[0].server.each{ server ->
-            if("releases" == server.id.text()){
-                accountMap.put("id",server.id.text())
-                accountMap.put("username",server.username.text())
-                accountMap.put("password",server.password.text())
+        //noinspection GroovyVariableNotAssigned
+        parsedSettingsXml.servers[0].server.each { server ->
+            if ("releases" == server.id.text()) {
+                accountMap.put("id", server.id.text())
+                accountMap.put("username", server.username.text())
+                accountMap.put("password", server.password.text())
             }
-
         }
-
-    }else{
-        accountMap.put("id","releases")
-        accountMap.put("username","admin")
-        accountMap.put("password","screct")
+    } else {
+        accountMap.put("id", "releases")
+        accountMap.put("username", "admin")
+        accountMap.put("password", "screct")
     }
+
+    println("============= getSonatypeUserAccount. username: ${accountMap.get("username")}, pswd: ${accountMap.get("password")} ============= ")
 
     return accountMap
 
@@ -279,11 +280,9 @@ nexusPublishing {
             snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
             packageGroup = "io.github.aliyun-sls" //groupId，必填
 
-            def accountMap = getAccount();
+            def accountMap = getSonatypeUserAccount();
             username = accountMap.get("username")
             password = accountMap.get("password")
-//            username = "" //配置在properties的sonatype user
-//            password = "" //配置在properties的sonatype pswd
         }
     }
 }
