@@ -54,9 +54,8 @@ ext {
     moduleName = 'sls-android-ot-ktx'
 }
 
-//====以下是将android library上传到jcenter的脚本
+//==== 以下是将android library上传到maven central的脚本
 apply from: "${project.rootProject.file('maven-publish.gradle')}"
 
-//====jacoco coverage reporter
-//apply from: "${project.rootProject.file('jacoco.gradle')}"
-//apply from: "${project.rootProject.file('jacoco/modules.gradle')}"
+//==== jacoco coverage reporter for module
+apply from: "${project.rootProject.file('jacoco/modules.gradle')}"
