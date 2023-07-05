@@ -2,7 +2,7 @@
 #########################################################
 # Function: publish aar by git tag                      #
 # Date    : 2017-07-28                                  #
-# Author  : yulong.yyl                                  #
+# Author  : yulong.gyl                                  #
 #########################################################
 
 # obtain current tag or branch or commit
@@ -35,7 +35,7 @@ do
   module=$(module_name $tag)
   if [[ $module == not_support ]]; then
       echo "module: $module not supported, please upgrade project"
-      exit 1
+      continue
   fi
 
   echo "########################################################################"
@@ -46,6 +46,7 @@ do
   ./gradlew :$module:clean                                                               # clean project first
   ./gradlew :$module:assembleRelease                                                     # assembleRelease
   ./gradlew :aliyun_sls_android_core:publishToSonatype closeAndReleaseStagingRepository  # publish aar to maven central
+#  ./gradlew :aliyun_sls_android_core:publishToMavenLocal                                # publish aar to maven central
 
 done
 

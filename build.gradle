@@ -293,6 +293,16 @@ nexusPublishing {
             password = accountMap.get("password")
         }
     }
+
+//    useStaging.set(provider {
+//        project.nexusPublishing
+//        def release = publishing.publications.mavenPublication
+//        release.version.endsWith("-SNAPSHOT")
+
+
+//        val release: MavenPublication by publishing.publications
+//        release.version.endsWith("-SNAPSHOT")
+//    })
 }
 
 apply from: 'jacoco/project.gradle'
