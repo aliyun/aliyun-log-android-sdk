@@ -219,7 +219,7 @@ class KotlinCoroutinesExtensionsTest {
                     assertEquals(startTraceId, span5.traceID)
                 }
 
-                val span6 = Tracer.startSpan("span6")
+//                val span6 = Tracer.startSpan("span6")
                 launch {
                     withContext("nested coroutine scope") {
                         assertEquals("nested coroutine scope", ContextManager.INSTANCE.activeSpan().name)
