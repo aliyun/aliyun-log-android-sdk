@@ -44,6 +44,7 @@ dependencies {
     testImplementation 'com.vmlens:concurrent-junit:1.0.2'
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 
+    implementation 'androidx.annotation:annotation:1.6.0'
     implementation project(':aliyun_sls_android_ot')
     implementation project(':aliyun_sls_android_trace')
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")

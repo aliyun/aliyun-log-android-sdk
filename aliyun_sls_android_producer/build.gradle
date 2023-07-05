@@ -49,10 +49,7 @@ android {
 }
 
 dependencies {
-//    androidTestImplementation 'junit:junit:4.13.2'
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:4.7.0'
-    testImplementation 'com.vmlens:concurrent-junit:1.0.2'
+    testImplementation project(':testable')
     testImplementation project(':aliyun_sls_android_producer')
 
 //    androidTestImplementation 'org.mockito:mockito-core:4.7.0'

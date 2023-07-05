@@ -34,9 +34,10 @@ android {
 }
 
 dependencies {
-//    testImplementation(project(':testable'))
-//    testImplementation(project(":aliyun_sls_android_trace"))
+    testImplementation(project(':testable'))
+    testImplementation(project(":aliyun_sls_android_trace"))
 
+    implementation 'androidx.annotation:annotation:1.6.0'
     implementation project(":aliyun_sls_android_producer")
     implementation project(":aliyun_sls_android_ot")
     implementation project(":aliyun_sls_android_core")

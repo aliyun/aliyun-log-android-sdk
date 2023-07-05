@@ -31,11 +31,10 @@ android {
 }
 
 dependencies {
-    testApi 'junit:junit:4.13.2'
-    testApi 'org.mockito:mockito-core:4.7.0'
-    testApi 'com.vmlens:concurrent-junit:1.0.2'
+    api 'junit:junit:4.13.2'
+    api 'org.mockito:mockito-core:4.7.0'
+    api 'com.vmlens:concurrent-junit:1.0.2'
 
-    testApi 'org.json:json:20140107'
-    testApi 'org.skyscreamer:jsonassert:1.5.1'
-    api 'androidx.annotation:annotation:1.2.0'
+    api 'org.json:json:20140107'
+    api 'org.skyscreamer:jsonassert:1.5.1'
 }

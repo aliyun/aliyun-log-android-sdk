@@ -3,7 +3,7 @@
 buildscript {
     ext {
         agp_version = "4.2.2"
-        kotlin_version = "1.5.30"
+        kotlin_version = "1.8.0"
     }
     repositories {
         // sonatype
