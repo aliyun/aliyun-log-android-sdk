@@ -1,9 +1,9 @@
 pluginManagement {
     repositories {
         // sonatype
-        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+//        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+//        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
+//        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 
         // aliyun maven
         // mirror of google()
@@ -25,9 +25,9 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         // sonatype
-        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+//        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+//        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
+//        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 
         // aliyun maven
         // mirror of google()
