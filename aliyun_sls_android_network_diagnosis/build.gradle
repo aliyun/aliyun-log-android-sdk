@@ -9,6 +9,9 @@ android {
         versionCode 1
         versionName "2.0.17"
 
+        buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -31,6 +34,9 @@ android {
 }
 
 dependencies {
+    testImplementation(project(':testable'))
+    testImplementation(project(":aliyun_sls_android_network_diagnosis"))
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(":aliyun_sls_android_producer")
     implementation project(":aliyun_sls_android_core")
@@ -42,5 +48,8 @@ ext {
     moduleName = 'sls-android-network-diagnosis'
 }
 
-//====以下是将android library上传到jcenter的脚本
+//==== 以下是将android library上传到maven central的脚本
 apply from: "${project.rootProject.file('maven-publish.gradle')}"
+
+//==== jacoco coverage reporter for module
+apply from: "${project.rootProject.file('jacoco/modules.gradle')}"

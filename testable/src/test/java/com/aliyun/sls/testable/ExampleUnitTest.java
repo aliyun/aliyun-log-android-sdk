@@ -1,4 +1,4 @@
-package com.aliyun.sls.android.producer.test;
+package com.aliyun.sls.testable;
 
 import org.junit.Test;
 

@@ -1,3 +1,50 @@
+pluginManagement {
+    repositories {
+        // sonatype
+//        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+//        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
+//        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+
+        // aliyun maven
+        // mirror of google()
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        // mirror of central & jcenter
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        // mirror of gradlePluginPortal
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+
+        // internal alibaba maven
+        maven {
+            allowInsecureProtocol = true
+            url 'http://mvnrepo.alibaba-inc.com/mvn/repository'
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        // sonatype
+//        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+//        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
+//        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+
+        // aliyun maven
+        // mirror of google()
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        // mirror of central & jcenter
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        // mirror of gradlePluginPortal
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+
+        // internal alibaba maven
+        maven {
+            allowInsecureProtocol = true
+            url 'http://mvnrepo.alibaba-inc.com/mvn/repository'
+        }
+    }
+}
+
 include ':app', ':aliyun_sls_android_producer'
 include ':aliyun_sls_android_ot'
 include ':aliyun_sls_android_core'
@@ -8,3 +55,4 @@ include ':aliyun_sls_android_unity_plugin'
 include ':aliyun_sls_android_trace'
 include ':aliyun_sls_android_okhttp'
 include ':aliyun_sls_android_ot_ktx'
+include ':testable'

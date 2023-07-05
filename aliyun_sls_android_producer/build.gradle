@@ -7,7 +7,11 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "2.6.13"
+        versionName "2.6.13.1"
+
+        buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
+
         ndk {
             // Specifies the ABI configurations of your native
             // libraries Gradle should build and package with your app.
@@ -18,8 +22,12 @@ android {
     }
     buildTypes {
         release {
+            testCoverageEnabled = false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled = false
         }
     }
     externalNativeBuild {
@@ -41,10 +49,8 @@ android {
 }
 
 dependencies {
-//    androidTestImplementation 'junit:junit:4.13.2'
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:4.7.0'
-    testImplementation 'com.vmlens:concurrent-junit:1.0.2'
+    testImplementation project(':testable')
+    testImplementation project(':aliyun_sls_android_producer')
 
 //    androidTestImplementation 'org.mockito:mockito-core:4.7.0'
 //    androidTestImplementation 'com.vmlens:concurrent-junit:1.0.2'
@@ -59,6 +65,8 @@ ext {
     moduleName = 'aliyun-log-android-sdk'
 }
 
-//====以下是将android library上传到jcenter的脚本
-//apply from: "mavenCentralUpload.gradle"
+//==== 以下是将android library上传到maven central的脚本
 apply from: "${project.rootProject.file('maven-publish.gradle')}"
+
+//==== jacoco coverage reporter for module
+apply from: "${project.rootProject.file('jacoco/modules.gradle')}"
