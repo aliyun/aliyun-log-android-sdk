@@ -45,8 +45,8 @@ do
 # android build command
   ./gradlew :$module:clean                                                               # clean project first
   ./gradlew :$module:assembleRelease                                                     # assembleRelease
-  ./gradlew :aliyun_sls_android_core:publishToSonatype closeAndReleaseStagingRepository  # publish aar to maven central
-#  ./gradlew :aliyun_sls_android_core:publishToMavenLocal                                # publish aar to maven central
+  ./gradlew :$module:publishToSonatype closeAndReleaseStagingRepository                  # publish aar to maven central
+#  ./gradlew :$module:publishToMavenLocal                                                # publish aar to maven central
 
 done
 
