@@ -23,7 +23,7 @@ function module_name() {
     *network_diagnosis*)  echo "aliyun_sls_android_network_diagnosis";;
     *okhttp*)             echo "aliyun_sls_android_okhttp";;
     *ot*)                 echo "aliyun_sls_android_ot";;
-    *ot_ktx*)             echo "aliyun_sls_android_ot_ktx";;
+    *ot-ktx*)             echo "aliyun_sls_android_ot_ktx";;
     *producer*)           echo "aliyun_sls_android_producer";;
     *trace*)              echo "aliyun_sls_android_trace";;
     *)                    echo "not_support";;
