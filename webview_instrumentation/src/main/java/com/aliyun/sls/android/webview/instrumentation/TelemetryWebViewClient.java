@@ -66,11 +66,16 @@ public class TelemetryWebViewClient extends WebViewClient {
             return originHtml;
         }
 
+        return injectJSHook(jsHook, originHtml);
+    }
+
+    @VisibleForTesting
+    public String injectJSHook(String jsHookString, String originHtml) {
         Document document = Jsoup.parse(originHtml);
         document.outputSettings().prettyPrint(true);
         Elements elements = document.getElementsByTag("head");
         if (elements.size() > 0) {
-            elements.get(0).prepend(jsHook);
+            elements.get(0).prepend(jsHookString);
         }
         return document.toString();
     }

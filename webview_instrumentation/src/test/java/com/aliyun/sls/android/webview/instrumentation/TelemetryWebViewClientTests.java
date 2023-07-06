@@ -10,6 +10,9 @@ import com.aliyun.sls.android.webview.instrumentation.TelemetryWebViewClient.Int
 import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation.WebViewInstrumentationConfiguration;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -91,6 +94,34 @@ public class TelemetryWebViewClientTests {
 
     @Test
     public void testInjectJSHook() {
+        final String jsHookString = "<script type=\"text/javascript\">";
+        final String originHtml = "<!DOCTYPE html>\n"
+            + "<html>\n"
+            + "<head>\n"
+            + "<meta charset=\"utf-8\">\n"
+            + "<title>文档标题</title>\n"
+            + "</head>\n"
+            + "<body>\n"
+            + "\t<h1>我的第一个HTML页面</h1>\n"
+            + "\t<p>我的第一个段落。</p>\n"
+            + "</body>\n"
+            + "</html>\n";
+        TelemetryWebViewClient client = createTelemetryWebViewClient();
+        String target = client.injectJSHook(jsHookString, originHtml);
 
+        assertTrue(target.contains(jsHookString));
+
+        Document document = Jsoup.parse(target);
+        Elements elements = document.getElementsByTag("head");
+
+        assertTrue(elements.size() > 0);
+        assertTrue(elements.get(0).toString().contains(jsHookString));
+    }
+
+    private TelemetryWebViewClient createTelemetryWebViewClient() {
+        when(webResourceRequest.isForMainFrame()).thenReturn(true);
+        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(telemetry);
+        WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
+        return new TelemetryWebViewClient(instrumentation);
     }
 }
