@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
 import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation;
 import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation.WebViewInstrumentationConfiguration;
@@ -19,10 +20,12 @@ import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
  */
 public class WebRequestInstrumentation implements IWebRequestInstrumentation {
 
-    private final WebViewInstrumentation instrumentation;
-    private final WebViewInstrumentationConfiguration configuration;
-    private final Tracer tracer;
-    private final Map<String, Span> cachedSpan = new ConcurrentHashMap<>();
+    @VisibleForTesting
+    public final WebViewInstrumentation instrumentation;
+    @VisibleForTesting
+    public final WebViewInstrumentationConfiguration configuration;
+    public final Tracer tracer;
+    public final Map<String, Span> cachedSpan = new ConcurrentHashMap<>();
 
     public WebRequestInstrumentation(
         WebViewInstrumentation instrumentation,

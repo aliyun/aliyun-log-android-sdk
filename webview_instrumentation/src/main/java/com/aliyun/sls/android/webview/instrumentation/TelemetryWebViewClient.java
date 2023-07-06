@@ -1,5 +1,7 @@
 package com.aliyun.sls.android.webview.instrumentation;
 
+import java.io.InputStream;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
@@ -8,6 +10,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.webview.instrumentation.httpclient.HttpClient;
 import com.aliyun.sls.android.webview.instrumentation.utils.Utils;
 import org.jsoup.Jsoup;
@@ -39,7 +42,7 @@ public class TelemetryWebViewClient extends WebViewClient {
         final WebResourceResponse response;
         if (request.isForMainFrame()) {
             String newHtml = injectJSHook(view.getContext(), HttpClient.requestHtml(instrumentation, view, request));
-            response = new WebResourceResponse("text/html", "utf-8", Utils.string2Input(newHtml));
+            response = new InternalWebResourceResponse(Utils.string2Input(newHtml));
         } else {
             //if (request.getUrl().toString().contains("otel_flag")) {
             //    String url = Utils.fetchRequestIdPair(request.getUrl().toString());
@@ -56,7 +59,8 @@ public class TelemetryWebViewClient extends WebViewClient {
         return response;
     }
 
-    private String injectJSHook(Context context, String originHtml) {
+    @VisibleForTesting
+    public String injectJSHook(Context context, String originHtml) {
         String jsHook = Utils.readFromAssets(context, "telemetry_js_hook.js");
         if (TextUtils.isEmpty(jsHook)) {
             return originHtml;
@@ -69,5 +73,12 @@ public class TelemetryWebViewClient extends WebViewClient {
             elements.get(0).prepend(jsHook);
         }
         return document.toString();
+    }
+
+    public static class InternalWebResourceResponse extends WebResourceResponse {
+
+        public InternalWebResourceResponse(InputStream data) {
+            super("text/html", "utf-8", data);
+        }
     }
 }

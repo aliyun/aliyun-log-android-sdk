@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
 import com.aliyun.sls.android.webview.instrumentation.instrumentation.IWebRequestInstrumentation;
 import com.aliyun.sls.android.webview.instrumentation.instrumentation.WebRequestInstrumentation;
@@ -16,8 +17,10 @@ import io.opentelemetry.api.trace.Span;
  * @date 2023/6/21
  */
 public class WebViewInstrumentation {
-    private final String userAgent;
-    private final WebView webView;
+    @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
+    public final String userAgent;
+    @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
+    public final WebView webView;
 
     /* package */ WebViewInstrumentationConfiguration configuration;
     /* package */ IWebRequestInstrumentation requestInstrumentation;
@@ -31,9 +34,6 @@ public class WebViewInstrumentation {
         WebSettings settings = webView.getSettings();
         this.userAgent = settings.getUserAgentString();
 
-        if (BuildConfig.DEBUG) {
-            WebView.setWebContentsDebuggingEnabled(true);
-        }
         settings.setJavaScriptEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setDomStorageEnabled(true);
