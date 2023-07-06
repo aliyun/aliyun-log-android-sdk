@@ -33,6 +33,9 @@ android {
     sourceSets {
         main.jniLibs.srcDirs = ['libs']
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {

@@ -27,10 +27,10 @@ public class OTelJSI {
         Log.d(TAG,
             "fetch. requestId: " + requestId + ", method: " + method + ", headers: " + headers + ", body: " + body
                 + ", url: " + url + ", origin: " + origin);
-        WebRequestInfo webRequestInfo = PayloadManager.get(requestId);
+        WebRequestInfo webRequestInfo = PayloadManager.getInstance().get(requestId);
         if (null == webRequestInfo) {
             webRequestInfo = new WebRequestInfo();
-            PayloadManager.set(requestId, webRequestInfo);
+            PayloadManager.getInstance().set(requestId, webRequestInfo);
         }
 
         webRequestInfo.requestId = requestId;
@@ -61,10 +61,10 @@ public class OTelJSI {
     @JavascriptInterface
     public void open(String requestId, String url, String method, String origin) {
         Log.d(TAG, "open. requestId: " + requestId + ", method: " + method + ", url: " + url + ", origin: " + origin);
-        WebRequestInfo webRequestInfo = PayloadManager.get(requestId);
+        WebRequestInfo webRequestInfo = PayloadManager.getInstance().get(requestId);
         if (null == webRequestInfo) {
             webRequestInfo = new WebRequestInfo();
-            PayloadManager.set(requestId, webRequestInfo);
+            PayloadManager.getInstance().set(requestId, webRequestInfo);
         }
 
         webRequestInfo.requestId = requestId;
@@ -76,10 +76,10 @@ public class OTelJSI {
     @JavascriptInterface
     public void setRequestHeader(String requestId, String key, String value) {
         Log.d(TAG, "setRequestHeader. requestId: " + requestId + ", key: " + key + ", value: " + value);
-        WebRequestInfo webRequestInfo = PayloadManager.get(requestId);
+        WebRequestInfo webRequestInfo = PayloadManager.getInstance().get(requestId);
         if (null == webRequestInfo) {
             webRequestInfo = new WebRequestInfo();
-            PayloadManager.set(requestId, webRequestInfo);
+            PayloadManager.getInstance().set(requestId, webRequestInfo);
         }
 
         if (null == webRequestInfo.headers) {
@@ -100,7 +100,7 @@ public class OTelJSI {
     @JavascriptInterface
     public void overrideMimeType(String requestId, String mimeType) {
         Log.d(TAG, "overrideMimeType. requestId: " + requestId + ", mimeType: " + mimeType);
-        WebRequestInfo webRequestInfo = PayloadManager.get(requestId);
+        WebRequestInfo webRequestInfo = PayloadManager.getInstance().get(requestId);
         if (null != webRequestInfo) {
             webRequestInfo.mimeType = mimeType;
         }
@@ -109,7 +109,7 @@ public class OTelJSI {
     @JavascriptInterface
     public void send(String requestId, String body) {
         Log.d(TAG, "send. requestId: " + requestId + ", body: " + body);
-        WebRequestInfo requestInfo = PayloadManager.get(requestId);
+        WebRequestInfo requestInfo = PayloadManager.getInstance().get(requestId);
         if (null != requestInfo) {
             requestInfo.body = body;
             requestInstrumentation.createdRequest(requestInfo);
@@ -121,7 +121,7 @@ public class OTelJSI {
         Log.d(TAG, "handleResponse. requestId: " + requestId + ", status: " + status + ", statusText: " + statusText
             + ", headers: " + headers + ", response: " + text.substring(0, Math.min(128, text.length())));
 
-        WebRequestInfo info = PayloadManager.get(requestId);
+        WebRequestInfo info = PayloadManager.getInstance().get(requestId);
         if (null != info) {
             info.responseStatus = status;
             info.responseStatusText = statusText;

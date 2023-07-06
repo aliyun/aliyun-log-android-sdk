@@ -3,6 +3,7 @@ package com.aliyun.sls.android.webview.instrumentation;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import androidx.annotation.VisibleForTesting;
 import org.json.JSONObject;
 
 /**
@@ -10,21 +11,38 @@ import org.json.JSONObject;
  * @date 2023/6/25
  */
 public class PayloadManager {
+    private PayloadManager() {
+        //no instance
+    }
 
-    private static final Map<String, WebRequestInfo> cachedRequests = new ConcurrentHashMap<>();
+    private static class Holder {
+        final static PayloadManager INSTANCE = new PayloadManager();
+    }
 
-    public static boolean contains(String requestId) {
+    public static PayloadManager getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    @VisibleForTesting
+    public final Map<String, WebRequestInfo> cachedRequests = new ConcurrentHashMap<>();
+
+    public boolean contains(String requestId) {
         return cachedRequests.containsKey(requestId);
     }
 
-    public static WebRequestInfo get(String requestId) {
+    public WebRequestInfo get(String requestId) {
         return cachedRequests.get(requestId);
     }
 
-    public static void set(String requestId, WebRequestInfo requestBean) {
-        cachedRequests.put(requestId, requestBean);
+    public void remove(String requestId) {
+        if (cachedRequests.containsKey(requestId)) {
+            cachedRequests.remove(requestId);
+        }
     }
 
+    public void set(String requestId, WebRequestInfo requestBean) {
+        cachedRequests.put(requestId, requestBean);
+    }
 
     public static class WebRequestInfo {
         public String requestId;
