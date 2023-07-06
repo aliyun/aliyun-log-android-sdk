@@ -16,6 +16,7 @@ public class OTelJSI {
     private static final String TAG = "DoKitJSI";
 
     private final IWebRequestInstrumentation requestInstrumentation;
+
     public OTelJSI(IWebRequestInstrumentation requestInstrumentation) {
         this.requestInstrumentation = requestInstrumentation;
     }
@@ -40,7 +41,7 @@ public class OTelJSI {
 
         webRequestInfo.headers = header2JSON(headers);
 
-        requestInstrumentation.requestStarted(webRequestInfo);
+        requestInstrumentation.createdRequest(webRequestInfo);
     }
 
     private JSONObject header2JSON(String headers) {
@@ -69,8 +70,6 @@ public class OTelJSI {
         webRequestInfo.url = url.startsWith("http") ? url : origin + (url.startsWith("/") ? url : ("/" + url));
         webRequestInfo.method = method;
         webRequestInfo.origin = origin;
-
-        requestInstrumentation.requestStarted(webRequestInfo);
     }
 
     @JavascriptInterface
@@ -87,8 +86,6 @@ public class OTelJSI {
         }
 
         putHeader(webRequestInfo.headers, key, value);
-
-        requestInstrumentation.requestHeadersUpdated(webRequestInfo);
     }
 
     private void putHeader(JSONObject headers, String key, String value) {
@@ -105,7 +102,6 @@ public class OTelJSI {
         WebRequestInfo webRequestInfo = PayloadManager.get(requestId);
         if (null != webRequestInfo) {
             webRequestInfo.mimeType = mimeType;
-            requestInstrumentation.requestMimeTypeUpdated(webRequestInfo);
         }
     }
 
@@ -115,14 +111,14 @@ public class OTelJSI {
         WebRequestInfo requestInfo = PayloadManager.get(requestId);
         if (null != requestInfo) {
             requestInfo.body = body;
-
-            requestInstrumentation.requestBodyUpdated(requestInfo);
+            requestInstrumentation.createdRequest(requestInfo);
         }
     }
 
     @JavascriptInterface
     public void handleResponse(String requestId, int status, String statusText, String text, String headers) {
-        Log.d(TAG, "handleResponse. requestId: " + requestId + ", status: " + status + ", statusText: " + statusText + ", headers: " + headers + ", response: " + text.substring(0, Math.min(128, text.length())));
+        Log.d(TAG, "handleResponse. requestId: " + requestId + ", status: " + status + ", statusText: " + statusText
+            + ", headers: " + headers + ", response: " + text.substring(0, Math.min(128, text.length())));
 
         WebRequestInfo info = PayloadManager.get(requestId);
         if (null != info) {
@@ -131,7 +127,7 @@ public class OTelJSI {
             info.responseHeaders = header2JSON(headers);
             info.responseBody = text;
 
-            requestInstrumentation.responseReturned(info);
+            requestInstrumentation.receivedResponse(info);
         } else {
             Log.w(TAG, "handleResponse. not found WebRequestInfo");
         }

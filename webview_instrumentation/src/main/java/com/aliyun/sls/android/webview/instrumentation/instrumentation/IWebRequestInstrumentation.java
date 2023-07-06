@@ -8,14 +8,18 @@ import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestI
  */
 public interface IWebRequestInstrumentation {
 
-    void requestStarted(WebRequestInfo info);
+    /**
+     * Called after WebRequest started.
+     *
+     * @param info {@link WebRequestInfo}
+     */
+    void createdRequest(WebRequestInfo info);
 
-    void requestHeadersUpdated(WebRequestInfo info);
-
-    void requestMimeTypeUpdated(WebRequestInfo info);
-
-    void requestBodyUpdated(WebRequestInfo info);
-
-    void responseReturned(WebRequestInfo info);
+    /**
+     * Called after WebRequest ended.
+     *
+     * @param info {@link WebRequestInfo}
+     */
+    void receivedResponse(WebRequestInfo info);
 
 }

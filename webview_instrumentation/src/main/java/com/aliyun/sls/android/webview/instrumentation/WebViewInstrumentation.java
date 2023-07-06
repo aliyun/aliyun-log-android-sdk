@@ -2,12 +2,15 @@ package com.aliyun.sls.android.webview.instrumentation;
 
 import android.annotation.SuppressLint;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
 import com.aliyun.sls.android.webview.instrumentation.instrumentation.IWebRequestInstrumentation;
 import com.aliyun.sls.android.webview.instrumentation.instrumentation.WebRequestInstrumentation;
 import com.aliyun.sls.android.webview.instrumentation.jsbridge.OTelJSI;
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
 
 /**
  * @author gordon
@@ -24,7 +27,7 @@ public class WebViewInstrumentation {
     public WebViewInstrumentation(WebView webView, WebViewInstrumentationConfiguration configuration) {
         this.webView = webView;
         this.configuration = configuration;
-        this.requestInstrumentation = new WebRequestInstrumentation(this, this.configuration.telemetry);
+        this.requestInstrumentation = new WebRequestInstrumentation(this, this.configuration);
 
         WebSettings settings = webView.getSettings();
         this.userAgent = settings.getUserAgentString();
@@ -49,17 +52,46 @@ public class WebViewInstrumentation {
 
     public static class WebViewInstrumentationConfiguration {
 
-        OpenTelemetry telemetry;
+        public final OpenTelemetry telemetry;
+
 
         public WebViewInstrumentationConfiguration(OpenTelemetry telemetry) {
             this.telemetry = telemetry;
         }
 
-        protected boolean shouldInstrument(WebResourceRequest request) {
+        public boolean shouldInstrument(WebResourceRequest request) {
             return true;
         }
 
-        protected boolean debuggable() {
+        public boolean shouldRecordPayload(WebRequestInfo requestInfo) {
+            return true;
+        }
+
+        public boolean shouldInjectTracingRequestHeaders(WebRequestInfo requestInfo) {
+            return true;
+        }
+
+        public String nameSpan(WebRequestInfo requestInfo) {
+            return null;
+        }
+
+        public void createdRequest(WebRequestInfo requestInfo, Span span) {
+
+        }
+
+        public boolean shouldInjectTracingResponseHeaders(WebRequestInfo requestInfo) {
+            return true;
+        }
+
+        public boolean shouldInjectTracingResponseBody(WebRequestInfo requestInfo) {
+            return true;
+        }
+
+        public void receivedResponse(WebRequestInfo requestInfo, Span span) {
+
+        }
+
+        public boolean debuggable() {
             return true;
         }
 

@@ -7,7 +7,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
 import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation;
-import io.opentelemetry.api.OpenTelemetry;
+import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation.WebViewInstrumentationConfiguration;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
@@ -20,17 +20,21 @@ import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 public class WebRequestInstrumentation implements IWebRequestInstrumentation {
 
     private final WebViewInstrumentation instrumentation;
+    private final WebViewInstrumentationConfiguration configuration;
     private final Tracer tracer;
     private final Map<String, Span> cachedSpan = new ConcurrentHashMap<>();
 
+    public WebRequestInstrumentation(
+        WebViewInstrumentation instrumentation,
+        WebViewInstrumentationConfiguration configuration) {
 
-    public WebRequestInstrumentation(WebViewInstrumentation instrumentation, OpenTelemetry telemetry) {
         this.instrumentation = instrumentation;
-        this.tracer = telemetry.getTracer("WebView-Instrumentation", "1.0.0");
+        this.configuration = configuration;
+        this.tracer = this.configuration.telemetry.getTracer("WebView-Instrumentation", "1.0.0");
     }
 
     @Override
-    public void requestStarted(WebRequestInfo info) {
+    public void createdRequest(WebRequestInfo info) {
         if (TextUtils.isEmpty(info.url)) {
             return;
         }
@@ -42,56 +46,43 @@ public class WebRequestInstrumentation implements IWebRequestInstrumentation {
         span.setAttribute(SemanticAttributes.HTTP_METHOD, info.method);
         span.setAttribute("http.path", uri.getPath());
         span.setAttribute("http.origin", info.origin);
+        span.setAttribute("http.mimeType", info.mimeType);
         span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, instrumentation.getUserAgent());
+
+        if (configuration.shouldRecordPayload(info)) {
+            span.setAttribute("http.body", info.body);
+        }
+
+        if (configuration.shouldInjectTracingRequestHeaders(info)) {
+            span.setAttribute("http.headers", info.headers.toString());
+        }
 
         cachedSpan.put(info.requestId, span);
     }
 
     @Override
-    public void requestHeadersUpdated(WebRequestInfo info) {
-        final Span span = cachedSpan.get(info.requestId);
-        if (null == span) {
-            return;
-        }
-
-        span.setAttribute("http.headers", info.headers.toString());
-    }
-
-    @Override
-    public void requestMimeTypeUpdated(WebRequestInfo info) {
-        final Span span = cachedSpan.get(info.requestId);
-        if (null == span) {
-            return;
-        }
-
-        span.setAttribute("http.mimeType", info.mimeType);
-    }
-
-    @Override
-    public void requestBodyUpdated(WebRequestInfo info) {
-        final Span span = cachedSpan.get(info.requestId);
-        if (null == span) {
-            return;
-        }
-
-        span.setAttribute("http.body", info.body);
-    }
-
-    @Override
-    public void responseReturned(WebRequestInfo info) {
+    public void receivedResponse(WebRequestInfo info) {
         final Span span = cachedSpan.get(info.requestId);
         if (null == span) {
             return;
         }
 
         span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, info.responseStatus);
-        span.setAttribute(SemanticAttributes.OTEL_STATUS_DESCRIPTION, info.responseStatusText);
-        span.setAttribute("http.response.headers", info.responseHeaders.toString());
-        span.setAttribute("http.response.body", info.responseBody);
+        span.setAttribute("http.status_description", info.responseStatusText);
+
+        if (configuration.shouldInjectTracingResponseHeaders(info)) {
+            span.setAttribute("http.response.headers", info.responseHeaders.toString());
+        }
+
+        if (configuration.shouldInjectTracingResponseBody(info)) {
+            span.setAttribute("http.response.body", info.responseBody);
+        }
 
         if (info.responseStatus / 100 != 2) {
             span.setStatus(StatusCode.ERROR, info.responseStatusText);
         }
+
+        configuration.receivedResponse(info, span);
 
         span.end();
     }
