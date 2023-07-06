@@ -4,9 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 /**
  * @author yulong.gyl
@@ -14,6 +17,9 @@ import android.text.TextUtils;
  */
 public class Utils {
     private static final int BUFFER_SIZE = 8192;
+
+    private static final String URL_REQUEST_ID_REGEX = "^.*?[&|\\?|%3f]?otel_flag[=|%3d](\\d+).*?$";
+    private static final String URL_REQUEST_ID_PAIR_REGEX = "^.*?([&|\\?|%3f]?otel_flag[=|%3d]\\d+).*?$";
 
     private Utils() {
         //no instance
@@ -83,5 +89,21 @@ public class Utils {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static String fetchRequestIdPair(String url) {
+        Pattern pattern =  Pattern.compile(URL_REQUEST_ID_PAIR_REGEX, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(url);
+        if (matcher.find()) {
+            int count = matcher.groupCount() + 1;
+            for (int i = 0; i < count; i++) {
+                if (1 == i) {
+                    String content = matcher.group(i);
+                    Log.d("DEBUGGG", content);
+                    return content;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -32,7 +32,7 @@ public class OTelJSI {
         }
 
         webRequestInfo.requestId = requestId;
-        webRequestInfo.url = url.startsWith("http") ? url : origin + url;
+        webRequestInfo.url = url.startsWith("http") ? url : origin + (url.startsWith("/") ? url : ("/" + url));
         webRequestInfo.method = method;
         webRequestInfo.origin = origin;
         webRequestInfo.mimeType = null;
@@ -66,8 +66,9 @@ public class OTelJSI {
         }
 
         webRequestInfo.requestId = requestId;
-        webRequestInfo.url = url.startsWith("http") ? url : origin + url;
+        webRequestInfo.url = url.startsWith("http") ? url : origin + (url.startsWith("/") ? url : ("/" + url));
         webRequestInfo.method = method;
+        webRequestInfo.origin = origin;
 
         requestInstrumentation.requestStarted(webRequestInfo);
     }
@@ -121,7 +122,7 @@ public class OTelJSI {
 
     @JavascriptInterface
     public void handleResponse(String requestId, int status, String statusText, String text, String headers) {
-        Log.d(TAG, "handleResponse. requestId: " + requestId + ", status: " + status + ", statusText: " + statusText + ", headers: " + headers + ", response: " + text);
+        Log.d(TAG, "handleResponse. requestId: " + requestId + ", status: " + status + ", statusText: " + statusText + ", headers: " + headers + ", response: " + text.substring(0, Math.min(128, text.length())));
 
         WebRequestInfo info = PayloadManager.get(requestId);
         if (null != info) {
@@ -131,6 +132,8 @@ public class OTelJSI {
             info.responseBody = text;
 
             requestInstrumentation.responseReturned(info);
+        } else {
+            Log.w(TAG, "handleResponse. not found WebRequestInfo");
         }
     }
 }

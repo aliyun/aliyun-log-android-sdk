@@ -41,16 +41,17 @@ public class TelemetryWebViewClient extends WebViewClient {
             String newHtml = injectJSHook(view.getContext(), HttpClient.requestHtml(instrumentation, view, request));
             response = new WebResourceResponse("text/html", "utf-8", Utils.string2Input(newHtml));
         } else {
-            if (request.getUrl().toString().contains("otel_flag")) {
-                String requestId = request.getUrl().getQueryParameter("otel_flag");
-                WebRequestInfo model = PayloadManager.get(requestId);
-                Log.d(TAG, "shouldInterceptRequest. requestId: " + requestId + ", model: " + model);
-
-            }
+            //if (request.getUrl().toString().contains("otel_flag")) {
+            //    String url = Utils.fetchRequestIdPair(request.getUrl().toString());
+            //    String requestId = request.getUrl().getQueryParameter("otel_flag");
+            //    WebRequestInfo model = PayloadManager.get(requestId);
+            //    Log.d(TAG, "shouldInterceptRequest. requestId: " + requestId + ", model: " + model);
+            //
+            //}
             response = super.shouldInterceptRequest(view, request);
         }
 
-        Log.d(TAG, "response: " + response);
+        //Log.d(TAG, "response: " + response);
 
         return response;
     }

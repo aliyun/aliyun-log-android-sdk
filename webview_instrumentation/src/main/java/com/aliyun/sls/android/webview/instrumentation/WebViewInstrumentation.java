@@ -14,8 +14,8 @@ import io.opentelemetry.api.OpenTelemetry;
  * @date 2023/6/21
  */
 public class WebViewInstrumentation {
-    private String userAgent;
-    private WebView webView;
+    private final String userAgent;
+    private final WebView webView;
 
     /* package */ WebViewInstrumentationConfiguration configuration;
     /* package */ IWebRequestInstrumentation requestInstrumentation;
@@ -24,18 +24,19 @@ public class WebViewInstrumentation {
     public WebViewInstrumentation(WebView webView, WebViewInstrumentationConfiguration configuration) {
         this.webView = webView;
         this.configuration = configuration;
-        this.requestInstrumentation = new WebRequestInstrumentation(this.configuration.telemetry);
+        this.requestInstrumentation = new WebRequestInstrumentation(this, this.configuration.telemetry);
 
         WebSettings settings = webView.getSettings();
         this.userAgent = settings.getUserAgentString();
 
-        webView.setWebContentsDebuggingEnabled(true);
+        if (BuildConfig.DEBUG) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
         settings.setJavaScriptEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
         webView.addJavascriptInterface(new OTelJSI(this.requestInstrumentation), "otelJsi");
-        //this.webView.getSettings().setJavaScriptEnabled(true);
     }
 
     public void start() {
@@ -55,6 +56,10 @@ public class WebViewInstrumentation {
         }
 
         protected boolean shouldInstrument(WebResourceRequest request) {
+            return true;
+        }
+
+        protected boolean debuggable() {
             return true;
         }
 

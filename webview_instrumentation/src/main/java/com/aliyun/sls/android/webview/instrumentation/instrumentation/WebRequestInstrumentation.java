@@ -3,7 +3,10 @@ package com.aliyun.sls.android.webview.instrumentation.instrumentation;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import android.net.Uri;
+import android.text.TextUtils;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
+import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
@@ -16,19 +19,30 @@ import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
  */
 public class WebRequestInstrumentation implements IWebRequestInstrumentation {
 
-    private final Map<String, Span> cachedSpan = new ConcurrentHashMap<>();
+    private final WebViewInstrumentation instrumentation;
     private final Tracer tracer;
+    private final Map<String, Span> cachedSpan = new ConcurrentHashMap<>();
 
-    public WebRequestInstrumentation(OpenTelemetry telemetry) {
+
+    public WebRequestInstrumentation(WebViewInstrumentation instrumentation, OpenTelemetry telemetry) {
+        this.instrumentation = instrumentation;
         this.tracer = telemetry.getTracer("WebView-Instrumentation", "1.0.0");
     }
 
     @Override
     public void requestStarted(WebRequestInfo info) {
-        Span span = tracer.spanBuilder("HTTP " + info.method + "").startSpan();
+        if (TextUtils.isEmpty(info.url)) {
+            return;
+        }
+
+        Uri uri = Uri.parse(info.url);
+        Span span = tracer.spanBuilder(String.format("Web %s %s", info.method, uri.getPath())).startSpan();
+
         span.setAttribute(SemanticAttributes.HTTP_URL, info.url);
         span.setAttribute(SemanticAttributes.HTTP_METHOD, info.method);
-        span.setAttribute(SemanticAttributes.HTTP_HOST, info.origin);
+        span.setAttribute("http.path", uri.getPath());
+        span.setAttribute("http.origin", info.origin);
+        span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, instrumentation.getUserAgent());
 
         cachedSpan.put(info.requestId, span);
     }
