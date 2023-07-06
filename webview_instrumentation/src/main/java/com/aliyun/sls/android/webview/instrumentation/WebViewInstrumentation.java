@@ -2,7 +2,6 @@ package com.aliyun.sls.android.webview.instrumentation;
 
 import android.annotation.SuppressLint;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
@@ -53,7 +52,6 @@ public class WebViewInstrumentation {
     public static class WebViewInstrumentationConfiguration {
 
         public final OpenTelemetry telemetry;
-
 
         public WebViewInstrumentationConfiguration(OpenTelemetry telemetry) {
             this.telemetry = telemetry;

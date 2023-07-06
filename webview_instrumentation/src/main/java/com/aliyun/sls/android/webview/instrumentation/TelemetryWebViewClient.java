@@ -8,7 +8,6 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
-import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
 import com.aliyun.sls.android.webview.instrumentation.httpclient.HttpClient;
 import com.aliyun.sls.android.webview.instrumentation.utils.Utils;
 import org.jsoup.Jsoup;
@@ -30,7 +29,8 @@ public class TelemetryWebViewClient extends WebViewClient {
     @Nullable
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        Log.d(TAG, "shouldInterceptRequest. path: " + request.getUrl().getPath() + "url: " + request.getUrl().toString());
+        Log.d(TAG,
+            "shouldInterceptRequest. path: " + request.getUrl().getPath() + "url: " + request.getUrl().toString());
 
         if (!instrumentation.configuration.shouldInstrument(request)) {
             return null;

@@ -40,7 +40,10 @@ public class WebRequestInstrumentation implements IWebRequestInstrumentation {
         }
 
         Uri uri = Uri.parse(info.url);
-        Span span = tracer.spanBuilder(String.format("Web %s %s", info.method, uri.getPath())).startSpan();
+        String spanName = configuration.nameSpan(info);
+        Span span = tracer.spanBuilder(
+                TextUtils.isEmpty(spanName) ? String.format("Web %s %s", info.method, uri.getPath()) : spanName)
+            .startSpan();
 
         span.setAttribute(SemanticAttributes.HTTP_URL, info.url);
         span.setAttribute(SemanticAttributes.HTTP_METHOD, info.method);
@@ -56,6 +59,8 @@ public class WebRequestInstrumentation implements IWebRequestInstrumentation {
         if (configuration.shouldInjectTracingRequestHeaders(info)) {
             span.setAttribute("http.headers", info.headers.toString());
         }
+
+        configuration.createdRequest(info, span);
 
         cachedSpan.put(info.requestId, span);
     }

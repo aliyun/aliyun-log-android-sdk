@@ -12,6 +12,7 @@ import org.json.JSONObject;
  * @author yulong.gyl
  * @date 2023/6/25
  */
+@SuppressWarnings("unused")
 public class OTelJSI {
     private static final String TAG = "DoKitJSI";
 
