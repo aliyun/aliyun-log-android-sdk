@@ -32,6 +32,7 @@
 
         <TableRow android:layout_marginTop="24dp">
             <Button android:text="Demo" android:padding="8dp" android:id="@+id/main_trace_demo"/>
+            <Button android:layout_span="2" android:text="WebViewInstrumentation" android:padding="8dp" android:id="@+id/main_webview"/>
         </TableRow>
 
 

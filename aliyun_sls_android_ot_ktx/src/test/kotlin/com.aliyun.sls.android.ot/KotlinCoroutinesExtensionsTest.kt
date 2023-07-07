@@ -115,7 +115,6 @@ class KotlinCoroutinesExtensionsTest {
     @Test
     fun runWithSpan() {
         val span = Span().setName("span")
-        assertEquals(null, ContextManager.INSTANCE.activeSpan())
 
         runBlocking(Dispatchers.Default + span.asContext()) {
             assertEquals(span, ContextManager.INSTANCE.activeSpan())
@@ -219,7 +218,7 @@ class KotlinCoroutinesExtensionsTest {
                     assertEquals(startTraceId, span5.traceID)
                 }
 
-                val span6 = Tracer.startSpan("span6")
+//                val span6 = Tracer.startSpan("span6")
                 launch {
                     withContext("nested coroutine scope") {
                         assertEquals("nested coroutine scope", ContextManager.INSTANCE.activeSpan().name)

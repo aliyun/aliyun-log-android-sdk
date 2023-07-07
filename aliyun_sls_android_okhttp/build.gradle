@@ -7,7 +7,10 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0.7"
+        versionName "1.0.7.1"
+
+        buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -31,6 +34,9 @@ android {
 }
 
 dependencies {
+    testImplementation(project(':testable'))
+    testImplementation(project(":aliyun_sls_android_okhttp"))
+
     implementation project(":aliyun_sls_android_ot")
     implementation project(":aliyun_sls_android_trace")
     implementation("com.squareup.okhttp3:okhttp:3.11.0")
@@ -41,5 +47,8 @@ ext {
     moduleName = 'sls-android-okhttp'
 }
 
-//====以下是将android library上传到jcenter的脚本
+//==== 以下是将android library上传到maven central的脚本
 apply from: "${project.rootProject.file('maven-publish.gradle')}"
+
+//==== jacoco coverage reporter for module
+apply from: "${project.rootProject.file('jacoco/modules.gradle')}"

@@ -12,6 +12,9 @@ android {
         versionCode 1
         versionName "1.0.1"
 
+        buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -41,6 +44,7 @@ dependencies {
     testImplementation 'com.vmlens:concurrent-junit:1.0.2'
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 
+    implementation 'androidx.annotation:annotation:1.6.0'
     implementation project(':aliyun_sls_android_ot')
     implementation project(':aliyun_sls_android_trace')
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
@@ -51,5 +55,8 @@ ext {
     moduleName = 'sls-android-ot-ktx'
 }
 
-//====以下是将android library上传到jcenter的脚本
+//==== 以下是将android library上传到maven central的脚本
 apply from: "${project.rootProject.file('maven-publish.gradle')}"
+
+//==== jacoco coverage reporter for module
+apply from: "${project.rootProject.file('jacoco/modules.gradle')}"

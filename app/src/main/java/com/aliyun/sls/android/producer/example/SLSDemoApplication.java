@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import androidx.multidex.MultiDexApplication;
@@ -19,6 +20,7 @@ import com.aliyun.sls.android.core.configuration.Credentials.TracerCredentials;
 import com.aliyun.sls.android.core.configuration.Credentials.TracerCredentials.TracerLogCredentials;
 import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.core.sender.Sender.Callback;
+import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.okhttp.OKHttp3InstrumentationDelegate;
 import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
 import com.aliyun.sls.android.okhttp.OkHttp3Configuration;
@@ -28,6 +30,14 @@ import com.aliyun.sls.android.ot.Resource;
 import com.aliyun.sls.android.ot.Span;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 import okhttp3.Request;
 
 /**
@@ -45,6 +55,8 @@ public class SLSDemoApplication extends MultiDexApplication {
         if (BuildConfig.CONFIG_ENABLE) {
             PreferenceUtils.overrideConfig(this);
         }
+
+        initOTel();
 
         Credentials credentials = new Credentials();
         credentials.instanceId = "androd-dev-f1a8";
@@ -133,7 +145,8 @@ public class SLSDemoApplication extends MultiDexApplication {
                     logCredentials.logstore = "sls-mall-custom-logs";
 
                     // 如果是仅更新 AK 的话，可以不对NetworkDiagnosisCredentials进行更新
-                    //NetworkDiagnosisCredentials networkDiagnosisCredentials = credentials.getNetworkDiagnosisCredentials();
+                    //NetworkDiagnosisCredentials networkDiagnosisCredentials = credentials
+                    // .getNetworkDiagnosisCredentials();
                     //networkDiagnosisCredentials.accessKeyId = credentials.accessKeyId;
                     //networkDiagnosisCredentials.accessKeySecret = credentials.accessKeySecret;
                     //networkDiagnosisCredentials.securityToken = credentials.securityToken;
@@ -216,5 +229,34 @@ public class SLSDemoApplication extends MultiDexApplication {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void initOTel() {
+        OtlpGrpcSpanExporter grpcSpanExporter = OtlpGrpcSpanExporter.builder()
+            .setEndpoint("https://cn-beijing.log.aliyuncs.com:10010")
+            .addHeader("x-sls-otel-project", "qs-demos")
+            .addHeader("x-sls-otel-instance-id", "sls-mall")
+            .addHeader("x-sls-otel-ak-id", PreferenceUtils.getAccessKeyId(this))
+            .addHeader("x-sls-otel-ak-secret", PreferenceUtils.getAccessKeySecret(this))
+            .build();
+
+        SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
+            .addSpanProcessor(BatchSpanProcessor.builder(grpcSpanExporter).build())
+            .setResource(io.opentelemetry.sdk.resources.Resource.create(Attributes.builder()
+                .put(ResourceAttributes.SERVICE_NAME, "Android Demo App")
+                .put(ResourceAttributes.SERVICE_NAMESPACE, "Android")
+                .put(ResourceAttributes.SERVICE_VERSION, BuildConfig.VERSION_NAME)
+                .put(ResourceAttributes.HOST_NAME, Build.HOST)
+                .put(ResourceAttributes.OS_NAME, "Android")
+                .put(ResourceAttributes.OS_TYPE, "Android")
+                .put(ResourceAttributes.DEPLOYMENT_ENVIRONMENT, "dev")
+                .put(ResourceAttributes.DEVICE_ID, Utdid.getInstance().getUtdid(this))
+                .build()))
+            .build();
+
+        OpenTelemetrySdk.builder()
+            .setTracerProvider(tracerProvider)
+            .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
+            .buildAndRegisterGlobal();
     }
 }

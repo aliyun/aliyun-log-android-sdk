@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.text.TextUtils;
+import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProcessor;
 import com.aliyun.sls.android.ot.ISpanProvider;
@@ -23,9 +24,10 @@ import com.aliyun.sls.android.producer.Log;
  * @date 2022/9/6
  */
 public class Tracer {
-    static ISpanProcessor spanProcessor;
-    static ISpanProvider spanProvider;
-    static TraceFeature traceFeature;
+    @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
+    public static ISpanProcessor spanProcessor;
+    public static ISpanProvider spanProvider;
+    public static TraceFeature traceFeature;
 
     private Tracer() {
         //no instance
