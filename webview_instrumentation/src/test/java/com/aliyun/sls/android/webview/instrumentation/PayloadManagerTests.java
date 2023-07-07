@@ -51,4 +51,11 @@ public class PayloadManagerTests {
         PayloadManager.getInstance().remove(requestId);
     }
 
+    @Test
+    public void testToString() {
+        WebRequestInfo info = new WebRequestInfo();
+        info.url = "https://www.aliyun.com";
+        info.toString();
+    }
+
 }

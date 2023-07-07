@@ -65,4 +65,15 @@ public class WebViewInstrumentationTests {
         //
         //}).when(webView::webc)
     }
+
+    @Test
+    public void testGetUserAgent() {
+        when(webView.getSettings()).thenReturn(webSettings);
+        when(webSettings.getUserAgentString()).thenReturn("test useragent");
+
+        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(telemetry);
+        WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
+
+        assertEquals("test useragent", instrumentation.getUserAgent());
+    }
 }
