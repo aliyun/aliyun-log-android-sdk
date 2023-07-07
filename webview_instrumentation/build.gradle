@@ -34,7 +34,7 @@ android {
         main.jniLibs.srcDirs = ['libs']
     }
     testOptions {
-        unitTests.returnDefaultValues = true
+//        unitTests.returnDefaultValues = true
     }
 }
 

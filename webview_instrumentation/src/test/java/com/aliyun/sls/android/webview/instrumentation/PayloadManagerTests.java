@@ -47,6 +47,8 @@ public class PayloadManagerTests {
 
         PayloadManager.getInstance().remove(requestId);
         assertNull(PayloadManager.getInstance().get(requestId));
+
+        PayloadManager.getInstance().remove(requestId);
     }
 
 }

@@ -26,10 +26,6 @@ public class PayloadManager {
     @VisibleForTesting
     public final Map<String, WebRequestInfo> cachedRequests = new ConcurrentHashMap<>();
 
-    public boolean contains(String requestId) {
-        return cachedRequests.containsKey(requestId);
-    }
-
     public WebRequestInfo get(String requestId) {
         return cachedRequests.get(requestId);
     }

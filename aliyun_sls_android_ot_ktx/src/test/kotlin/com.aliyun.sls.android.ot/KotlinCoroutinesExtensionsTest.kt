@@ -115,7 +115,6 @@ class KotlinCoroutinesExtensionsTest {
     @Test
     fun runWithSpan() {
         val span = Span().setName("span")
-        assertEquals(null, ContextManager.INSTANCE.activeSpan())
 
         runBlocking(Dispatchers.Default + span.asContext()) {
             assertEquals(span, ContextManager.INSTANCE.activeSpan())

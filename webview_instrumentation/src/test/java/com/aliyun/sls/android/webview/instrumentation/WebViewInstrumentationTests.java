@@ -46,7 +46,9 @@ public class WebViewInstrumentationTests {
         //}).when(webView).addJavascriptInterface();
         //verify(webView).addJavascriptInterface(new OTelJSI(), );
 
-        GlobalOpenTelemetry.set(telemetry);
+        if (GlobalOpenTelemetry.get() == null) {
+            GlobalOpenTelemetry.set(telemetry);
+        }
 
         WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(telemetry);
         WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
