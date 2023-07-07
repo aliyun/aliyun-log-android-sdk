@@ -281,7 +281,7 @@ class TraceDemoKotlinActivity : AppCompatActivity() {
                     .build()
             ).execute()
 
-            return response.body()?.string()
+            return response.body?.string()
         }
     }
 

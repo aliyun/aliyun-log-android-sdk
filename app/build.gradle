@@ -82,6 +82,7 @@ dependencies {
     implementation project(':aliyun_sls_android_trace')
     implementation project(':aliyun_sls_android_okhttp')
     implementation project(':aliyun_sls_android_ot_ktx')
+    implementation project(':webview_instrumentation')
 
 //    implementation 'io.github.aliyun-sls:aliyun-log-android-sdk:2.6.13.1'
 //    implementation 'io.github.aliyun-sls:sls-android-core:1.0.8'
@@ -107,6 +108,23 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
+
+    // provided to assist with synchronizing versions of dependencies
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.22.0"))
+    // apis
+    implementation("io.opentelemetry:opentelemetry-api")
+    implementation("io.opentelemetry:opentelemetry-context")
+    implementation("io.opentelemetry:opentelemetry-api-logs")
+    // api extensions
+    implementation("io.opentelemetry:opentelemetry-extension-kotlin")
+    // sdks
+    implementation('io.opentelemetry:opentelemetry-sdk')
+    implementation('io.opentelemetry:opentelemetry-sdk-logs')
+    // semantic conventions
+    implementation("io.opentelemetry:opentelemetry-semconv")
+    // exporters
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+//    implementation("io.opentelemetry:opentelemetry-exporter-otlp-logs")
 
 //    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

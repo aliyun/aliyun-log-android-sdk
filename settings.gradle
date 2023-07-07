@@ -45,7 +45,8 @@ dependencyResolutionManagement {
     }
 }
 
-include ':app', ':aliyun_sls_android_producer'
+include ':app'
+include ':aliyun_sls_android_producer'
 include ':aliyun_sls_android_ot'
 include ':aliyun_sls_android_core'
 include ':aliyun_sls_android_crashreporter'
@@ -56,3 +57,4 @@ include ':aliyun_sls_android_trace'
 include ':aliyun_sls_android_okhttp'
 include ':aliyun_sls_android_ot_ktx'
 include ':testable'
+include ':webview_instrumentation'
