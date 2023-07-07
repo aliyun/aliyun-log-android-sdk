@@ -7,7 +7,6 @@ import com.aliyun.sls.android.webview.instrumentation.TelemetryTestHelper;
 import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation;
 import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation.WebViewInstrumentationConfiguration;
 import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.api.trace.Span;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;

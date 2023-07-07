@@ -2,6 +2,7 @@ package com.aliyun.sls.android.webview.instrumentation.jsbridge;
 
 import android.util.Log;
 import android.webkit.JavascriptInterface;
+import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
 import com.aliyun.sls.android.webview.instrumentation.instrumentation.IWebRequestInstrumentation;
@@ -45,7 +46,8 @@ public class OTelJSI {
         requestInstrumentation.createdRequest(webRequestInfo);
     }
 
-    private JSONObject header2JSON(String headers) {
+    @VisibleForTesting
+    public JSONObject header2JSON(String headers) {
         if (null == headers) {
             return new JSONObject();
         }
@@ -89,7 +91,8 @@ public class OTelJSI {
         putHeader(webRequestInfo.headers, key, value);
     }
 
-    private void putHeader(JSONObject headers, String key, String value) {
+    @VisibleForTesting
+    public void putHeader(JSONObject headers, String key, String value) {
         try {
             headers.put(key, value);
         } catch (JSONException e) {
@@ -123,14 +126,23 @@ public class OTelJSI {
 
         WebRequestInfo info = PayloadManager.getInstance().get(requestId);
         if (null != info) {
-            info.responseStatus = status;
-            info.responseStatusText = statusText;
-            info.responseHeaders = header2JSON(headers);
-            info.responseBody = text;
+            internalHandleResponse(info, status, statusText, text, headers);
 
-            requestInstrumentation.receivedResponse(info);
+            // remove cached web request info
+            PayloadManager.getInstance().remove(info.requestId);
         } else {
             Log.w(TAG, "handleResponse. not found WebRequestInfo");
         }
+    }
+
+    @VisibleForTesting
+    public void internalHandleResponse(WebRequestInfo info, int status, String statusText, String text,
+        String headers) {
+        info.responseStatus = status;
+        info.responseStatusText = statusText;
+        info.responseHeaders = header2JSON(headers);
+        info.responseBody = text;
+
+        requestInstrumentation.receivedResponse(info);
     }
 }
