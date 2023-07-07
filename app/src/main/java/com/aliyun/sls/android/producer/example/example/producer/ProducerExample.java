@@ -113,8 +113,6 @@ public class ProducerExample extends BaseActivity {
             config.setPersistentMaxLogCount(65536);
             config.logProducerDebug();
 
-            config.setCompressType(CompressType.ZSTD);
-
             /**
              * 以下为通过 LogProducerConfig 构造一个 LogProducerClient 实例
              */
