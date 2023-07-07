@@ -41,7 +41,7 @@ public class TelemetryWebViewClient extends WebViewClient {
 
         final WebResourceResponse response;
         if (request.isForMainFrame()) {
-            String newHtml = injectJSHook(view.getContext(), HttpClient.requestHtml(instrumentation, view, request));
+            String newHtml = injectJSHook(view.getContext(), HttpClient.requestHtml(instrumentation, request));
             response = new InternalWebResourceResponse(Utils.string2Input(newHtml));
         } else {
             //if (request.getUrl().toString().contains("otel_flag")) {
@@ -61,6 +61,10 @@ public class TelemetryWebViewClient extends WebViewClient {
 
     @VisibleForTesting
     public String injectJSHook(Context context, String originHtml) {
+        if (null == originHtml) {
+            return null;
+        }
+
         String jsHook = Utils.readFromAssets(context, "telemetry_js_hook.js");
         if (TextUtils.isEmpty(jsHook)) {
             return originHtml;

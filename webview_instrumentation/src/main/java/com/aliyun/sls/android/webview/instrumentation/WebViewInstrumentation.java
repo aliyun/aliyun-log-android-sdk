@@ -41,6 +41,10 @@ public class WebViewInstrumentation {
         webView.addJavascriptInterface(new OTelJSI(this.requestInstrumentation), "otelJsi");
     }
 
+    public IWebRequestInstrumentation getRequestInstrumentation() {
+        return requestInstrumentation;
+    }
+
     public void start() {
         this.webView.setWebViewClient(new TelemetryWebViewClient(this));
     }
