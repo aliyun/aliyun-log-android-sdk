@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
+import com.aliyun.sls.android.producer.LogProducerConfig.CompressType;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.BaseActivity;

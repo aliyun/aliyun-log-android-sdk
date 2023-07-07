@@ -170,8 +170,6 @@ public class LogProducerConfig {
 
     private static native int log_producer_persistent_config_is_enabled(long config);
 
-    private static native void log_producer_config_set_use_webtracking(long config, int use);
-
     private static native void log_producer_config_set_http_header_inject(long config, LogProducerHttpHeaderInjector injector);
 
     public Context getContext() {
@@ -333,8 +331,13 @@ public class LogProducerConfig {
         log_producer_config_set_destroy_sender_wait_sec(config, num);
     }
 
+    @Deprecated
     public void setCompressType(int num) {
         log_producer_config_set_compress_type(config, num);
+    }
+
+    public void setCompressType(CompressType type) {
+        log_producer_config_set_compress_type(config, type.type);
     }
 
     public void setNtpTimeOffset(int num) {
@@ -369,8 +372,9 @@ public class LogProducerConfig {
         log_producer_config_reset_security_token(config, accessKeyID, accessKeySecret, securityToken);
     }
 
+    @Deprecated
     public void setUseWebtracking(boolean enable) {
-        log_producer_config_set_use_webtracking(config, enable ? 1 : 0);
+        // no longer support
     }
 
     public void logProducerDebug() {
@@ -391,5 +395,15 @@ public class LogProducerConfig {
 
     public void setHttpHeaderInjector(LogProducerHttpHeaderInjector injector) {
         log_producer_config_set_http_header_inject(config, injector);
+    }
+
+    public enum CompressType {
+        LZ4(1),
+        ZSTD(2);
+
+        final int type;
+        CompressType(int type) {
+            this.type = type;
+        }
     }
 }

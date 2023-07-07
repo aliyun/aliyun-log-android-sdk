@@ -60,6 +60,7 @@ typedef struct _log_buffer {
 
 extern log_buf serialize_to_proto_buf_with_malloc(log_group_builder* bder);
 extern lz4_log_buf* serialize_to_proto_buf_with_malloc_lz4(log_group_builder* bder);
+extern lz4_log_buf* serialize_to_proto_buf_with_malloc_zstd(log_group_builder* bder);
 extern lz4_log_buf* serialize_to_proto_buf_with_malloc_no_lz4(log_group_builder* bder);
 extern void free_lz4_log_buf(lz4_log_buf* pBuf);
 extern log_group_builder* log_group_create();
@@ -73,7 +74,6 @@ extern void add_topic(log_group_builder* bder,const char* tpc,size_t len);
 extern void add_tag(log_group_builder* bder,const char* k,size_t k_len,const char* v,size_t v_len);
 extern void add_pack_id(log_group_builder* bder, const char* pack, size_t pack_len, size_t packNum);
 extern void fix_log_group_time(char * pb_buffer, size_t len, uint32_t new_time);
-extern size_t serialize_pb_buffer_to_webtracking(char *pb_buffer, size_t len, char **new_buffer);
 extern void fix_log_time(char * pb_buffer, size_t len, uint32_t new_time);
 extern uint32_t get_log_time(const char * pb_buffer, size_t len);
 extern void clear_log_tag(log_tag * tag);
