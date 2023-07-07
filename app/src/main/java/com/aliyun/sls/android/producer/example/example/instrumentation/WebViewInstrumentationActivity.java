@@ -21,9 +21,8 @@ public class WebViewInstrumentationActivity extends AppCompatActivity {
 
         final WebView webView = findViewById(R.id.webView);
 
-        WebViewInstrumentation instrumentation = new WebViewInstrumentation(
-            webView,
-            new WebViewInstrumentationConfiguration(GlobalOpenTelemetry.get()));
+        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(GlobalOpenTelemetry.get());
+        WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
         instrumentation.start();
 
         webView.loadUrl("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com");
