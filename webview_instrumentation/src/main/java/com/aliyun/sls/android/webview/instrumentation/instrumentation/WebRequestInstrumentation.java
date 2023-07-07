@@ -24,8 +24,10 @@ public class WebRequestInstrumentation implements IWebRequestInstrumentation {
     public final WebViewInstrumentation instrumentation;
     @VisibleForTesting
     public final WebViewInstrumentationConfiguration configuration;
+    @VisibleForTesting
     public final Tracer tracer;
-    public final Map<String, Span> cachedSpan = new ConcurrentHashMap<>();
+    @VisibleForTesting
+    public Map<String, Span> cachedSpan = new ConcurrentHashMap<>();
 
     public WebRequestInstrumentation(
         WebViewInstrumentation instrumentation,
@@ -42,15 +44,15 @@ public class WebRequestInstrumentation implements IWebRequestInstrumentation {
             return;
         }
 
-        Uri uri = Uri.parse(info.url);
+        final String path = getPathFromUrl(info.url);
         String spanName = configuration.nameSpan(info);
         Span span = tracer.spanBuilder(
-                TextUtils.isEmpty(spanName) ? String.format("Web %s %s", info.method, uri.getPath()) : spanName)
+                TextUtils.isEmpty(spanName) ? String.format("Web %s %s", info.method, path) : spanName)
             .startSpan();
 
         span.setAttribute(SemanticAttributes.HTTP_URL, info.url);
         span.setAttribute(SemanticAttributes.HTTP_METHOD, info.method);
-        span.setAttribute("http.path", uri.getPath());
+        span.setAttribute("http.path", path);
         span.setAttribute("http.origin", info.origin);
         span.setAttribute("http.mimeType", info.mimeType);
         span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, instrumentation.getUserAgent());
@@ -59,7 +61,7 @@ public class WebRequestInstrumentation implements IWebRequestInstrumentation {
             span.setAttribute("http.body", info.body);
         }
 
-        if (configuration.shouldInjectTracingRequestHeaders(info)) {
+        if (null != info.headers && configuration.shouldInjectTracingRequestHeaders(info)) {
             span.setAttribute("http.headers", info.headers.toString());
         }
 
@@ -78,7 +80,7 @@ public class WebRequestInstrumentation implements IWebRequestInstrumentation {
         span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, info.responseStatus);
         span.setAttribute("http.status_description", info.responseStatusText);
 
-        if (configuration.shouldInjectTracingResponseHeaders(info)) {
+        if (null != info.responseHeaders && configuration.shouldInjectTracingResponseHeaders(info)) {
             span.setAttribute("http.response.headers", info.responseHeaders.toString());
         }
 
@@ -93,5 +95,13 @@ public class WebRequestInstrumentation implements IWebRequestInstrumentation {
         configuration.receivedResponse(info, span);
 
         span.end();
+
+        // remove cached span
+        cachedSpan.remove(info.requestId);
+    }
+
+    @VisibleForTesting
+    public String getPathFromUrl(String url) {
+        return Uri.parse(url).getPath();
     }
 }

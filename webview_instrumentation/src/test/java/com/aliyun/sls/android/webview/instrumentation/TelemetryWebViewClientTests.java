@@ -39,8 +39,7 @@ public class TelemetryWebViewClientTests {
     private WebSettings webSettings;
     @Mock
     private WebView webView;
-    @Mock
-    private static OpenTelemetry telemetry;
+
     @Mock
     private Context context;
     @Mock
@@ -48,13 +47,10 @@ public class TelemetryWebViewClientTests {
     @Mock
     private Uri uri;
 
-    @BeforeClass
-    public static void beforeClass() {
-        GlobalOpenTelemetry.set(telemetry);
-    }
-
     @Before
     public void before() {
+
+        TelemetryTestHelper.initTelemetry();
         when(webView.getSettings()).thenReturn(webSettings);
     }
 
@@ -66,7 +62,7 @@ public class TelemetryWebViewClientTests {
         assertNull(client.instrumentation);
 
         // parameter is not null
-        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(telemetry);
+        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(GlobalOpenTelemetry.get());
         WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
         client = new TelemetryWebViewClient(instrumentation);
         assertEquals(instrumentation, client.instrumentation);
@@ -122,7 +118,7 @@ public class TelemetryWebViewClientTests {
 
     private TelemetryWebViewClient createTelemetryWebViewClient() {
         //when(webResourceRequest.isForMainFrame()).thenReturn(true);
-        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(telemetry);
+        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(GlobalOpenTelemetry.get());
         WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
         return new TelemetryWebViewClient(instrumentation);
     }

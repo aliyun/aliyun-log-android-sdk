@@ -4,7 +4,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation.WebViewInstrumentationConfiguration;
 import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.api.OpenTelemetry;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -26,8 +26,10 @@ public class WebViewInstrumentationTests {
     @Mock
     private WebView webView;
 
-    @Mock
-    OpenTelemetry telemetry;
+    @Before
+    public void before() {
+        TelemetryTestHelper.initTelemetry();
+    }
 
     @Test
     public void testConstructor() {
@@ -46,11 +48,8 @@ public class WebViewInstrumentationTests {
         //}).when(webView).addJavascriptInterface();
         //verify(webView).addJavascriptInterface(new OTelJSI(), );
 
-        if (GlobalOpenTelemetry.get() == null) {
-            GlobalOpenTelemetry.set(telemetry);
-        }
-
-        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(telemetry);
+        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(
+            GlobalOpenTelemetry.get());
         WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
 
         assertEquals(instrumentation.configuration, configuration);
@@ -71,7 +70,8 @@ public class WebViewInstrumentationTests {
         when(webView.getSettings()).thenReturn(webSettings);
         when(webSettings.getUserAgentString()).thenReturn("test useragent");
 
-        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(telemetry);
+        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(
+            GlobalOpenTelemetry.get());
         WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
 
         assertEquals("test useragent", instrumentation.getUserAgent());
