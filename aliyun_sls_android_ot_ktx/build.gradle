@@ -40,7 +40,7 @@ android {
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:2.8.9'
+    testImplementation 'org.mockito:mockito-core:2.28.2'
     testImplementation 'com.vmlens:concurrent-junit:1.0.2'
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 

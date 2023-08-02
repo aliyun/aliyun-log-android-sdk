@@ -19,7 +19,7 @@ public class Log {
     private final Object lock = new Object();
 
     public Log() {
-        this.logTime = TimeUtils.getTimeInMillis();
+        this.logTime = TimeUtils.getInstance().getTimeInMillis();
     }
 
     public void putContents(Map<String, String> contents) {

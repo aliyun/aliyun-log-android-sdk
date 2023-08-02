@@ -74,7 +74,7 @@ public class LogProducerConfig {
         setGetTimeUnixFunc(new LogProducerTimeUnixFunc() {
             @Override
             public long getTimeUnix() {
-                return TimeUtils.getTimeInMillis();
+                return TimeUtils.getInstance().getTimeInMillis();
             }
         });
         setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
