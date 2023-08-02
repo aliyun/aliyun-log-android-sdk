@@ -18,11 +18,19 @@ public class TimeUtils {
     private static long serverTime;
     private static long elapsedRealTime;
 
+    private static class Holder {
+        private static final TimeUtils INSTANCE = new TimeUtils();
+    }
+
     private TimeUtils() {
         //no instance
     }
 
-    public static void startUpdateServerTime(Context context, final String endpoint, final String project) {
+    public static TimeUtils getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    public void startUpdateServerTime(Context context, final String endpoint, final String project) {
         if (null != context) {
             PackageManager pManager = context.getPackageManager();
             if (pManager.checkPermission(
@@ -43,12 +51,12 @@ public class TimeUtils {
         });
     }
 
-    public static void updateServerTime(long timeInMillis) {
+    public void updateServerTime(long timeInMillis) {
         serverTime = timeInMillis;
         elapsedRealTime = SystemClock.elapsedRealtime();
     }
 
-    public static long getTimeInMillis() {
+    public long getTimeInMillis() {
         if (0L == elapsedRealTime) {
             return System.currentTimeMillis() / 1000;
         }

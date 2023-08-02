@@ -33,7 +33,7 @@ public class LogProducerClient {
         final String endpoint = logProducerConfig.getEndpoint();
         final String project = logProducerConfig.getProject();
         if (!TextUtils.isEmpty(endpoint) && !TextUtils.isEmpty(project)) {
-            TimeUtils.startUpdateServerTime(logProducerConfig.getContext(), endpoint, project);
+            TimeUtils.getInstance().startUpdateServerTime(logProducerConfig.getContext(), endpoint, project);
         }
         enable = true;
     }
