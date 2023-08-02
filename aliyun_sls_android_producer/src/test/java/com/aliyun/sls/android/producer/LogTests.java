@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
  */
 @ThreadCount(100)
 @RunWith(ConcurrentTestRunner.class)
-public class LogTest {
+public class LogTests {
     //private LogProducerConfig config;
     private LogProducerClient client;
     private Log log;
