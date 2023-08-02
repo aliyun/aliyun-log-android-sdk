@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import android.text.TextUtils;
+import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -140,7 +141,8 @@ public class Log {
         this.putContents(kvMap);
     }
 
-    private String numberToString(Number value) {
+    @VisibleForTesting
+    public String numberToString(Number value) {
         try {
             return JSONObject.numberToString(value);
         } catch (JSONException e) {

@@ -34,6 +34,7 @@ dependencies {
     api 'junit:junit:4.13.2'
     api 'org.mockito:mockito-core:4.7.0'
     api 'com.vmlens:concurrent-junit:1.0.2'
+    api 'org.assertj:assertj-core:3.21.0'
 
     api 'org.json:json:20140107'
     api 'org.skyscreamer:jsonassert:1.5.1'
