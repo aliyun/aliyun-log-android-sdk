@@ -1,5 +1,6 @@
 package com.aliyun.sls.android.producer;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,11 +15,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static com.aliyun.sls.testable.Utils.put;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author gordon
@@ -32,11 +32,10 @@ public class LogTest {
     private Log log;
 
     @Before
-    public void setup() throws Throwable{
+    public void setup() {
         //this.config = mock(LogProducerConfig.class);
         this.client = mock(LogProducerClient.class);
         this.log = new Log();
-
 
         //LogProducerConfig config = new LogProducerConfig();
         //this.config = spy(config);
@@ -52,28 +51,140 @@ public class LogTest {
     }
 
     @Test
-    public void log_add_string() {
+    public void log_putContent_put_boolValue() {
         Log log = new Log();
-        log.putContent("abc", "abc");
-
-        assertEquals("abc", log.getContent().get("abc"));
+        log.putContent("bool", true);
+        assertThat(log.getContent()).containsEntry("bool", "true");
     }
 
     @Test
-    public void log_add_int() {
+    public void log_putContent_put_floatValue() {
+        Log log = new Log();
+        log.putContent("float", 12.34f);
+        assertThat(log.getContent()).containsEntry("float", "12.34");
+    }
+
+    @Test
+    public void log_putContent_put_doubleValue() {
+        Log log = new Log();
+        log.putContent("double", 45.45d);
+        assertThat(log.getContent()).containsEntry("double", "45.45");
+    }
+
+    @Test
+    public void log_putContent_put_stringValue() {
+        Log log = new Log();
+        log.putContent("string", "abc");
+        assertThat(log.getContent().get("string")).isEqualTo("abc");
+    }
+
+    @Test
+    public void log_putContent_put_intValue() {
         Log log = new Log();
         log.putContent("int", 11);
-        assertEquals(11, Integer.parseInt(log.getContent().get("int")));
+        assertThat(log.getContent().get("int")).isEqualTo("11");
     }
 
     @Test
-    public void log_add_long() {
+    public void log_putContent_put_longValue() {
         Log log = new Log();
         log.putContent("long", 11L);
+        assertThat(log.getContent().get("long")).isEqualTo("11");
     }
 
     @Test
-    public void log_add_concurrent() throws  Throwable{
+    public void log_putContent_put_jsonValue_withKey() {
+        Log log = new Log();
+        JSONObject object = new JSONObject();
+        put(object, "intKey", 111);
+        put(object, "stringKey", "test123");
+
+        log.putContent("json", object);
+        assertThat(log.getContent()).containsKey("json").containsValue(object.toString());
+    }
+
+
+    @Test
+    public void log_putContent_put_jsonValue_withKey_withNull() {
+        Log log = new Log();
+        log.putContent("json", (JSONObject)null);
+        assertThat(log.getContent()).containsEntry("json", "null");
+    }
+
+    @Test
+    public void log_putContent_put_jsonValue() {
+        Log log = new Log();
+        JSONObject object = new JSONObject();
+        put(object, "intKey", 111);
+        put(object, "stringKey", "test123");
+
+        log.putContent(object);
+        assertThat(log.getContent()).containsEntry("intKey", "111").containsEntry("stringKey", "test123");
+    }
+
+    @Test
+    public void log_putContent_put_jsonValue_withNull() {
+        Log log = new Log();
+
+        log.putContent(null);
+        assertThat(log.getContent()).isEmpty();
+    }
+
+    @Test
+    public void log_putContent_put_arrayValue() {
+        Log log = new Log();
+        JSONArray array = new JSONArray();
+        array.put("a array element");
+        log.putContent("json", array);
+        assertThat(log.getContent()).containsEntry("json", array.toString());
+    }
+
+    @Test
+    public void log_putContent_put_arrayValue_withNull() {
+        Log log = new Log();
+        log.putContent("json", (JSONArray)null);
+        assertThat(log.getContent()).containsEntry("json", "null");
+    }
+
+    @Test
+    public void log_putContents_put_mapValue() {
+        Log log = new Log();
+        Map<String, String> mapValue = new HashMap<String, String>() {
+            {
+                put("key", "value");
+                put("key2", "value2");
+            }
+        };
+        log.putContents(mapValue);
+        assertThat(log.getContent()).containsEntry("key", "value").containsEntry("key2", "value2");
+    }
+
+    @Test
+    public void log_putContents_put_mapValue_withNull() {
+        Log log = new Log();
+        log.putContents(null);
+        assertThat(log.getContent()).isEmpty();
+    }
+
+    @Test
+    public void log_numberToString_Correct() {
+        assertThat(new Log().numberToString(111)).isEqualTo("111");
+    }
+
+    @Test
+    public void log_numberToString_Incorrect() {
+        assertThat(new Log().numberToString(null)).isEqualTo("");
+    }
+
+    @Test
+    public void log_hasLogTime_setLogTime() {
+        Log log = new Log();
+        log.setLogTime(123456789);
+        assertThat(log.getLogTime()).isEqualTo(123456789);
+    }
+
+    @Test
+    public void log_add_concurrent() throws Throwable {
         Log log = new Log();
         ExecutorService es = Executors.newSingleThreadExecutor();
         Future<?> addFuture =
@@ -89,12 +200,11 @@ public class LogTest {
             }
         } catch (Throwable t) {
             addFuture.cancel(true);
-            throw  t;
+            throw t;
         }
 
         addFuture.get();
     }
-
 
     //@Test
     //public void log_multi_add() {
@@ -145,7 +255,9 @@ public class LogTest {
         log.putContent("array", new JSONArray());
 
         // common input content
-        log.putContent("content_key_1", "1abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
+        log.putContent("content_key_1",
+            "1abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()"
+                + "_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("content_key_2", "2abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("content_key_3", "3abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
         log.putContent("content_key_4", "4abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
@@ -157,7 +269,7 @@ public class LogTest {
         log.putContent("random", String.valueOf(Math.random()));
         log.putContent("content", "中文️");
         log.putContent(null, "null");
-        log.putContent("null", (String) null);
+        log.putContent("null", (String)null);
         return log;
     }
 }
