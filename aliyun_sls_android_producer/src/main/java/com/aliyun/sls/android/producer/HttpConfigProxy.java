@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import androidx.annotation.VisibleForTesting;
+
 /**
  * @author gordon
  * @date 2021/06/24
@@ -21,6 +23,11 @@ public final class HttpConfigProxy {
 
     public static void addPluginUserAgent(String plugin, String version) {
         PLUGIN_USER_AGENTS.put(plugin, version);
+    }
+
+    @VisibleForTesting
+    public static void removePluginUserAgent(String plugin) {
+        PLUGIN_USER_AGENTS.remove(plugin);
     }
 
     public static String getUserAgent() {
