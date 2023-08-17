@@ -52,7 +52,11 @@ project.afterEvaluate {
                             '**/utils/Utils.*',
                             '**/utils/ContextUtils.*',
                             '**/utils/ThreadUtils.*',
-                            '**/utils/ProcessUtils.*'
+                            '**/utils/ProcessUtils.*',
+                            '**/sls/android/blockdetection/**',
+                            '**/sls/android/core/**',
+                            '**/sls/android/crashreporter/**',
+                            '**/sls/android/ot/**'
                     ]
 
                     def jClasses = "${project.buildDir}/intermediates/javac/${variantName}/classes"
