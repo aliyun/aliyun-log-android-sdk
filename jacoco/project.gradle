@@ -44,7 +44,11 @@ project.afterEvaluate {
                 '**/*Binding.*',
                 '**/example/*',
                 '**/trace/*',
-                '**/testable/*'
+                '**/testable/*',
+                '**/utils/Utils.*',
+                '**/utils/ContextUtils.*',
+                '**/utils/ThreadUtils.*',
+                '**/utils/ProcessUtils.*'
         ]
 
         def jClasses = subprojects.collect { proj ->

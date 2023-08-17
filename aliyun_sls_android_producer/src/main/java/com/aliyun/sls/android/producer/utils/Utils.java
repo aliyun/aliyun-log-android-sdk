@@ -2,6 +2,9 @@ package com.aliyun.sls.android.producer.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
+
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 /**
  * @author gordon
@@ -29,6 +32,17 @@ public final class Utils {
 
     public static void setContext(Context context) {
         Utils.context = null != context ? context.getApplicationContext() : null;
+    }
+
+    public static boolean checkInternetPermission(Context context) {
+        if (null == context) {
+            return false;
+        }
+
+        PackageManager pManager = context.getPackageManager();
+        return pManager.checkPermission(
+            "android.permission.INTERNET"
+            , context.getPackageName()) == PERMISSION_GRANTED;
     }
 
 }
