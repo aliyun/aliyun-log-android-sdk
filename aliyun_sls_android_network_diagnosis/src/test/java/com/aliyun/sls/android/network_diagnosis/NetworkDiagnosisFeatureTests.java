@@ -163,8 +163,6 @@ public class NetworkDiagnosisFeatureTests extends BaseTestCase {
 
     @Test
     public void networkDiagnosisFeature_http_request() {
-        final Callback2 callback = response -> {
-        };
         final HttpCredential credential = new HttpCredential(null, null);
         final HttpRequest request = new HttpRequest();
         request.domain = "https://www.aliyun.com";
@@ -173,7 +171,7 @@ public class NetworkDiagnosisFeatureTests extends BaseTestCase {
         request.timeout = 10;
         request.downloadBytesLimit = 20;
         request.headerOnly = false;
-        feature.http(request, callback);
+        feature.http(request);
 
         ArgumentCaptor<HttpConfig> captor = ArgumentCaptor.forClass(HttpConfig.class);
         verify(diagnosis).startHttpPing(captor.capture());
@@ -223,14 +221,12 @@ public class NetworkDiagnosisFeatureTests extends BaseTestCase {
 
     @Test
     public void networkDiagnosisFeature_ping_request() {
-        final Callback2 callback = response -> {
-        };
         final PingRequest request = new PingRequest();
         request.size = 10;
         request.domain = "aliyun.com";
         request.maxTimes = 20;
         request.timeout = 100;
-        feature.ping(request, callback);
+        feature.ping(request);
 
         ArgumentCaptor<PingConfig> captor = ArgumentCaptor.forClass(PingConfig.class);
         verify(diagnosis).startPing(captor.capture());
@@ -279,14 +275,12 @@ public class NetworkDiagnosisFeatureTests extends BaseTestCase {
 
     @Test
     public void networkDiagnosisFeature_tcpping_Request() {
-        final Callback2 callback = response -> {
-        };
         TcpPingRequest request = new TcpPingRequest();
         request.domain = "www.aliyun.com";
         request.port = 10;
         request.maxTimes = 25;
         request.timeout = 300;
-        feature.tcpPing(request, callback);
+        feature.tcpPing(request);
 
         ArgumentCaptor<TcpPingConfig> captor = ArgumentCaptor.forClass(TcpPingConfig.class);
         verify(diagnosis).startTcpPing(captor.capture());
@@ -362,8 +356,6 @@ public class NetworkDiagnosisFeatureTests extends BaseTestCase {
 
     @Test
     public void networkDiagnosisFeature_mtr_Request() {
-        final Callback2 callback = response -> {
-        };
         MtrRequest request = new MtrRequest();
         request.domain = "www.aliyun.com";
         request.maxTTL = 10;
@@ -373,7 +365,7 @@ public class NetworkDiagnosisFeatureTests extends BaseTestCase {
         request.extension = new HashMap<String, String>() {};
         request.multiplePortsDetect = true;
 
-        feature.mtr(request, callback);
+        feature.mtr(request);
 
         ArgumentCaptor<MtrConfig> captor = ArgumentCaptor.forClass(MtrConfig.class);
         verify(diagnosis).startMtr(captor.capture());
@@ -423,9 +415,6 @@ public class NetworkDiagnosisFeatureTests extends BaseTestCase {
 
     @Test
     public void networkDiagnosisFeature_dns_Request() {
-        final Callback2 callback = response -> {
-        };
-
         DnsRequest request = new DnsRequest();
         request.domain = "www.aliyun.com";
         request.nameServer = "www.nameserver.com";
@@ -434,7 +423,7 @@ public class NetworkDiagnosisFeatureTests extends BaseTestCase {
         request.multiplePortsDetect = true;
         request.extension = new HashMap<String, String>() {};
 
-        feature.dns(request, callback);
+        feature.dns(request);
 
         ArgumentCaptor<DnsConfig> captor = ArgumentCaptor.forClass(DnsConfig.class);
         verify(diagnosis).startDns(captor.capture());
