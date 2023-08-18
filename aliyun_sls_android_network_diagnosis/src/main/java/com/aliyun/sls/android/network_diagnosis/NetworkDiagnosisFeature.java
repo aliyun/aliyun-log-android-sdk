@@ -17,6 +17,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Pair;
+import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
@@ -45,7 +46,26 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     private static final TaskIdGenerator TASK_ID_GENERATOR = new TaskIdGenerator();
     private NetworkDiagnosisSender networkDiagnosisSender;
-    private boolean enableMultiplePortsDetect = false;
+    @VisibleForTesting
+    public boolean enableMultiplePortsDetect = false;
+
+    private IDiagnosis diagnosis;
+    private Utdid utdid;
+
+    public NetworkDiagnosisFeature() {
+        this.diagnosis = new NetSpeedDiagnosis();
+        this.utdid = Utdid.getInstance();
+    }
+
+    @VisibleForTesting
+    public void setDiagnosis(IDiagnosis diagnosis) {
+        this.diagnosis = diagnosis;
+    }
+
+    @VisibleForTesting
+    public void setUtdid(Utdid utdid) {
+        this.utdid = utdid;
+    }
 
     @Override
     public String name() {
@@ -63,12 +83,8 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
 
     // region init
-    @Override
-    protected void onInitSender(Context context, Credentials credentials, Configuration configuration) {
-        super.onInitSender(context, credentials, configuration);
-    }
-
-    private String getIPAIdBySecretKey(String secretKey) {
+    @VisibleForTesting
+    public String getIPAIdBySecretKey(String secretKey) {
         @SuppressWarnings("CharsetObjectCanBeUsed")
         String decode = new String(
             Base64.decode(
@@ -98,19 +114,19 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(networkDiagnosisCredentials.secretKey);
         }
 
-        Diagnosis.preInit(
+        diagnosis.preInit(
             networkDiagnosisCredentials.secretKey,
-            Utdid.getInstance().getUtdid(context),
+            utdid.getUtdid(context),
             networkDiagnosisCredentials.siteId,
             networkDiagnosisCredentials.extension
         );
 
-        Diagnosis.enableDebug(configuration.debuggable && AppUtils.debuggable(context));
+        diagnosis.enableDebug(configuration.debuggable && AppUtils.debuggable(context));
 
         networkDiagnosisSender = new NetworkDiagnosisSender(context, this);
         networkDiagnosisSender.initialize(credentials);
 
-        Diagnosis.registerLogger(this, networkDiagnosisSender);
+        diagnosis.registerLogger(this, networkDiagnosisSender);
 
         NetworkDiagnosis.getInstance().setNetworkDiagnosis(this);
     }
@@ -123,9 +139,9 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
-        Diagnosis.init(
+        diagnosis.init(
             networkDiagnosisCredentials.secretKey,
-            Utdid.getInstance().getUtdid(context),
+            utdid.getUtdid(context),
             networkDiagnosisCredentials.siteId,
             networkDiagnosisCredentials.extension
         );
@@ -156,8 +172,10 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         }
 
         // set instanceId to network diagnosis credentials that will be used in sender.provideLogstoreName() method.
-        if (null != credentials.networkDiagnosisCredentials && !TextUtils.isEmpty(credentials.networkDiagnosisCredentials.secretKey)) {
-            credentials.networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(credentials.networkDiagnosisCredentials.secretKey);
+        if (null != credentials.networkDiagnosisCredentials && !TextUtils.isEmpty(
+            credentials.networkDiagnosisCredentials.secretKey)) {
+            credentials.networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(
+                credentials.networkDiagnosisCredentials.secretKey);
         }
 
         networkDiagnosisSender.setCredentials(credentials);
@@ -169,12 +187,12 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
-        Diagnosis.setPolicyDomain(domain);
+        diagnosis.setPolicyDomain(domain);
     }
 
     @Override
     public void disableExNetworkInfo() {
-        Diagnosis.disableExNetworkInfo();
+        diagnosis.disableExNetworkInfo();
     }
 
     @Override
@@ -205,12 +223,12 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         }
 
         final Map<String, String> extensionCopy = new HashMap<>(extension);
-        Diagnosis.updateExtension(extensionCopy);
+        diagnosis.updateExtension(extensionCopy);
     }
 
     @Override
     public void registerHttpCredentialCallback(HttpCredentialCallback callback) {
-        Diagnosis.registerHttpCredentialCallback((url, context) -> {
+        diagnosis.registerHttpCredentialCallback((url, context) -> {
             if (null != callback) {
                 HttpCredential credential = callback.getCredential(url, context);
                 if (null != credential) {
@@ -303,7 +321,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != request.extension) {
             config.setDetectExtension(new HashMap<>(request.extension));
         }
-        Diagnosis.startHttpPing(config);
+        diagnosis.startHttpPing(config);
     }
     // endregion
 
@@ -379,7 +397,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != pingRequest.extension) {
             config.setDetectExtension(new HashMap<>(pingRequest.extension));
         }
-        Diagnosis.startPing(config);
+        diagnosis.startPing(config);
     }
     // endregion
 
@@ -443,7 +461,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != request.extension) {
             config.setDetectExtension(new HashMap<>(request.extension));
         }
-        Diagnosis.startTcpPing(config);
+        diagnosis.startTcpPing(config);
     }
 
     // endregion
@@ -524,7 +542,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != request.extension) {
             config.setDetectExtension(new HashMap<>(request.extension));
         }
-        Diagnosis.startMtr(config);
+        diagnosis.startMtr(config);
     }
     // endregion
 
@@ -597,7 +615,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != dnsRequest.extension) {
             config.setDetectExtension(new HashMap<>(dnsRequest.extension));
         }
-        Diagnosis.startDns(config);
+        diagnosis.startDns(config);
     }
     // endregion
 
@@ -649,7 +667,8 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         @Override
         protected String provideLogstoreName(Credentials credentials) {
             // instanceId must not be null or empty
-            if (null == credentials.networkDiagnosisCredentials || TextUtils.isEmpty(credentials.networkDiagnosisCredentials.instanceId)) {
+            if (null == credentials.networkDiagnosisCredentials || TextUtils.isEmpty(
+                credentials.networkDiagnosisCredentials.instanceId)) {
                 return null;
             }
 

@@ -10,7 +10,8 @@ import androidx.annotation.VisibleForTesting;
  */
 @SuppressWarnings("deprecation")
 public final class NetworkDiagnosis implements INetworkDiagnosis {
-    private INetworkDiagnosis networkDiagnosis;
+    @VisibleForTesting
+    public INetworkDiagnosis networkDiagnosis;
 
     private static class Holder {
         private static final NetworkDiagnosis INSTANCE = new NetworkDiagnosis();
