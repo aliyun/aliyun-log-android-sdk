@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.alibaba.netspeed.network.Diagnosis;
 import com.alibaba.netspeed.network.DnsConfig;
 import com.alibaba.netspeed.network.HttpConfig;
 import com.alibaba.netspeed.network.Logger;
@@ -619,14 +618,27 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
     // endregion
 
-    private static class NetworkDiagnosisSender extends SdkSender implements Logger, ISpanProcessor {
+    @VisibleForTesting
+    public static class NetworkDiagnosisSender extends SdkSender implements Logger, ISpanProcessor {
 
-        private final SdkFeature feature;
+        private NetworkDiagnosisFeature feature;
         private INetworkDiagnosis.Callback2 callback;
+        private NetworkDiagnosisHttpHeaderInjector httpHeaderInjector;
 
-        public NetworkDiagnosisSender(Context context, SdkFeature feature) {
+        @VisibleForTesting
+        public NetworkDiagnosisSender(Context context) {
+            super(context);
+        }
+
+        public NetworkDiagnosisSender(Context context, NetworkDiagnosisFeature feature) {
             super(context);
             TAG = "NetworkDiagnosisSender";
+            this.httpHeaderInjector = new NetworkDiagnosisHttpHeaderInjector(feature);
+            this.feature = feature;
+        }
+
+        @VisibleForTesting
+        public void setFeature(NetworkDiagnosisFeature feature) {
             this.feature = feature;
         }
 
@@ -708,20 +720,14 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         @Override
         protected void provideLogProducerConfig(LogProducerConfig config) {
             super.provideLogProducerConfig(config);
-            config.setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
-                @Override
-                public String[] injectHeaders(String[] srcHeaders, int count) {
-                    return HttpHeader.getHeadersWithUA(srcHeaders,
-                        String.format("%s/%s", feature.name(), feature.version()));
-                }
-            });
+            config.setHttpHeaderInjector(httpHeaderInjector);
         }
 
-        @Override
-        public void report(Object context, String msg) {
+        @VisibleForTesting
+        public SpanBuilder createSpanBuilder(String msg, NetworkDiagnosisFeature feature) {
             if (TextUtils.isEmpty(msg)) {
                 SLSLog.w(TAG, "msg is empty.");
-                return;
+                return null;
             }
 
             JSONObject object;
@@ -729,13 +735,13 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 object = new JSONObject(msg);
             } catch (JSONException e) {
                 SLSLog.w(TAG, "msg to json error. e: " + e.getMessage());
-                return;
+                return null;
             }
 
             final String method = object.optString("method");
             if (TextUtils.isEmpty(method)) {
                 SLSLog.w(TAG, "method is empty.");
-                return;
+                return null;
             }
 
             SLSLog.v(TAG, "network diagnosis result: method=" + method + ", result: " + msg);
@@ -748,11 +754,37 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                     Pair.create("net.origin", msg)
                 )
             );
+            return builder;
+        }
+
+        @VisibleForTesting
+        public void handleCallback(Callback2 callback, Object context, String msg) {
+            if (null == callback) {
+                return;
+            }
+
+            String method;
+            try {
+                JSONObject object = new JSONObject(msg);
+                method = object.optString("method");
+            } catch (JSONException e) {
+                SLSLog.w(TAG, "msg to json error. e: " + e.getMessage());
+                return;
+            }
+
+            callback.onComplete(Response.response(context, Type.of(method), msg));
+        }
+
+        @Override
+        public void report(Object context, String msg) {
+            final SpanBuilder builder = createSpanBuilder(msg, feature);
+            if (null == builder) {
+                return;
+            }
+
             builder.build().end();
 
-            if (null != callback) {
-                callback.onComplete(Response.response(context, Type.of(method), msg));
-            }
+            handleCallback(callback, context, msg);
         }
 
         @Override
@@ -785,6 +817,23 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         synchronized String generate() {
             index += 1;
             return String.format("%s_%d", prefix, index);
+        }
+    }
+
+    @VisibleForTesting
+    public static class NetworkDiagnosisHttpHeaderInjector implements LogProducerHttpHeaderInjector {
+        private final NetworkDiagnosisFeature feature;
+
+        public NetworkDiagnosisHttpHeaderInjector(NetworkDiagnosisFeature feature) {
+            this.feature = feature;
+        }
+
+        @Override
+        public String[] injectHeaders(String[] srcHeaders, int count) {
+            return HttpHeader.getHeadersWithUA(
+                srcHeaders,
+                String.format("%s/%s", feature.name(), feature.version())
+            );
         }
     }
 }
