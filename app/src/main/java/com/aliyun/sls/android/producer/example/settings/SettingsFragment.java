@@ -9,7 +9,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
-import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.R;
 
 /**
  * @author gordon

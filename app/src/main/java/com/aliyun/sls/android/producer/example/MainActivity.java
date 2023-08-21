@@ -9,6 +9,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import com.aliyun.sls.android.producer.R;
 import com.aliyun.sls.android.producer.example.example.TraceDemoActivity;
 import com.aliyun.sls.android.producer.example.example.TraceDemoKotlinActivity;
 import com.aliyun.sls.android.producer.example.example.crash.CrashExampleActivity;

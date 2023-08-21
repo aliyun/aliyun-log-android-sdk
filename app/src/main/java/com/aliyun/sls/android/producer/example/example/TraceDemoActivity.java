@@ -20,7 +20,7 @@ import com.aliyun.sls.android.ot.context.ContextManager;
 import com.aliyun.sls.android.ot.context.Scope;
 import com.aliyun.sls.android.ot.logs.LogData;
 import com.aliyun.sls.android.ot.logs.LogLevel;
-import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.R;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient.ApiCallback;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;

@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
-import com.aliyun.sls.android.producer.example.databinding.BaseListContainerLayoutBinding;
+import com.aliyun.sls.android.producer.databinding.BaseListContainerLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.trace.UITracer;
 import com.aliyun.sls.android.trace.Tracer;

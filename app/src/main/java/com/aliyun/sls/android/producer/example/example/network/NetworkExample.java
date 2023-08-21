@@ -29,7 +29,7 @@ import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.PingRequest;
 import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.TcpPingRequest;
 import com.aliyun.sls.android.network_diagnosis.NetworkDiagnosis;
 import com.aliyun.sls.android.producer.example.BaseActivity;
-import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.R;
 
 /**
  * @author gordon

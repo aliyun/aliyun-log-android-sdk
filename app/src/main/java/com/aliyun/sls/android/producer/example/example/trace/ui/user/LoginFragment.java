@@ -8,7 +8,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
-import com.aliyun.sls.android.producer.example.databinding.FragmentLoginBinding;
+import com.aliyun.sls.android.producer.databinding.FragmentLoginBinding;
 import com.aliyun.sls.android.producer.example.example.trace.ui.core.VisibilityFragment;
 
 /**
