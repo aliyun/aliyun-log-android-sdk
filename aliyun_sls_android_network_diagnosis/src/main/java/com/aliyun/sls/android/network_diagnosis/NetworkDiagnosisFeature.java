@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.alibaba.netspeed.network.Diagnosis;
 import com.alibaba.netspeed.network.DnsConfig;
 import com.alibaba.netspeed.network.HttpConfig;
 import com.alibaba.netspeed.network.Logger;
@@ -17,6 +16,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Pair;
+import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
@@ -45,7 +45,26 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     private static final TaskIdGenerator TASK_ID_GENERATOR = new TaskIdGenerator();
     private NetworkDiagnosisSender networkDiagnosisSender;
-    private boolean enableMultiplePortsDetect = false;
+    @VisibleForTesting
+    public boolean enableMultiplePortsDetect = false;
+
+    private IDiagnosis diagnosis;
+    private Utdid utdid;
+
+    public NetworkDiagnosisFeature() {
+        this.diagnosis = new NetSpeedDiagnosis();
+        this.utdid = Utdid.getInstance();
+    }
+
+    @VisibleForTesting
+    public void setDiagnosis(IDiagnosis diagnosis) {
+        this.diagnosis = diagnosis;
+    }
+
+    @VisibleForTesting
+    public void setUtdid(Utdid utdid) {
+        this.utdid = utdid;
+    }
 
     @Override
     public String name() {
@@ -63,12 +82,8 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     }
 
     // region init
-    @Override
-    protected void onInitSender(Context context, Credentials credentials, Configuration configuration) {
-        super.onInitSender(context, credentials, configuration);
-    }
-
-    private String getIPAIdBySecretKey(String secretKey) {
+    @VisibleForTesting
+    public String getIPAIdBySecretKey(String secretKey) {
         @SuppressWarnings("CharsetObjectCanBeUsed")
         String decode = new String(
             Base64.decode(
@@ -98,19 +113,19 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(networkDiagnosisCredentials.secretKey);
         }
 
-        Diagnosis.preInit(
+        diagnosis.preInit(
             networkDiagnosisCredentials.secretKey,
-            Utdid.getInstance().getUtdid(context),
+            utdid.getUtdid(context),
             networkDiagnosisCredentials.siteId,
             networkDiagnosisCredentials.extension
         );
 
-        Diagnosis.enableDebug(configuration.debuggable && AppUtils.debuggable(context));
+        diagnosis.enableDebug(configuration.debuggable && AppUtils.debuggable(context));
 
         networkDiagnosisSender = new NetworkDiagnosisSender(context, this);
         networkDiagnosisSender.initialize(credentials);
 
-        Diagnosis.registerLogger(this, networkDiagnosisSender);
+        diagnosis.registerLogger(this, networkDiagnosisSender);
 
         NetworkDiagnosis.getInstance().setNetworkDiagnosis(this);
     }
@@ -123,9 +138,9 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
-        Diagnosis.init(
+        diagnosis.init(
             networkDiagnosisCredentials.secretKey,
-            Utdid.getInstance().getUtdid(context),
+            utdid.getUtdid(context),
             networkDiagnosisCredentials.siteId,
             networkDiagnosisCredentials.extension
         );
@@ -156,8 +171,10 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         }
 
         // set instanceId to network diagnosis credentials that will be used in sender.provideLogstoreName() method.
-        if (null != credentials.networkDiagnosisCredentials && !TextUtils.isEmpty(credentials.networkDiagnosisCredentials.secretKey)) {
-            credentials.networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(credentials.networkDiagnosisCredentials.secretKey);
+        if (null != credentials.networkDiagnosisCredentials && !TextUtils.isEmpty(
+            credentials.networkDiagnosisCredentials.secretKey)) {
+            credentials.networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(
+                credentials.networkDiagnosisCredentials.secretKey);
         }
 
         networkDiagnosisSender.setCredentials(credentials);
@@ -169,12 +186,12 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
-        Diagnosis.setPolicyDomain(domain);
+        diagnosis.setPolicyDomain(domain);
     }
 
     @Override
     public void disableExNetworkInfo() {
-        Diagnosis.disableExNetworkInfo();
+        diagnosis.disableExNetworkInfo();
     }
 
     @Override
@@ -205,12 +222,12 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         }
 
         final Map<String, String> extensionCopy = new HashMap<>(extension);
-        Diagnosis.updateExtension(extensionCopy);
+        diagnosis.updateExtension(extensionCopy);
     }
 
     @Override
     public void registerHttpCredentialCallback(HttpCredentialCallback callback) {
-        Diagnosis.registerHttpCredentialCallback((url, context) -> {
+        diagnosis.registerHttpCredentialCallback((url, context) -> {
             if (null != callback) {
                 HttpCredential credential = callback.getCredential(url, context);
                 if (null != credential) {
@@ -303,7 +320,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != request.extension) {
             config.setDetectExtension(new HashMap<>(request.extension));
         }
-        Diagnosis.startHttpPing(config);
+        diagnosis.startHttpPing(config);
     }
     // endregion
 
@@ -379,7 +396,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != pingRequest.extension) {
             config.setDetectExtension(new HashMap<>(pingRequest.extension));
         }
-        Diagnosis.startPing(config);
+        diagnosis.startPing(config);
     }
     // endregion
 
@@ -443,7 +460,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != request.extension) {
             config.setDetectExtension(new HashMap<>(request.extension));
         }
-        Diagnosis.startTcpPing(config);
+        diagnosis.startTcpPing(config);
     }
 
     // endregion
@@ -524,7 +541,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != request.extension) {
             config.setDetectExtension(new HashMap<>(request.extension));
         }
-        Diagnosis.startMtr(config);
+        diagnosis.startMtr(config);
     }
     // endregion
 
@@ -597,18 +614,31 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != dnsRequest.extension) {
             config.setDetectExtension(new HashMap<>(dnsRequest.extension));
         }
-        Diagnosis.startDns(config);
+        diagnosis.startDns(config);
     }
     // endregion
 
-    private static class NetworkDiagnosisSender extends SdkSender implements Logger, ISpanProcessor {
+    @VisibleForTesting
+    public static class NetworkDiagnosisSender extends SdkSender implements Logger, ISpanProcessor {
 
-        private final SdkFeature feature;
+        private NetworkDiagnosisFeature feature;
         private INetworkDiagnosis.Callback2 callback;
+        private NetworkDiagnosisHttpHeaderInjector httpHeaderInjector;
 
-        public NetworkDiagnosisSender(Context context, SdkFeature feature) {
+        @VisibleForTesting
+        public NetworkDiagnosisSender(Context context) {
+            super(context);
+        }
+
+        public NetworkDiagnosisSender(Context context, NetworkDiagnosisFeature feature) {
             super(context);
             TAG = "NetworkDiagnosisSender";
+            this.httpHeaderInjector = new NetworkDiagnosisHttpHeaderInjector(feature);
+            this.feature = feature;
+        }
+
+        @VisibleForTesting
+        public void setFeature(NetworkDiagnosisFeature feature) {
             this.feature = feature;
         }
 
@@ -649,7 +679,8 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         @Override
         protected String provideLogstoreName(Credentials credentials) {
             // instanceId must not be null or empty
-            if (null == credentials.networkDiagnosisCredentials || TextUtils.isEmpty(credentials.networkDiagnosisCredentials.instanceId)) {
+            if (null == credentials.networkDiagnosisCredentials || TextUtils.isEmpty(
+                credentials.networkDiagnosisCredentials.instanceId)) {
                 return null;
             }
 
@@ -689,20 +720,14 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         @Override
         protected void provideLogProducerConfig(LogProducerConfig config) {
             super.provideLogProducerConfig(config);
-            config.setHttpHeaderInjector(new LogProducerHttpHeaderInjector() {
-                @Override
-                public String[] injectHeaders(String[] srcHeaders, int count) {
-                    return HttpHeader.getHeadersWithUA(srcHeaders,
-                        String.format("%s/%s", feature.name(), feature.version()));
-                }
-            });
+            config.setHttpHeaderInjector(httpHeaderInjector);
         }
 
-        @Override
-        public void report(Object context, String msg) {
+        @VisibleForTesting
+        public SpanBuilder createSpanBuilder(String msg, NetworkDiagnosisFeature feature) {
             if (TextUtils.isEmpty(msg)) {
                 SLSLog.w(TAG, "msg is empty.");
-                return;
+                return null;
             }
 
             JSONObject object;
@@ -710,13 +735,13 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 object = new JSONObject(msg);
             } catch (JSONException e) {
                 SLSLog.w(TAG, "msg to json error. e: " + e.getMessage());
-                return;
+                return null;
             }
 
             final String method = object.optString("method");
             if (TextUtils.isEmpty(method)) {
                 SLSLog.w(TAG, "method is empty.");
-                return;
+                return null;
             }
 
             SLSLog.v(TAG, "network diagnosis result: method=" + method + ", result: " + msg);
@@ -729,11 +754,37 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                     Pair.create("net.origin", msg)
                 )
             );
+            return builder;
+        }
+
+        @VisibleForTesting
+        public void handleCallback(Callback2 callback, Object context, String msg) {
+            if (null == callback) {
+                return;
+            }
+
+            String method;
+            try {
+                JSONObject object = new JSONObject(msg);
+                method = object.optString("method");
+            } catch (JSONException e) {
+                SLSLog.w(TAG, "msg to json error. e: " + e.getMessage());
+                return;
+            }
+
+            callback.onComplete(Response.response(context, Type.of(method), msg));
+        }
+
+        @Override
+        public void report(Object context, String msg) {
+            final SpanBuilder builder = createSpanBuilder(msg, feature);
+            if (null == builder) {
+                return;
+            }
+
             builder.build().end();
 
-            if (null != callback) {
-                callback.onComplete(Response.response(context, Type.of(method), msg));
-            }
+            handleCallback(callback, context, msg);
         }
 
         @Override
@@ -766,6 +817,23 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         synchronized String generate() {
             index += 1;
             return String.format("%s_%d", prefix, index);
+        }
+    }
+
+    @VisibleForTesting
+    public static class NetworkDiagnosisHttpHeaderInjector implements LogProducerHttpHeaderInjector {
+        private final NetworkDiagnosisFeature feature;
+
+        public NetworkDiagnosisHttpHeaderInjector(NetworkDiagnosisFeature feature) {
+            this.feature = feature;
+        }
+
+        @Override
+        public String[] injectHeaders(String[] srcHeaders, int count) {
+            return HttpHeader.getHeadersWithUA(
+                srcHeaders,
+                String.format("%s/%s", feature.name(), feature.version())
+            );
         }
     }
 }
