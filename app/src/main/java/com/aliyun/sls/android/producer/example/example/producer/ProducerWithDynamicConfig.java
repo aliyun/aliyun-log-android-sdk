@@ -1,19 +1,18 @@
 package com.aliyun.sls.android.producer.example.example.producer;
 
+import java.io.File;
+
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
-
 import androidx.annotation.Nullable;
-
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.BaseActivity;
-import com.aliyun.sls.android.producer.example.R;
-
-import java.io.File;
+import com.aliyun.sls.android.producer.R;
 
 /**
  * 动态配置
@@ -25,7 +24,6 @@ public class ProducerWithDynamicConfig extends BaseActivity {
 
     private LogProducerConfig config = null;
     private LogProducerClient client = null;
-    private int index = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,8 +79,6 @@ public class ProducerWithDynamicConfig extends BaseActivity {
             // 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败
             // 默认为64 * 1024 * 1024
             config.setMaxBufferLimit(64 * 1024 * 1024);
-            // 发送线程数，默认为1
-            config.setSendThreadCount(1);
 
             //网络连接超时时间，整数，单位秒，默认为10
             config.setConnectTimeoutSec(10);
@@ -147,16 +143,14 @@ public class ProducerWithDynamicConfig extends BaseActivity {
                     android.util.Log.e(TAG, String.format("resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", resultCode, reqId, errorMessage, logBytes, compressedBytes));
                     printStatus(String.format("send log resultCode: %s, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
 
-
-                    if (LogProducerResult.fromInt(resultCode) == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
-                        updateConfig();
+                    LogProducerResult logProducerResult = LogProducerResult.fromInt(resultCode);
+                    if (logProducerResult == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
+                        // LogProducerClient 初始化参数不正确。
+                        // 需要检查endpoint、project、logstore、accessKeyId、accessKeySecret、accessKeyToken是否无效
+                        // errorMessage 也会有对应的说明:
+                        // Invalid producer config destination params，表示：endpoint、project、logstore的配置可能有问题
+                        // Invalid producer config authority params，表示：accessKeyId、accessKeySecret、accessKeyToken的配置可能有问题
                     }
-
-                    if (index % 9 == 0 && LogProducerResult.fromInt(resultCode) == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
-                        updateAK();
-                    }
-
-                    index += 1;
                 }
             };
             // 需要关注日志的发送成功或失败状态时, 第二个参数需要传入一个 callbak
@@ -182,8 +176,12 @@ public class ProducerWithDynamicConfig extends BaseActivity {
         final String accessKeySecret = this.accessKeySecret;
         final String accessKeyToken = this.accessKeyToken;
 
-        config.setAccessKeyId(accessKeyId);
-        config.setAccessKeySecret(accessKeySecret);
+        if (TextUtils.isEmpty(accessKeyToken)) {
+            config.setAccessKeyId(accessKeyId);
+            config.setAccessKeySecret(accessKeySecret);
+        } else {
+            config.resetSecurityToken(accessKeyId, accessKeySecret, accessKeyToken);
+        }
     }
 
     private void reset() {
@@ -202,20 +200,6 @@ public class ProducerWithDynamicConfig extends BaseActivity {
     }
 
     private com.aliyun.sls.android.producer.Log oneLog() {
-        com.aliyun.sls.android.producer.Log log = new com.aliyun.sls.android.producer.Log();
-        log.putContent("content_key_1", "1abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_2", "2abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_3", "3abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_4", "4abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_5", "5abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_6", "6abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_7", "7abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_8", "8abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_9", "9abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("random", String.valueOf(Math.random()));
-        log.putContent("content", "中文️");
-        log.putContent(null, "null");
-        log.putContent("null", null);
-        return log;
+        return LogUtils.createLog();
     }
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.aliyun.sls.android.network_diagnosis">
+
+    <permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <permission android:name="android.permission.WRITE_SETTINGS"/>
+
+</manifest>

@@ -113,7 +113,8 @@ config.setPacketTimeout(3000);
 // 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败
 // 默认为64 * 1024 * 1024
 config.setMaxBufferLimit(64*1024*1024);
-// 发送线程数，默认为1
+// 发送线程数，默认为1，不建议修改此配置
+// 开启断点续传功能后，sendThreadCount强制为1
 config.setSendThreadCount(1);
 
 // 1 开启断点续传功能， 0 关闭
@@ -153,8 +154,8 @@ config.setLogstore(logstore);
 | setPacketLogBytes         | 每个缓存的日志包的大小上限                                                          | 整数，取值为1~5242880，单位为字节。默认为1024 * 1024                    |
 | setPacketLogCount         | 每个缓存的日志包中包含日志数量的最大值                                                | 整数，取值为1~4096，默认为1024                                        |
 | setPacketTimeout          | 被缓存日志的发送超时时间，如果缓存超时，则会被立即发送                                  | 整数，单位为毫秒，默认为3000                                           |
-| setMaxBufferLimit         | 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败         | 整数，默认为1                                                        |
-| setSendThreadCount        | 发送线程数                                                                        | 整数，64 * 1024 * 1024                                              |
+| setMaxBufferLimit         | 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败         | 整数，64 * 1024 * 1024                                              |
+| setSendThreadCount        | 发送线程数                                                                        | 整数，默认为1                                                        |
 | setPersistent             | 每次发送前会把日志保存到本地的binlog文件，只有发送成功才会删除，保证日志上传At Least Once  | 整数，1 开启断点续传功能， 0 关闭                                      |
 | setPersistentFilePath     | 持久化的文件名，需要保证文件所在的文件夹已创建。配置多个客户端时，不应设置相同文件           | 字符串，默认为空                                                     |
 | setPersistentForceFlush   | 是否每次AddLog强制刷新，高可靠性场景建议打开                                           | 整数，默认为0                                                       |

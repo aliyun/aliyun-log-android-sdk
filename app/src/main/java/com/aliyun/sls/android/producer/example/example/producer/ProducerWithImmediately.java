@@ -1,19 +1,17 @@
 package com.aliyun.sls.android.producer.example.example.producer;
 
+import java.io.File;
+
 import android.os.Bundle;
 import android.view.View;
-
 import androidx.annotation.Nullable;
-
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.BaseActivity;
-import com.aliyun.sls.android.producer.example.R;
-
-import java.io.File;
+import com.aliyun.sls.android.producer.R;
 
 /**
  * 立即发送。不推荐使用。使用该功能会导致每条日志都会单独发送
@@ -64,8 +62,6 @@ public class ProducerWithImmediately extends BaseActivity {
             // 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败
             // 默认为64 * 1024 * 1024
             config.setMaxBufferLimit(64 * 1024 * 1024);
-            // 发送线程数，默认为1
-            config.setSendThreadCount(10);
 
             //网络连接超时时间，整数，单位秒，默认为10
             config.setConnectTimeoutSec(10);
@@ -148,20 +144,6 @@ public class ProducerWithImmediately extends BaseActivity {
     }
 
     private com.aliyun.sls.android.producer.Log oneLog() {
-        com.aliyun.sls.android.producer.Log log = new com.aliyun.sls.android.producer.Log();
-        log.putContent("content_key_1", "1abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_2", "2abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_3", "3abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_4", "4abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_5", "5abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_6", "6abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_7", "7abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_8", "8abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_9", "9abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("random", String.valueOf(Math.random()));
-        log.putContent("content", "中文️");
-        log.putContent(null, "null");
-        log.putContent("null", null);
-        return log;
+        return LogUtils.createLog();
     }
 }

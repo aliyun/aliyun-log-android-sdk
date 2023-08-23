@@ -2,17 +2,32 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.0"
+    buildToolsVersion "29.0.3"
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "bricks_1.0.5"
+        versionName "2.7.0"
+
+        buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
+
+        ndk {
+            // Specifies the ABI configurations of your native
+            // libraries Gradle should build and package with your app.
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner "com.anarsoft.vmlens.concurrent.junit.ConcurrentTestRunner"
     }
     buildTypes {
         release {
+            testCoverageEnabled = false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled = false
         }
     }
     externalNativeBuild {
@@ -20,12 +35,30 @@ android {
             path file('src/main/cpp/Android.mk')
         }
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
     productFlavors {
+    }
+    ndkVersion "16.1.4479499" // e.g.,  ndkVersion "21.3.6528147"
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
     }
 }
 
 dependencies {
+    testImplementation project(':testable')
+    testImplementation project(':aliyun_sls_android_producer')
+
+//    androidTestImplementation 'org.mockito:mockito-core:4.7.0'
+//    androidTestImplementation 'com.vmlens:concurrent-junit:1.0.2'
+//    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.annotation:annotation:1.6.0'
 }
 
 ext {
@@ -33,6 +66,8 @@ ext {
     moduleName = 'aliyun-log-android-sdk'
 }
 
-//====以下是将android library上传到jcenter的脚本
-//apply from: "mavenCentralUpload.gradle"
+//==== 以下是将android library上传到maven central的脚本
 apply from: "${project.rootProject.file('maven-publish.gradle')}"
+
+//==== jacoco coverage reporter for module
+apply from: "${project.rootProject.file('jacoco/modules.gradle')}"

@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdkVersion 31
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 31
+        versionCode 1
+        versionName "1.0.0"
+
+        buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    testImplementation(project(':testable'))
+    testImplementation(project(":aliyun_sls_android_unity_plugin"))
+
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation project(':aliyun_sls_android_producer')
+    implementation project(':aliyun_sls_android_core')
+    implementation project(':aliyun_sls_android_ot')
+    implementation project(':aliyun_sls_android_crashreporter')
+    implementation project(':aliyun_sls_android_network_diagnosis')
+}
+
+//====jacoco coverage reporter
+//apply from: "${project.rootProject.file('jacoco.gradle')}"
+apply from: "${project.rootProject.file('jacoco/modules.gradle')}"

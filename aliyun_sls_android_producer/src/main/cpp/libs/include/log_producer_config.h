@@ -11,6 +11,11 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "log_multi_thread.h"
+
+// change from 100ms to 1000s, reduce wake up when app switch to back
+#define LOG_PRODUCER_FLUSH_INTERVAL_MS 1000
+#define LOG_PRODUCER_QUEUE_POP_INTERVAL_MS 1000
+
 LOG_CPP_START
 
 
@@ -41,6 +46,8 @@ typedef struct _log_producer_config
     int32_t logCountPerPackage;
     int32_t logBytesPerPackage;
     int32_t maxBufferBytes;
+    int32_t flushIntervalInMS;
+    int32_t logQueuePopIntervalInMS;
 
     char * netInterface;
     int32_t connectTimeoutSec;
@@ -48,7 +55,7 @@ typedef struct _log_producer_config
     int32_t destroyFlusherWaitTimeoutSec;
     int32_t destroySenderWaitTimeoutSec;
 
-    int32_t compressType; // 0 no compress, 1 lz4
+    int32_t compressType; // 0 no compress, 1 lz4, 2 zstd
     int32_t ntpTimeOffset;
     int using_https; // 0 http, 1 https
 
@@ -67,6 +74,8 @@ typedef struct _log_producer_config
 
     int32_t dropUnauthorizedLog; // 1 true, 0 false, default 0
     int32_t callbackFromSenderThread; // 1 true, 0 false, default 1int32_t callbackFromSenderThread;
+
+    void *user_params; // user params pass to c
 
 }log_producer_config;
 
@@ -187,6 +196,22 @@ LOG_EXPORT void log_producer_config_set_packet_log_bytes(log_producer_config * c
 LOG_EXPORT void log_producer_config_set_max_buffer_limit(log_producer_config * config, int64_t max_buffer_bytes);
 
 /**
+ * set flush interval time in ms.
+ * @note interval time should > 30ms.
+ * @param config
+ * @param flush_interval_in_ms
+ */
+LOG_EXPORT void log_producer_config_set_flush_interval(log_producer_config * config, int32_t flush_interval_in_ms);
+
+/**
+ * set log queue pop interval time in ms.
+ * @note interval time should > 30ms.
+ * @param config
+ * @param log_queue_in_ms
+ */
+LOG_EXPORT void log_producer_config_set_log_queue_interval(log_producer_config * config, int32_t log_queue_in_ms);
+
+/**
  * set send thread count, default is 0.
  * @note if thread count is 0, flusher thread is in the charge of send logs.
  * @note if thread count > 1, then producer will create $(thread_count) threads to send logs.
@@ -233,7 +258,7 @@ LOG_EXPORT void log_producer_config_set_destroy_sender_wait_sec(log_producer_con
 /**
  * set compress type, default 1 (lz4)
  * @param config
- * @param compress_type only support 1 or 0. 1 -> lz4, 0 -> no compress
+ * @param compress_type only support 2 or 1 or 0. 2 -> zstd, 1 -> lz4, 0 -> no compress
  */
 LOG_EXPORT void log_producer_config_set_compress_type(log_producer_config * config, int32_t compress_type);
 
@@ -315,6 +340,8 @@ LOG_EXPORT void log_producer_config_set_drop_unauthorized_log(log_producer_confi
  * @param callback_from_sender_thread
  */
 LOG_EXPORT void log_producer_config_set_callback_from_sender_thread(log_producer_config * config, int32_t callback_from_sender_thread);
+
+LOG_EXPORT void log_producer_config_set_shardkey(log_producer_config *config, const char *shardKey);
 
 /**
  * destroy config, this will free all memory allocated by this config

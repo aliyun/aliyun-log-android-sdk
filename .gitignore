@@ -88,3 +88,8 @@ lint/tmp/
 *.hprof
 /aliyun_sls_android_producer/.externalNativeBuild/ndkBuild/
 /.idea/
+
+#scan
+scan.py
+diff_*
+push_scan.py

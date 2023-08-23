@@ -1,28 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
-
-    <TableLayout
+    android:padding="12dp"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:stretchColumns="0,1,2"
         android:layout_height="wrap_content">
-        <TableRow>
-            <Button android:text="基本配置" android:padding="8dp" android:id="@+id/main_producer_basic"/>
-            <Button android:text="不带缓存" android:padding="8dp" android:id="@+id/main_producer_persistent"/>
-            <Button android:text="动态配置" android:padding="8dp" android:id="@+id/main_producer_dynamic_config"/>
-        </TableRow>
-        <TableRow>
-            <Button android:text="多Clients" android:padding="8dp" android:id="@+id/main_producer_multi_clients"/>
-            <Button android:text="立即发送" android:padding="8dp" android:id="@+id/main_producer_immediately"/>
-        </TableRow>
 
-        <TableRow android:layout_marginTop="24dp">
-            <Button android:text="崩溃监控" android:padding="8dp" android:id="@+id/main_apm_crash"/>
-        </TableRow>
+        <TableLayout
+            android:layout_width="match_parent"
+            android:stretchColumns="0,1,2"
+            android:layout_height="wrap_content">
+            <TextView android:text="SDK配置"/>
+            <TableRow>
+                <Button android:text="基本配置" android:padding="8dp" android:id="@+id/main_producer_basic"/>
+                <Button android:text="不带缓存" android:padding="8dp" android:id="@+id/main_producer_persistent"/>
+                <Button android:text="动态配置" android:padding="8dp" android:id="@+id/main_producer_dynamic_config"/>
+            </TableRow>
+            <TableRow>
+                <Button android:text="多实例" android:padding="8dp" android:id="@+id/main_producer_multi_clients"/>
+                <Button android:text="立即发送" android:padding="8dp" android:id="@+id/main_producer_immediately"/>
+                <Button android:text="销毁实例" android:padding="8dp" android:id="@+id/main_producer_destroy"/>
+            </TableRow>
 
-    </TableLayout>
+            <TextView android:text="监控分析" android:layout_marginTop="24dp"/>
+            <TableRow >
+                <Button android:text="崩溃监控" android:padding="8dp" android:id="@+id/main_apm_crash"/>
+                <Button android:text="网络分析" android:padding="8dp" android:id="@+id/main_network_diagnosis"/>
+            </TableRow>
 
-</LinearLayout>
+            <TextView android:text="Trace示例" android:layout_marginTop="24dp"/>
+            <TableRow >
+                <Button android:text="袜子商店" android:padding="8dp" android:id="@+id/main_trace" android:textAllCaps="false"/>
+                <Button android:text="Demo" android:padding="8dp" android:id="@+id/main_trace_demo" android:textAllCaps="false"/>
+                <Button android:text="Kotlin Demo" android:padding="8dp" android:id="@+id/main_kotlin_trace" android:textAllCaps="false"/>
+            </TableRow>
+
+            <TextView android:text="instrumentation" android:layout_marginTop="12dp" />
+            <TableRow>
+                <Button android:text="WebView" android:id="@+id/main_webview" android:textAllCaps="false"/>
+            </TableRow>
+
+            <TextView android:text="benchmark" android:layout_marginTop="12dp" />
+            <TableRow>
+                <Button android:text="Benchmark" android:id="@+id/main_benchmark" android:textAllCaps="false"/>
+            </TableRow>
+        </TableLayout>
+
+    </LinearLayout>
+</ScrollView>

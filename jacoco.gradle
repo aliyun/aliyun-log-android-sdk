@@ -1,0 +1,53 @@
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+}
+
+def androidExclusion = [
+        '**/databinding/**/*.*',
+        '**/android/databinding/*Binding.*',
+        '**/BR.*',
+        '**/R.*',
+        '**/R$*.*',
+        '**/BuildConfig.*',
+        '**/Manifest*.*',
+        '**/*_MembersInjector.*',
+        '**/Dagger*Component.*',
+        '**/Dagger*Component$Builder.*',
+        '**/*Module_*Factory.*',
+        '**/*Fragment*.*',
+        '**/*Activity*.*',
+        '**/*Adapter*.*',
+        '**/*ViewPager*.*',
+        '**/*ViewHolder*.*',
+        '**/*Module*.*'
+]
+
+task jacocoTestReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    getClassDirectories().setFrom(fileTree(
+            dir: "${buildDir}/intermediates/javac/debug/classes/",
+            excludes: androidExclusion
+    ))
+
+    println("debug -- buildDir: ${buildDir}")
+    println("debug -- project.projectDir: ${project.projectDir}")
+
+    getSourceDirectories().setFrom(files((project.projectDir).toString() + "/src"))
+    getExecutionData().setFrom(files("$buildDir/jacoco/testDebugUnitTest.exec"))
+}
+//task getCoverage(type: Exec, dependsOn: 'jacocoTestReport') {
+//    group = "Reporting"
+//    commandLine "open", "$buildDir/reports/jacoco/codeCoverageReport/html/index.html"
+//}

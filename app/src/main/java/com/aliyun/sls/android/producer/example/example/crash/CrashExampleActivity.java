@@ -1,27 +1,28 @@
 package com.aliyun.sls.android.producer.example.example.crash;
 
+import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.aliyun.sls.android.SLSAdapter;
-import com.aliyun.sls.android.SLSConfig;
-import com.aliyun.sls.android.plugin.crashreporter.SLSCrashReporterPlugin;
+import com.aliyun.sls.android.blockdetection.BlockDetection;
+import com.aliyun.sls.android.core.SLSAndroid;
+import com.aliyun.sls.android.core.configuration.Credentials;
+import com.aliyun.sls.android.crashreporter.CrashReporter;
+import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
+import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
-import com.aliyun.sls.android.producer.example.R;
-import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
-import com.uc.crashsdk.JNIBridge;
-
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import com.aliyun.sls.android.producer.R;
+import com.aliyun.sls.android.producer.utils.ThreadUtils;
 
 /**
  * @author gordon
@@ -41,20 +42,6 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        SLSConfig config = new SLSConfig(this);
-        config.endpoint = this.endpoint;
-        config.pluginLogproject = this.logProject;
-        config.pluginAppId = this.pluginAppId;
-        config.debuggable = true;
-        config.accessKeyId = PreferenceUtils.getAccessKeyId(this);
-        config.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
-        config.securityToken = PreferenceUtils.getAccessKeyToken(this);
-
-        SLSAdapter adapter = SLSAdapter.getInstance();
-        adapter.addPlugin(new SLSCrashReporterPlugin());
-        adapter.init(config);
-
         setContentView(R.layout.activity_crash_example);
 
         // register onClick() event
@@ -63,7 +50,8 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 R.id.java_class_cast, R.id.java_number_format, R.id.java_out_of_bounds,
                 R.id.native_crash, R.id.native_heap_corruption, R.id.native_fd_leak,
                 R.id.native_abort, R.id.native_stack_overflow, R.id.native_oom,
-                R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr,
+                R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr, R.id.custom_log,
+                R.id.jank, R.id.switchFeature, R.id.switchBlockFeature, R.id.dynamic_update
         };
         for (int btnId : btnIds) {
             findViewById(btnId).setOnClickListener(this);
@@ -73,13 +61,13 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void onClick(View view) {
-        doCrash(view.getId());
+        doCrash(view, view.getId());
     }
 
-    public void doCrash(int id) {
+    public void doCrash(View view, int id) {
         switch (id) {
             case R.id.java_null_ptr:
-                crashInJavaNull();
+                ThreadUtils.exec(this::crashInJavaNull);
                 break;
 
             case R.id.java_oom:
@@ -144,6 +132,90 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                         e.printStackTrace();
                     }
                 }
+            case R.id.custom_log: {
+                try {
+                    String tst = null;
+                    tst.length();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+
+                    CrashReporter.reportError("custom", t);
+                }
+
+                //Credentials credentials = new Credentials();
+                //credentials.instanceId = "yuanbo-test-1111";
+                //credentials.accessKeyId = PreferenceUtils.getAccessKeyId(this);
+                //credentials.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
+                //credentials.securityToken = PreferenceUtils.getAccessKeyToken(this);
+                //SLSAndroid.setCredentials(credentials);
+                //
+                //UserInfo info = new UserInfo();
+                //info.uid = "11111111";
+                //info.channel = "beta";
+                //info.addExt("tt", "vv");
+                //SLSAndroid.setUserInfo(info);
+                //
+                //Map<String, String> params = new HashMap<>();
+                //params.put("position", "1");
+                //Map<String, String> params2 = new HashMap<>();
+                //params2.put("position", "2");
+                //CrashReporter.addCustomError("MyTest", params);
+                //CrashReporter.addCustomError("MyTest2", params2);
+                //getWindow().getDecorView().postDelayed(new Runnable() {
+                //    @Override
+                //    public void run() {
+                //        Map<String, String> params2 = new HashMap<>();
+                //        params2.put("position", "3");
+                //        CrashReporter.addCustomError("MyTest3", params2);
+                //    }
+                //}, 1000);
+                break;
+            }
+            case R.id.jank: {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+            case R.id.switchFeature: {
+                Boolean enable = (Boolean)view.getTag();
+                if (null == enable) {
+                    enable = true;
+                }
+
+                if (enable) {
+                    CrashReporter.setEnabled(false);
+                    view.setTag(false);
+                } else {
+                    CrashReporter.setEnabled(true);
+                    view.setTag(true);
+                }
+
+                break;
+            }
+            case R.id.switchBlockFeature: {
+                Boolean enable = (Boolean)view.getTag();
+                if (null == enable) {
+                    enable = true;
+                }
+
+                if (enable) {
+                    BlockDetection.setEnabled(false);
+                    view.setTag(false);
+                } else {
+                    BlockDetection.setEnabled(true);
+                    view.setTag(true);
+                }
+                break;
+            }
+            case R.id.dynamic_update: {
+                Credentials credentials = new Credentials();
+                credentials.instanceId = "ios-dev-ea64";
+                SLSAndroid.setCredentials(credentials);
+                break;
+            }
 
             default:
                 break;
@@ -163,7 +235,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void nativeCrash(int type) {
-        JNIBridge.nativeCrash(type, 0);
+        JNICrash.nativeCrash(type);
     }
 
     private void crashInJavaNull() {

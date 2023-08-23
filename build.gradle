@@ -1,27 +1,127 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    ext {
+        agp_version = "4.2.2"
+        kotlin_version = "1.8.0"
+    }
     repositories {
-        google()
-        jcenter()
-        mavenCentral()
+        // sonatype
+//        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+//        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
+//        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+
+        // aliyun maven
+        // mirror of google()
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        // mirror of central & jcenter
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        // mirror of gradlePluginPortal
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+
+        // internal alibaba maven
+        maven {
+            allowInsecureProtocol = true
+            url 'http://mvnrepo.alibaba-inc.com/mvn/repository'
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.2'
+        classpath "com.android.tools.build:gradle:${agp_version}"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
+//        classpath "io.github.gradle-nexus:publish-plugin:1.1.0"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
-allprojects {
+//apply plugin: 'io.github.gradle-nexus.publish-plugin'
+//apply plugin: 'signing'
+
+plugins {
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+}
+
+allprojects { project ->
     repositories {
-        google()
-        jcenter()
-        mavenCentral()
+        // sonatype
+//        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+//        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
+//        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+
+        // aliyun maven
+        // mirror of google()
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        // mirror of central & jcenter
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        // mirror of gradlePluginPortal
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+
+        // internal alibaba maven
+        maven { url 'http://mvnrepo.alibaba-inc.com/mvn/repository' }
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+HashMap getSonatypeUserAccount() {
+    HashMap accountMap = new HashMap()
+    def parsedSettingsXml
+    def settingsFile = "/home/admin/settings.xml"
+    def defaultSettingsFile = System.getProperty("user.home") + "/.m2/settings.xml"
+
+    println("============= getSonatypeUserAccount. settingsFile: ${settingsFile}, exists: ${file(settingsFile).exists()} ============= ")
+    println("============= getSonatypeUserAccount. defaultSettingsFile: ${defaultSettingsFile}, exists: ${file(defaultSettingsFile).exists()} ============= ")
+
+    if (file(settingsFile).exists() || file(defaultSettingsFile).exists()) {
+        if (file(settingsFile).exists()) {
+            println("============= getSonatypeUserAccount. settingsFile exists ============= ")
+            parsedSettingsXml = (new XmlParser()).parse(settingsFile);
+        } else if (file(defaultSettingsFile).exists()) {
+            println("============= getSonatypeUserAccount. defaultSettingsFile exists ============= ")
+            parsedSettingsXml = (new XmlParser()).parse(defaultSettingsFile);
+        }
+
+        //noinspection GroovyVariableNotAssigned
+        parsedSettingsXml.servers[0].server.each { server ->
+            if ("releases" == server.id.text()) {
+                accountMap.put("id", server.id.text())
+                accountMap.put("username", server.username.text())
+                accountMap.put("password", server.password.text())
+            }
+        }
+    } else {
+        accountMap.put("id", "releases")
+        accountMap.put("username", "admin")
+        accountMap.put("password", "screct")
+    }
+
+    println("============= getSonatypeUserAccount. username: ${accountMap.get("username")}, pswd: ${accountMap.get("password")} ============= ")
+
+    return accountMap
+
 }
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/") //注意地址
+            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
+            packageGroup = "io.github.aliyun-sls" //groupId，必填
+
+            def accountMap = getSonatypeUserAccount();
+            username = accountMap.get("username")
+            password = accountMap.get("password")
+        }
+    }
+
+//    useStaging.set(provider {
+//        project.nexusPublishing
+//        def release = publishing.publications.mavenPublication
+//        release.version.endsWith("-SNAPSHOT")
+
+
+//        val release: MavenPublication by publishing.publications
+//        release.version.endsWith("-SNAPSHOT")
+//    })
+}
+
+apply from: 'jacoco/project.gradle'

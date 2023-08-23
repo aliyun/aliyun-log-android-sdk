@@ -1,19 +1,18 @@
 package com.aliyun.sls.android.producer.example.example.producer;
 
+import java.io.File;
+
 import android.os.Bundle;
 import android.view.View;
-
 import androidx.annotation.Nullable;
-
 import com.aliyun.sls.android.producer.LogProducerCallback;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
+import com.aliyun.sls.android.producer.LogProducerConfig.CompressType;
 import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.BaseActivity;
-import com.aliyun.sls.android.producer.example.R;
-
-import java.io.File;
+import com.aliyun.sls.android.producer.R;
 
 /**
  * 推荐配置
@@ -64,8 +63,6 @@ public class ProducerExample extends BaseActivity {
             // 单个Producer Client实例可以使用的内存的上限，超出缓存时add_log接口会立即返回失败
             // 默认为64 * 1024 * 1024
             config.setMaxBufferLimit(64 * 1024 * 1024);
-            // 发送线程数，默认为1
-            config.setSendThreadCount(1);
 
             //网络连接超时时间，整数，单位秒，默认为10
             config.setConnectTimeoutSec(10);
@@ -114,6 +111,7 @@ public class ProducerExample extends BaseActivity {
             config.setPersistentMaxFileSize(1024 * 1024);
             // 本地最多缓存的日志数，不建议超过1M，通常设置为65536即可
             config.setPersistentMaxLogCount(65536);
+            config.logProducerDebug();
 
             /**
              * 以下为通过 LogProducerConfig 构造一个 LogProducerClient 实例
@@ -129,6 +127,11 @@ public class ProducerExample extends BaseActivity {
                     // compressedBytes: 日志压缩字节数
                     android.util.Log.e(TAG, String.format("resultCode: %d, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", resultCode, reqId, errorMessage, logBytes, compressedBytes));
                     printStatus(String.format("send log resultCode: %s, reqId: %s, errorMessage: %s, logBytes: %d, compressedBytes: %d", LogProducerResult.fromInt(resultCode), reqId, errorMessage, logBytes, compressedBytes));
+
+                    final LogProducerResult result = LogProducerResult.fromInt(resultCode);
+                    if (LogProducerResult.LOG_PRODUCER_SEND_UNAUTHORIZED == result || LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID == result) {
+                        // 需要更新 AK 或者 SDK 的初始化参数
+                    }
                 }
             };
             // 需要关注日志的发送成功或失败状态时, 第二个参数需要传入一个 callbak
@@ -145,20 +148,6 @@ public class ProducerExample extends BaseActivity {
     }
 
     private com.aliyun.sls.android.producer.Log oneLog() {
-        com.aliyun.sls.android.producer.Log log = new com.aliyun.sls.android.producer.Log();
-        log.putContent("content_key_1", "1abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_2", "2abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_3", "3abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_4", "4abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_5", "5abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_6", "6abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_7", "7abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_8", "8abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("content_key_9", "9abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+");
-        log.putContent("random", String.valueOf(Math.random()));
-        log.putContent("content", "中文️");
-        log.putContent(null, "null");
-        log.putContent("null", null);
-        return log;
+        return LogUtils.createLog();
     }
 }
