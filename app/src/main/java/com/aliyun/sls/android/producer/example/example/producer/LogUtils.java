@@ -9,8 +9,8 @@ import org.json.JSONObject;
  * @author gordon
  * @date 2022/6/27
  */
-class LogUtils {
-    static Log createLog() {
+public class LogUtils {
+    public static Log createLog() {
         Log log = new Log();
         // multi-type input content
         log.putContent("1int", 11);

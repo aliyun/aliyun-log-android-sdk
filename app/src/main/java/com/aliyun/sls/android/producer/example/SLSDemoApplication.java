@@ -57,6 +57,10 @@ public class SLSDemoApplication extends MultiDexApplication {
             PreferenceUtils.overrideConfig(this);
         }
 
+        //if (true) {
+        //    return;
+        //}
+
         initOTel();
 
         Credentials credentials = new Credentials();

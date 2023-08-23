@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:stretchColumns="0,1,2">
+
+    <TextView android:text="仅内存写" android:layout_marginBottom="6dp" tools:ignore="HardcodedText" />
+    <TableRow>
+        <Button android:id="@+id/benchmark_mem_write_1" android:text="1条/s" tools:ignore="ButtonStyle,HardcodedText" />
+        <Button android:id="@+id/benchmark_mem_write_10" android:text="10条/s" tools:ignore="ButtonStyle,HardcodedText" />
+    </TableRow>
+    <TableRow>
+        <Button android:id="@+id/benchmark_mem_write_50" android:text="50条/s" tools:ignore="ButtonStyle,HardcodedText" />
+        <Button android:id="@+id/benchmark_mem_write_100" android:text="100条/s" tools:ignore="ButtonStyle,HardcodedText" />
+    </TableRow>
+    <TableRow>
+        <Button android:id="@+id/benchmark_mem_write_200" android:text="200条/s" tools:ignore="ButtonStyle,HardcodedText" />
+    </TableRow>
+
+    <TextView android:layout_marginTop="24dp" android:text="文件写" android:layout_marginBottom="6dp" tools:ignore="HardcodedText" />
+    <TableRow>
+        <Button android:id="@+id/benchmark_file_write_1" android:text="1条/s" tools:ignore="ButtonStyle,HardcodedText" />
+        <Button android:id="@+id/benchmark_file_write_10" android:text="10条/s" tools:ignore="ButtonStyle,HardcodedText" />
+    </TableRow>
+    <TableRow>
+        <Button android:id="@+id/benchmark_file_write_50" android:text="50条/s" tools:ignore="ButtonStyle,HardcodedText" />
+        <Button android:id="@+id/benchmark_file_write_100" android:text="100条/s" tools:ignore="ButtonStyle,HardcodedText" />
+    </TableRow>
+    <TableRow>
+        <Button android:id="@+id/benchmark_file_write_200" android:text="200条/s" tools:ignore="ButtonStyle,HardcodedText" />
+    </TableRow>
+
+
+</TableLayout>

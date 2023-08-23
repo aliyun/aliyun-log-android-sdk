@@ -36,7 +36,6 @@
         <activity android:name=".example.example.producer.ProducerWithDynamicConfig" />
         <activity android:name=".example.example.producer.ProducerWithMultiClients" />
         <activity android:name=".example.example.producer.ProducerWithDestroy" />
-        <activity android:name=".example.example.producer.ProducerWebTracking" />
 
         <activity android:name=".example.example.crash.CrashExampleActivity" />
         <activity android:name=".example.example.network.NetworkExample" />
@@ -48,6 +47,9 @@
 
         <!-- instrumentation -->
         <activity android:name=".example.example.instrumentation.WebViewInstrumentationActivity" />
+
+        <!--  benchmark  -->
+        <activity android:name=".example.example.benchmark.BenchmarkActivity"/>
     </application>
 
 </manifest>
