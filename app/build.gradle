@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-android'
-apply plugin: 'com.aliyun.sls.android'
+apply plugin: 'io.github.aliyun-sls'
 
 //apply plugin: 'kotlin-android-extensions'
 
