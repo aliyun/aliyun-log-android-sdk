@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
 import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation;
-import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation.WebViewInstrumentationConfiguration;
+import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentationConfiguration;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;

@@ -50,11 +50,6 @@ public class WebViewInstrumentation {
         webView.addJavascriptInterface(new OTelJSI(this.requestInstrumentation), "otelJsi");
     }
 
-    public void test() {
-        //TransformerHelper.init(webView);
-        webView.loadUrl(url);
-    }
-
     public IWebRequestInstrumentation getRequestInstrumentation() {
         return requestInstrumentation;
     }
@@ -67,49 +62,4 @@ public class WebViewInstrumentation {
         return this.userAgent;
     }
 
-    public static class WebViewInstrumentationConfiguration {
-
-        public final OpenTelemetry telemetry;
-
-        public WebViewInstrumentationConfiguration(OpenTelemetry telemetry) {
-            this.telemetry = telemetry;
-        }
-
-        public boolean shouldInstrument(WebResourceRequest request) {
-            return true;
-        }
-
-        public boolean shouldRecordPayload(WebRequestInfo requestInfo) {
-            return true;
-        }
-
-        public boolean shouldInjectTracingRequestHeaders(WebRequestInfo requestInfo) {
-            return true;
-        }
-
-        public String nameSpan(WebRequestInfo requestInfo) {
-            return null;
-        }
-
-        public void createdRequest(WebRequestInfo requestInfo, Span span) {
-
-        }
-
-        public boolean shouldInjectTracingResponseHeaders(WebRequestInfo requestInfo) {
-            return true;
-        }
-
-        public boolean shouldInjectTracingResponseBody(WebRequestInfo requestInfo) {
-            return true;
-        }
-
-        public void receivedResponse(WebRequestInfo requestInfo, Span span) {
-
-        }
-
-        public boolean debuggable() {
-            return true;
-        }
-
-    }
 }

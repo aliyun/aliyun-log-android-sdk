@@ -1,9 +1,9 @@
 package com.aliyun.sls.android.webview.instrumentation.helper;
 
 import android.webkit.WebView;
+import com.aliyun.sls.android.webview.instrumentation.GlobalWebViewInstrumentation;
 import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation;
-import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation.WebViewInstrumentationConfiguration;
-import io.opentelemetry.api.GlobalOpenTelemetry;
+import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentationConfiguration;
 
 /**
  * @author yulong.gyl
@@ -15,8 +15,7 @@ public class TransformerHelper {
     }
 
     public static void init(WebView webView) {
-        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(
-            GlobalOpenTelemetry.get());
+        WebViewInstrumentationConfiguration configuration = GlobalWebViewInstrumentation.getGlobalConfiguration();
         WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
         instrumentation.start();
     }
