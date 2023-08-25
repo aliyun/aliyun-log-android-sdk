@@ -3,7 +3,7 @@ package com.aliyun.sls.android.producer.example.example.trace.ui.category;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import com.aliyun.sls.android.producer.example.databinding.TraceItemCategoryLayoutBinding;
+import com.aliyun.sls.android.producer.databinding.TraceItemCategoryLayoutBinding;
 import com.aliyun.sls.android.producer.example.example.trace.http.ApiClient;
 import com.aliyun.sls.android.producer.example.example.trace.model.ItemModel;
 import com.aliyun.sls.android.producer.example.example.trace.ui.FragmentActivity;

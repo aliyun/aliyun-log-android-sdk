@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.webkit.WebView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.R;
 
 /**
  * @author yulong.gyl

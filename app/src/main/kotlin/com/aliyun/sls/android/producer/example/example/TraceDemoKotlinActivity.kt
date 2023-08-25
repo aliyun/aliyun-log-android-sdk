@@ -5,7 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.aliyun.sls.android.okhttp.OKHttp3Tracer
 import com.aliyun.sls.android.ot.*
-import com.aliyun.sls.android.producer.example.R
+import com.aliyun.sls.android.producer.R;
 import com.aliyun.sls.android.trace.Tracer
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient

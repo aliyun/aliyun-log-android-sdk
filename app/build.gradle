@@ -9,7 +9,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
     defaultConfig {
-        applicationId "com.aliyun.sls.android.producer.example"
+        applicationId "com.aliyun.sls.android.producer"
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
@@ -89,7 +89,7 @@ dependencies {
 //    implementation 'io.github.aliyun-sls:sls-android-core:1.0.8@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-ot:1.0.8.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-ot-ktx:1.0.1@aar'
-//    implementation 'io.github.aliyun-sls:sls-android-network-diagnosis:2.0.17@aar'
+//    implementation 'io.github.aliyun-sls:sls-android-network-diagnosis:2.1.0@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-crashreporter:2.0.6.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-blockdetection:1.0.3.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-trace:1.0.7@aar'

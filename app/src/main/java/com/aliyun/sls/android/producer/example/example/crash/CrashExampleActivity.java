@@ -21,7 +21,7 @@ import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
 import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
-import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.R;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
 
 /**

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.aliyun.sls.android.producer.example">
+    package="com.aliyun.sls.android.producer">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".SLSDemoApplication"
+        android:name=".example.SLSDemoApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -18,36 +18,38 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".example.trace.TraceActivity"
+            android:name=".example.example.trace.TraceActivity"
             android:exported="true"
             android:label="@string/title_activity_trace" />
-        <activity android:name=".example.trace.ui.FragmentActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".example.example.trace.ui.FragmentActivity" />
+        <activity android:name=".example.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".example.producer.ProducerExample" />
-        <activity android:name=".example.producer.ProducerWithImmediately" />
-        <activity android:name=".example.producer.ProducerWithNoPersistent" />
-        <activity android:name=".example.producer.ProducerWithDynamicConfig" />
-        <activity android:name=".example.producer.ProducerWithMultiClients" />
-        <activity android:name=".example.producer.ProducerWithDestroy" />
-        <activity android:name=".example.producer.ProducerWebTracking" />
+        <activity android:name=".example.SettingsActivity" />
+        <activity android:name=".example.example.producer.ProducerExample" />
+        <activity android:name=".example.example.producer.ProducerWithImmediately" />
+        <activity android:name=".example.example.producer.ProducerWithNoPersistent" />
+        <activity android:name=".example.example.producer.ProducerWithDynamicConfig" />
+        <activity android:name=".example.example.producer.ProducerWithMultiClients" />
+        <activity android:name=".example.example.producer.ProducerWithDestroy" />
 
-        <activity android:name=".example.crash.CrashExampleActivity" />
-        <activity android:name=".example.network.NetworkExample" />
-        <activity android:name=".example.network.NetworkWithPolicy" />
+        <activity android:name=".example.example.crash.CrashExampleActivity" />
+        <activity android:name=".example.example.network.NetworkExample" />
+        <activity android:name=".example.example.network.NetworkWithPolicy" />
 
-        <activity android:name=".example.TraceDemoActivity" />
+        <activity android:name=".example.example.TraceDemoActivity" />
 
-        <activity android:name=".example.TraceDemoKotlinActivity" />
+        <activity android:name=".example.example.TraceDemoKotlinActivity" />
 
         <!-- instrumentation -->
-        <activity android:name=".example.instrumentation.WebViewInstrumentationActivity" />
+        <activity android:name=".example.example.instrumentation.WebViewInstrumentationActivity" />
+
+        <!--  benchmark  -->
+        <activity android:name=".example.example.benchmark.BenchmarkActivity"/>
     </application>
 
 </manifest>

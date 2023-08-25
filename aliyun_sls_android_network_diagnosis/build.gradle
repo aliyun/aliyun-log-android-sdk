@@ -7,7 +7,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "2.0.17"
+        versionName "2.1.1"
 
         buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
         buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
@@ -36,6 +36,8 @@ android {
 dependencies {
     testImplementation(project(':testable'))
     testImplementation(project(":aliyun_sls_android_network_diagnosis"))
+    testImplementation("com.squareup.okhttp3:okhttp:3.11.0")
+    implementation 'androidx.annotation:annotation:1.6.0'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(":aliyun_sls_android_producer")

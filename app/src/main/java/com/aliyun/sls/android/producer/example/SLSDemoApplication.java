@@ -28,6 +28,7 @@ import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
 import com.aliyun.sls.android.ot.Resource;
 import com.aliyun.sls.android.ot.Span;
+import com.aliyun.sls.android.producer.BuildConfig;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
 import io.opentelemetry.api.common.Attributes;
@@ -55,6 +56,10 @@ public class SLSDemoApplication extends MultiDexApplication {
         if (BuildConfig.CONFIG_ENABLE) {
             PreferenceUtils.overrideConfig(this);
         }
+
+        //if (true) {
+        //    return;
+        //}
 
         initOTel();
 

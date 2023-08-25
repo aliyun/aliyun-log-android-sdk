@@ -2,13 +2,16 @@ package com.aliyun.sls.android.network_diagnosis;
 
 import java.util.Map;
 
+import androidx.annotation.VisibleForTesting;
+
 /**
  * @author gordon
  * @date 2022/7/22
  */
 @SuppressWarnings("deprecation")
 public final class NetworkDiagnosis implements INetworkDiagnosis {
-    private INetworkDiagnosis networkDiagnosis;
+    @VisibleForTesting
+    public INetworkDiagnosis networkDiagnosis;
 
     private static class Holder {
         private static final NetworkDiagnosis INSTANCE = new NetworkDiagnosis();
@@ -23,7 +26,8 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
         return Holder.INSTANCE;
     }
 
-    private boolean checkNetworkDiagnosis() {
+    @VisibleForTesting
+    public boolean checkNetworkDiagnosis() {
         return null != this.networkDiagnosis;
     }
 

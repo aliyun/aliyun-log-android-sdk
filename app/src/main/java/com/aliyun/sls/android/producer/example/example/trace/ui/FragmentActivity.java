@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.R;
 import com.aliyun.sls.android.producer.example.example.trace.ui.detail.DetailFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.order.OrderListFragment;
 import com.aliyun.sls.android.producer.example.example.trace.ui.user.LoginFragment;

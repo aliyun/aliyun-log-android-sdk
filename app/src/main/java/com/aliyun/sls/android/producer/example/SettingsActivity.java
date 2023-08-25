@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import com.aliyun.sls.android.producer.R;
 import com.aliyun.sls.android.producer.example.settings.SettingsFragment;
 
 /**

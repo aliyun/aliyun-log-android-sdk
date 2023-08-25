@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.widget.EditText;
 import androidx.annotation.Nullable;
 import com.aliyun.sls.android.producer.example.BaseActivity;
-import com.aliyun.sls.android.producer.example.R;
+import com.aliyun.sls.android.producer.R;
 
 /**
  * @author gordon
