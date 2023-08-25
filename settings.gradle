@@ -5,6 +5,7 @@ pluginManagement {
 //        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
 //        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 
+        mavenLocal()
         // aliyun maven
         // mirror of google()
         maven { url 'https://maven.aliyun.com/repository/google' }

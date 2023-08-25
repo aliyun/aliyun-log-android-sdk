@@ -3,29 +3,21 @@ package com.aliyun.sls.android.webview.instrumentation;
 import android.content.Context;
 import android.net.Uri;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import com.aliyun.sls.android.webview.instrumentation.TelemetryWebViewClient.InternalWebResourceResponse;
-import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation.WebViewInstrumentationConfiguration;
 import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.api.OpenTelemetry;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -54,7 +46,6 @@ public class TelemetryWebViewClientTests {
         when(webView.getSettings()).thenReturn(webSettings);
     }
 
-
     @Test
     public void testConstructor() {
         // parameter is null
@@ -62,7 +53,8 @@ public class TelemetryWebViewClientTests {
         assertNull(client.instrumentation);
 
         // parameter is not null
-        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(GlobalOpenTelemetry.get());
+        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(
+            GlobalOpenTelemetry.get());
         WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
         client = new TelemetryWebViewClient(instrumentation);
         assertEquals(instrumentation, client.instrumentation);
@@ -118,7 +110,8 @@ public class TelemetryWebViewClientTests {
 
     private TelemetryWebViewClient createTelemetryWebViewClient() {
         //when(webResourceRequest.isForMainFrame()).thenReturn(true);
-        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(GlobalOpenTelemetry.get());
+        WebViewInstrumentationConfiguration configuration = new WebViewInstrumentationConfiguration(
+            GlobalOpenTelemetry.get());
         WebViewInstrumentation instrumentation = new WebViewInstrumentation(webView, configuration);
         return new TelemetryWebViewClient(instrumentation);
     }
