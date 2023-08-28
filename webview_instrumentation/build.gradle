@@ -9,7 +9,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
-        versionName "1.1.0-SNAPSHOT"
+        versionName "1.1.0"
 
         buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
         buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
@@ -71,7 +71,7 @@ dependencies {
 
 ext {
     moduleVersion = android.defaultConfig.versionName
-    moduleName = 'webview-instrumentation'
+    moduleName = 'sls-android-webview-instrumentation'
 }
 
 //==== 以下是将android library上传到maven central的脚本
