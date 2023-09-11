@@ -77,7 +77,7 @@ dependencies {
     implementation project(':aliyun_sls_android_producer')
     implementation project(':aliyun_sls_android_core')
     implementation project(':aliyun_sls_android_ot')
-    implementation project(':aliyun_sls_android_crashreporter')
+    implementation project(':aliyun_sls_android_crashreporter2')
     implementation project(':aliyun_sls_android_blockdetection')
     implementation project(':aliyun_sls_android_network_diagnosis')
     implementation project(':aliyun_sls_android_trace')

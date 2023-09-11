@@ -59,6 +59,9 @@ dependencies {
 //    // exporters
 
 
+    implementation project(":aliyun_sls_android_producer")
+    implementation project(":aliyun_sls_android_core")
+
     implementation 'androidx.annotation:annotation:1.6.0'
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'androidx.webkit:webkit:1.3.0'

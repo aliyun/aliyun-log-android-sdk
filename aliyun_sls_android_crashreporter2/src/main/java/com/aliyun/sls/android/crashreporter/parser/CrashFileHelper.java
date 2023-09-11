@@ -2,12 +2,15 @@ package com.aliyun.sls.android.crashreporter.parser;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.text.TextUtils;
+import com.aliyun.sls.android.crashreporter.otel.CrashReporterOTel;
 import com.aliyun.sls.android.producer.utils.TimeUtils;
+import io.opentelemetry.api.trace.SpanBuilder;
 
 import static android.util.Log.w;
 import static java.lang.String.format;
@@ -50,6 +53,7 @@ public class CrashFileHelper {
         if ("jni".equals(type)) {
             type = "native";
         }
+
         LogParserResult result = LogParser.getInstance().parser(context, file, type);
         onLogParsedEnd(type, file, result);
     }
@@ -69,14 +73,29 @@ public class CrashFileHelper {
             start = TimeUnit.MILLISECONDS.toNanos(parseTime(time));
         }
 
+        SpanBuilder builder = CrashReporterOTel.spanBuilder("crashreporter");
+        // reset span start time to crash time
+        builder.setStartTimestamp(start, TimeUnit.MILLISECONDS);
+
         //List<Attribute> attributes = new ArrayList<>();
-        //Iterator<String> it = result.keys();
-        //while (it.hasNext()) {
-        //    String key = it.next();
-        //    attributes.add(
-        //        Attribute.of("ex." + key, result.getString(key))
-        //    );
-        //}
+        Iterator<String> it = result.keys();
+        while (it.hasNext()) {
+            String key = it.next();
+            builder.setAttribute("ex." + key, result.getString(key));
+            //attributes.add(
+            //    Attribute.of("ex." + key, result.getString(key))
+            //);
+        }
+
+        builder.setAttribute("state", type)
+            //.setAttribute("page.name")
+            .setAttribute("t", "error")
+            .setAttribute("ex.type", "crash")
+            .setAttribute("ex.sub_type", type)
+            .setAttribute("ex.id", id)
+            .setAttribute("ex.catId", catId);
+
+        builder.startSpan().end();
         //
         //final String topActivity = AppUtils.getTopActivity();
         //final String eventName = "Application crashed";

@@ -3,7 +3,9 @@ package com.aliyun.sls.android.crashreporter;
 import java.io.File;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
+import com.aliyun.sls.android.crashreporter.otel.CrashReporterOTel;
 import com.aliyun.sls.android.crashreporter.parser.CrashFileHelper;
 import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.ICrashClient;
@@ -12,7 +14,7 @@ import com.uc.crashsdk.export.ICrashClient;
  * @author yulong.gyl
  * @date 2023/9/7
  */
-public final class CrashReporter implements ICrashClient {
+public final class CrashReporter {
     private static final String TAG = "CrashReporter";
     private static final String PATH_ROOT = "sls_rum" + File.separator + "crashreporter";
     public static final String PATH_ITRACE_LOGS = PATH_ROOT + File.separator + "itrace_logs";
@@ -22,11 +24,13 @@ public final class CrashReporter implements ICrashClient {
 
     private CrashApi crashApi;
 
-    private CrashReporter(Application application) {
+    public CrashReporter(Application application) {
         this.application = application;
     }
 
     public void init(boolean debuggable) {
+        CrashReporterOTel.getInstance().initOtel(application.getApplicationContext());
+
         String fileDirName = application.getFilesDir().getName();
         final Bundle args = new Bundle();
         // 路径配置
@@ -73,45 +77,60 @@ public final class CrashReporter implements ICrashClient {
         //args.putString("mBuildId", AppUtils.getAppVersion(application));
 
         //final String appId = options.instanceId;
-        crashApi = CrashApi.createInstanceEx(application, "sls-internal", false, args, this);
+        crashApi = CrashApi.createInstanceEx(application, "sls-internal", false, args,
+            new InternalCrashClient(application));
         crashApi.setCrashStatReporter((uuid, stat) -> {
             //if (options.debuggable) {
             //    SLSLog.v(TAG, "report dau stat, stat: " + stat);
             //}
 
             CrashFileHelper.scanAndReport(application);
+
+            CrashReporterOTel.spanBuilder("app.start")
+                .setAttribute("t", "startup.pv")
+                .startSpan()
+                .end();
+
             return true;
         });
         crashApi.setForeground(true);
     }
 
-    @Override
-    public void onLogGenerated(File file, String s) {
-        CrashFileHelper.parseCrashFile(application, file, s);
-    }
+    private static class InternalCrashClient implements ICrashClient {
+        private Context context;
 
-    @Override
-    public void onClientProcessLogGenerated(String s, File file, String s1) {
+        public InternalCrashClient(Context context) {
+            this.context = context;
+        }
 
-    }
+        @Override
+        public void onLogGenerated(File file, String s) {
+            CrashFileHelper.parseCrashFile(this.context, file, s);
+        }
 
-    @Override
-    public File onBeforeUploadLog(File file) {
-        return file;
-    }
+        @Override
+        public void onClientProcessLogGenerated(String s, File file, String s1) {
 
-    @Override
-    public void onCrashRestarting(boolean b) {
+        }
 
-    }
+        @Override
+        public File onBeforeUploadLog(File file) {
+            return file;
+        }
 
-    @Override
-    public void onAddCrashStats(String s, int i, int i1) {
+        @Override
+        public void onCrashRestarting(boolean b) {
 
-    }
+        }
 
-    @Override
-    public String onGetCallbackInfo(String s, boolean b) {
-        return null;
+        @Override
+        public void onAddCrashStats(String s, int i, int i1) {
+
+        }
+
+        @Override
+        public String onGetCallbackInfo(String s, boolean b) {
+            return null;
+        }
     }
 }

@@ -18,8 +18,8 @@ import com.aliyun.sls.android.blockdetection.BlockDetection;
 import com.aliyun.sls.android.core.SLSAndroid;
 import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.crashreporter.CrashReporter;
-import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
-import com.aliyun.sls.android.crashreporter.JNICrash;
+//import com.aliyun.sls.android.crashreporter.CrashReporter.LogLevel;
+//import com.aliyun.sls.android.crashreporter.JNICrash;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.R;
 import com.aliyun.sls.android.producer.utils.ThreadUtils;
@@ -139,7 +139,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 } catch (Throwable t) {
                     t.printStackTrace();
 
-                    CrashReporter.reportError("custom", t);
+                    //CrashReporter.reportError("custom", t);
                 }
 
                 //Credentials credentials = new Credentials();
@@ -186,10 +186,10 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                 }
 
                 if (enable) {
-                    CrashReporter.setEnabled(false);
+                    //CrashReporter.setEnabled(false);
                     view.setTag(false);
                 } else {
-                    CrashReporter.setEnabled(true);
+                    //CrashReporter.setEnabled(true);
                     view.setTag(true);
                 }
 
@@ -235,7 +235,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void nativeCrash(int type) {
-        JNICrash.nativeCrash(type);
+        //JNICrash.nativeCrash(type);
     }
 
     private void crashInJavaNull() {
