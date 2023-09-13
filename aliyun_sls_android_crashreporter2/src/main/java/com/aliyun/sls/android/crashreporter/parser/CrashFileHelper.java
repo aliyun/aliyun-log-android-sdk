@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import android.content.Context;
 import android.text.TextUtils;
 import com.aliyun.sls.android.crashreporter.otel.CrashReporterOTel;
-import com.aliyun.sls.android.producer.utils.TimeUtils;
+//import com.aliyun.sls.android.producer.utils.TimeUtils;
 import io.opentelemetry.api.trace.SpanBuilder;
 
 import static android.util.Log.w;
@@ -68,14 +68,14 @@ public class CrashFileHelper {
         String catId = result.getString("catId");
         result.remove("time");
         result.remove("id");
-        long start = TimeUtils.getInstance().getTimeInMillis();
-        if (!TextUtils.isEmpty(time)) {
-            start = TimeUnit.MILLISECONDS.toNanos(parseTime(time));
-        }
+        //long start = TimeUtils.getInstance().getTimeInMillis();
+        //if (!TextUtils.isEmpty(time)) {
+        //    start = TimeUnit.MILLISECONDS.toNanos(parseTime(time));
+        //}
 
         SpanBuilder builder = CrashReporterOTel.spanBuilder("crashreporter");
         // reset span start time to crash time
-        builder.setStartTimestamp(start, TimeUnit.MILLISECONDS);
+        //builder.setStartTimestamp(start, TimeUnit.MILLISECONDS);
 
         //List<Attribute> attributes = new ArrayList<>();
         Iterator<String> it = result.keys();

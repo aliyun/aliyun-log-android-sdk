@@ -4,14 +4,16 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.text.TextUtils;
-import com.aliyun.sls.android.core.configuration.AccessKeyDelegate;
-import com.aliyun.sls.android.core.configuration.ConfigurationManager;
-import com.aliyun.sls.android.core.configuration.ResourceDelegate;
-import com.aliyun.sls.android.core.utdid.Utdid;
-import com.aliyun.sls.android.core.utils.AppUtils;
-import com.aliyun.sls.android.core.utils.DeviceUtils;
 import com.aliyun.sls.android.crashreporter.BuildConfig;
 import com.aliyun.sls.android.exporter.otlp.OtlpSLSSpanExporter;
+import com.aliyun.sls.android.otel.common.AccessKeyConfiguration;
+import com.aliyun.sls.android.otel.common.AppUtils;
+import com.aliyun.sls.android.otel.common.ConfigurationManager;
+import com.aliyun.sls.android.otel.common.ConfigurationManager.AccessKeyDelegate;
+import com.aliyun.sls.android.otel.common.ConfigurationManager.ResourceDelegate;
+import com.aliyun.sls.android.otel.common.DeviceUtils;
+import com.aliyun.sls.android.otel.common.ResourceConfiguration;
+import com.aliyun.sls.android.otel.common.utdid.Utdid;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
@@ -42,17 +44,22 @@ public final class CrashReporterOTel {
     }
 
     public void initOtel(Context context) {
-        final AccessKeyDelegate accessKeyDelegate = ConfigurationManager.getAccessKeyDelegate();
-        final ResourceDelegate resourceDelegate = ConfigurationManager.getResourceDelegate();
+        final AccessKeyDelegate accessKeyDelegate = ConfigurationManager.getInstance().getAccessKeyDelegate();
+        final ResourceDelegate resourceDelegate = ConfigurationManager.getInstance().getResourceDelegate();
+
+        final AccessKeyConfiguration accessKeyConfiguration = null != accessKeyDelegate
+            ? accessKeyDelegate.getAccessKey("uem") : null;
+        final ResourceConfiguration resourceConfiguration = null != resourceDelegate ?
+            resourceDelegate.getResource("uem") : null;
 
         OtlpSLSSpanExporter exporter = OtlpSLSSpanExporter.builder()
-            .setEndpoint(null != resourceDelegate ? resourceDelegate.getEndpoint("uem") : null)
-            .setProject(null != resourceDelegate ? resourceDelegate.getProject("uem") : null)
-            .setLogstore(null != resourceDelegate ? resourceDelegate.getInstanceId("uem") : null)
+            .setEndpoint(null != resourceConfiguration ? resourceConfiguration.getEndpoint() : null)
+            .setProject(null != resourceConfiguration ? resourceConfiguration.getProject() : null)
+            .setLogstore(null != resourceConfiguration ? resourceConfiguration.getInstanceId() : null)
             .setAccessKey(
-                null != accessKeyDelegate ? accessKeyDelegate.getAccessKeyId("uem") : null,
-                null != accessKeyDelegate ? accessKeyDelegate.getAccessKeySecret("uem") : null,
-                null != accessKeyDelegate ? accessKeyDelegate.getAccessKeyToken("uem") : null
+                null != accessKeyConfiguration ? accessKeyConfiguration.getAccessKeyId() : null,
+                null != accessKeyConfiguration ? accessKeyConfiguration.getAccessKeySecret() : null,
+                null != accessKeyConfiguration ? accessKeyConfiguration.getAccessKeySecurityToken() : null
             )
             .build();
 

@@ -14,13 +14,10 @@ import androidx.multidex.MultiDexApplication;
 import com.aliyun.sls.android.core.SLSAndroid;
 import com.aliyun.sls.android.core.SLSAndroid.OptionConfiguration;
 import com.aliyun.sls.android.core.SLSLog;
-import com.aliyun.sls.android.core.configuration.AccessKeyDelegate;
-import com.aliyun.sls.android.core.configuration.ConfigurationManager;
 import com.aliyun.sls.android.core.configuration.Credentials;
 import com.aliyun.sls.android.core.configuration.Credentials.NetworkDiagnosisCredentials;
 import com.aliyun.sls.android.core.configuration.Credentials.TracerCredentials;
 import com.aliyun.sls.android.core.configuration.Credentials.TracerCredentials.TracerLogCredentials;
-import com.aliyun.sls.android.core.configuration.ResourceDelegate;
 import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.core.utdid.Utdid;
@@ -32,6 +29,9 @@ import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
 import com.aliyun.sls.android.ot.Resource;
 import com.aliyun.sls.android.ot.Span;
+import com.aliyun.sls.android.otel.common.AccessKeyConfiguration;
+import com.aliyun.sls.android.otel.common.ConfigurationManager;
+import com.aliyun.sls.android.otel.common.ResourceConfiguration;
 import com.aliyun.sls.android.producer.BuildConfig;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
@@ -61,40 +61,18 @@ public class SLSDemoApplication extends MultiDexApplication {
             PreferenceUtils.overrideConfig(this);
         }
 
-        ConfigurationManager.setResourceDelegate(new ResourceDelegate() {
-            @Override
-            public String getEndpoint(String scope) {
-                return "https://cn-hangzhou.log.aliyuncs.com";
-            }
-
-            @Override
-            public String getProject(String scope) {
-                return "sls-aysls-rum-mobile";
-            }
-
-            @Override
-            public String getInstanceId(String scope) {
-                return "sls-aysls-rum-mobile-rum-raw";
-            }
-        });
-
-        ConfigurationManager.setAccessKeyDelegate(new AccessKeyDelegate() {
-            @Override
-            public String getAccessKeyId(String scope) {
-                return PreferenceUtils.getAccessKeyId(SLSDemoApplication.this);
-            }
-
-            @Override
-            public String getAccessKeySecret(String scope) {
-                return PreferenceUtils.getAccessKeySecret(SLSDemoApplication.this);
-            }
-
-            @Override
-            public String getAccessKeyToken(String scope) {
-                return PreferenceUtils.getAccessKeyToken(SLSDemoApplication.this);
-            }
-        });
         if (true) {
+            ConfigurationManager.getInstance().setDelegate(
+                scope -> AccessKeyConfiguration.configuration(
+                    PreferenceUtils.getAccessKeyId(SLSDemoApplication.this),
+                    PreferenceUtils.getAccessKeySecret(SLSDemoApplication.this),
+                    PreferenceUtils.getAccessKeyToken(SLSDemoApplication.this)),
+                scope -> ResourceConfiguration.configuration(
+                    "https://cn-hangzhou.log.aliyuncs.com",
+                    "sls-aysls-rum-mobile",
+                    "sls-aysls-rum-mobile-rum-raw")
+            );
+
             new CrashReporter(this).init(true);
             return;
         }

@@ -60,7 +60,7 @@ dependencies {
 
 
     implementation project(":aliyun_sls_android_producer")
-    implementation project(":aliyun_sls_android_core")
+    implementation project(":aliyun_sls_android_otel_common")
 
     implementation 'androidx.annotation:annotation:1.6.0'
     implementation 'org.jsoup:jsoup:1.13.1'

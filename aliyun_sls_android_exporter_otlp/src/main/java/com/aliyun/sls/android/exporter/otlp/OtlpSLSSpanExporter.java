@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import android.text.TextUtils;
-import com.aliyun.sls.android.core.configuration.AccessKeyDelegate;
-import com.aliyun.sls.android.core.configuration.ConfigurationManager;
+import com.aliyun.sls.android.otel.common.AccessKeyConfiguration;
+import com.aliyun.sls.android.otel.common.ConfigurationManager;
+import com.aliyun.sls.android.otel.common.ConfigurationManager.AccessKeyDelegate;
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
@@ -81,21 +82,25 @@ public class OtlpSLSSpanExporter implements SpanExporter {
                     v(TAG,
                         "client onCall. result: " + LogProducerResult.fromInt(resultCode) + ", error: " + errorMessage);
 
-                    AccessKeyDelegate delegate = ConfigurationManager.getAccessKeyDelegate();
+                    final AccessKeyDelegate delegate = ConfigurationManager.getInstance().getAccessKeyDelegate();
                     if (null == delegate) {
                         return;
                     }
+                    final AccessKeyConfiguration accessKeyConfiguration = delegate.getAccessKey(scope);
+                    if (null == accessKeyConfiguration) {
+                        return;
+                    }
 
-                    final String accessKeyId = delegate.getAccessKeyId(scope);
-                    final String accessKeySecret = delegate.getAccessKeySecret(scope);
-                    final String accessKeyToken = delegate.getAccessKeyToken(scope);
+                    final String accessKeyId = accessKeyConfiguration.getAccessKeyId();
+                    final String accessKeySecret = accessKeyConfiguration.getAccessKeySecret();
+                    final String accessKeyToken = accessKeyConfiguration.getAccessKeySecurityToken();
                     if (TextUtils.isEmpty(accessKeyToken)) {
                         config.setAccessKeyId(accessKeyId);
                         config.setAccessKeySecret(accessKeySecret);
                     } else {
-                        config.resetSecurityToken(delegate.getAccessKeyId(scope),
-                            delegate.getAccessKeySecret(scope),
-                            delegate.getAccessKeyToken(scope)
+                        config.resetSecurityToken(accessKeyConfiguration.getAccessKeyId(),
+                            accessKeyConfiguration.getAccessKeySecret(),
+                            accessKeyConfiguration.getAccessKeySecurityToken()
                         );
                     }
                 });

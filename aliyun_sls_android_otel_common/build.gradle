@@ -2,12 +2,12 @@ apply plugin:  'com.android.library'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.0"
+    buildToolsVersion "29.0.3"
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "0.1.0"
+        versionName "1.0.8"
 
         buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
         buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
@@ -34,21 +34,16 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.annotation:annotation:1.6.0'
+    testImplementation(project(':testable'))
+    testImplementation(project(":aliyun_sls_android_core"))
 
-    implementation project(":aliyun_sls_android_exporter_otlp")
-    implementation project(":aliyun_sls_android_otel_common")
-
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.22.0"))
-    implementation("io.opentelemetry:opentelemetry-api")
-    implementation('io.opentelemetry:opentelemetry-sdk')
-    implementation("io.opentelemetry:opentelemetry-semconv")
+    implementation project(":aliyun_sls_android_producer")
+    implementation project(":aliyun_sls_android_ot")
 }
 
 ext {
     moduleVersion = android.defaultConfig.versionName
-    moduleName = 'sls-android-crashreporter'
+    moduleName = 'sls-android-core'
 }
 
 //==== 以下是将android library上传到maven central的脚本
