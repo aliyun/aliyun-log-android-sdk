@@ -67,12 +67,14 @@ public final class CrashReporterOTel {
             .addSpanProcessor(BatchSpanProcessor.builder(exporter).build())
             .setResource(Resource.getDefault()
                 .merge(Resource.create(Attributes.builder()
+                    // service
+                    .put(ResourceAttributes.SERVICE_NAME, "sls-android")
                     // device
                     .put(ResourceAttributes.DEVICE_ID, Utdid.getInstance().getUtdid(context))
                     .put(ResourceAttributes.DEVICE_MANUFACTURER, Build.MANUFACTURER)
                     .put(ResourceAttributes.DEVICE_MODEL_NAME, Build.MODEL)
                     .put(ResourceAttributes.DEVICE_MODEL_IDENTIFIER, Build.DEVICE)
-                    .put("device.resolution", DeviceUtils.getResolution(context))
+                    .put("device.screen", DeviceUtils.getResolution(context))
                     // app
                     .put("app.version", AppUtils.getAppVersion(context))
                     .put("app.versionCode", AppUtils.getAppVersionCode(context))
@@ -91,6 +93,8 @@ public final class CrashReporterOTel {
                     // uem
                     .put("uem.data.type", "Android")
                     .put("uem.sdk.version", BuildConfig.VERSION_NAME)
+                    // workspace
+                    .put("workspace", null != resourceConfiguration ? resourceConfiguration.getInstanceId() : "")
                     .build())))
             .build();
 

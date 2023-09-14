@@ -202,7 +202,7 @@ public class DeviceUtils {
                 width ^= height;
             }
 
-            resolution = height + "*" + width;
+            resolution = width + "x" + height;
         } catch (Exception var5) {
             SLSLog.e(TAG, "DeviceUtils getResolution: error: " + var5.getMessage());
         }
