@@ -4,12 +4,13 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.text.TextUtils;
 import com.aliyun.sls.android.crashreporter.otel.CrashReporterOTel;
-//import com.aliyun.sls.android.producer.utils.TimeUtils;
+import com.aliyun.sls.android.otel.common.Configuration;
+import com.aliyun.sls.android.otel.common.ConfigurationManager;
+import com.aliyun.sls.android.otel.common.ConfigurationManager.ConfigurationDelegate;
 import io.opentelemetry.api.trace.SpanBuilder;
 
 import static android.util.Log.w;
@@ -81,19 +82,26 @@ public class CrashFileHelper {
         Iterator<String> it = result.keys();
         while (it.hasNext()) {
             String key = it.next();
-            builder.setAttribute("ex." + key, result.getString(key));
+            if ("basic_info".equalsIgnoreCase(key) ||
+                "summary".equalsIgnoreCase(key) ||
+                "stacktrace".equalsIgnoreCase(key)) {
+                builder.setAttribute("ex." + key, result.getString(key));
+            }
             //attributes.add(
             //    Attribute.of("ex." + key, result.getString(key))
             //);
         }
 
+        ConfigurationDelegate delegate = ConfigurationManager.getInstance().getConfigurationDelegate();
+        final Configuration configuration = null != delegate ? delegate.getConfiguration("uem") : null;
         builder.setAttribute("state", type)
             //.setAttribute("page.name")
             .setAttribute("t", "error")
             .setAttribute("ex.type", "crash")
             .setAttribute("ex.sub_type", type)
             .setAttribute("ex.id", id)
-            .setAttribute("ex.catId", catId);
+            .setAttribute("ex.catId", catId)
+            .setAttribute("uid", null != configuration ? configuration.getUid() : "");
 
         builder.startSpan().end();
         //

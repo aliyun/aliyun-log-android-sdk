@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.text.TextUtils;
-import com.aliyun.sls.android.otel.common.AccessKeyConfiguration;
+import com.aliyun.sls.android.otel.common.AccessKey;
 import com.aliyun.sls.android.otel.common.ConfigurationManager;
 import com.aliyun.sls.android.otel.common.ConfigurationManager.AccessKeyDelegate;
 import com.aliyun.sls.android.producer.Log;
@@ -86,21 +86,21 @@ public class OtlpSLSSpanExporter implements SpanExporter {
                     if (null == delegate) {
                         return;
                     }
-                    final AccessKeyConfiguration accessKeyConfiguration = delegate.getAccessKey(scope);
-                    if (null == accessKeyConfiguration) {
+                    final AccessKey accessKey = delegate.getAccessKey(scope);
+                    if (null == accessKey) {
                         return;
                     }
 
-                    final String accessKeyId = accessKeyConfiguration.getAccessKeyId();
-                    final String accessKeySecret = accessKeyConfiguration.getAccessKeySecret();
-                    final String accessKeyToken = accessKeyConfiguration.getAccessKeySecurityToken();
+                    final String accessKeyId = accessKey.getAccessKeyId();
+                    final String accessKeySecret = accessKey.getAccessKeySecret();
+                    final String accessKeyToken = accessKey.getAccessKeySecurityToken();
                     if (TextUtils.isEmpty(accessKeyToken)) {
                         config.setAccessKeyId(accessKeyId);
                         config.setAccessKeySecret(accessKeySecret);
                     } else {
-                        config.resetSecurityToken(accessKeyConfiguration.getAccessKeyId(),
-                            accessKeyConfiguration.getAccessKeySecret(),
-                            accessKeyConfiguration.getAccessKeySecurityToken()
+                        config.resetSecurityToken(accessKey.getAccessKeyId(),
+                            accessKey.getAccessKeySecret(),
+                            accessKey.getAccessKeySecurityToken()
                         );
                     }
                 });

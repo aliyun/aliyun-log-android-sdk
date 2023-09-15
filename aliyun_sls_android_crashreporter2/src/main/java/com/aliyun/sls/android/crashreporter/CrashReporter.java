@@ -87,7 +87,7 @@ public final class CrashReporter {
             CrashFileHelper.scanAndReport(application);
 
             CrashReporterOTel.spanBuilder("app.start")
-                .setAttribute("t", "startup.pv")
+                .setAttribute("t", "pv")
                 .startSpan()
                 .end();
 

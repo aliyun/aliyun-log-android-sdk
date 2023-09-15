@@ -6,15 +6,20 @@ package com.aliyun.sls.android.otel.common;
  */
 public class ConfigurationManager {
     public interface AccessKeyDelegate {
-        AccessKeyConfiguration getAccessKey(String scope);
+        AccessKey getAccessKey(String scope);
     }
 
     public interface ResourceDelegate {
-        ResourceConfiguration getResource(String scope);
+        Resource getResource(String scope);
+    }
+
+    public interface ConfigurationDelegate {
+        Configuration getConfiguration(String scope);
     }
 
     private AccessKeyDelegate accessKeyDelegate;
     private ResourceDelegate resourceDelegate;
+    private ConfigurationDelegate configurationDelegate;
 
     private static final class Holder {
         private static final ConfigurationManager INSTANCE = new ConfigurationManager();
@@ -28,9 +33,11 @@ public class ConfigurationManager {
         return Holder.INSTANCE;
     }
 
-    public void setDelegate(AccessKeyDelegate accessKeyDelegate, ResourceDelegate resourceDelegate) {
+    public void setDelegate(AccessKeyDelegate accessKeyDelegate, ResourceDelegate resourceDelegate,
+        ConfigurationDelegate configurationDelegate) {
         this.accessKeyDelegate = accessKeyDelegate;
         this.resourceDelegate = resourceDelegate;
+        this.configurationDelegate = configurationDelegate;
     }
 
     public AccessKeyDelegate getAccessKeyDelegate() {
@@ -39,5 +46,9 @@ public class ConfigurationManager {
 
     public ResourceDelegate getResourceDelegate() {
         return resourceDelegate;
+    }
+
+    public ConfigurationDelegate getConfigurationDelegate() {
+        return configurationDelegate;
     }
 }

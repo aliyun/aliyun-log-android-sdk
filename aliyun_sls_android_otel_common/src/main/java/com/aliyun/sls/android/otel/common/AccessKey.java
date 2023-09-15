@@ -4,20 +4,20 @@ package com.aliyun.sls.android.otel.common;
  * @author yulong.gyl
  * @date 2023/9/13
  */
-public class AccessKeyConfiguration {
+public class AccessKey {
     private final String accessKeyId;
     private final String accessKeySecret;
     private final String accessKeySecurityToken;
 
-    private AccessKeyConfiguration(String accessKeyId, String accessKeySecret, String accessKeySecurityToken) {
+    private AccessKey(String accessKeyId, String accessKeySecret, String accessKeySecurityToken) {
         this.accessKeyId = accessKeyId;
         this.accessKeySecret = accessKeySecret;
         this.accessKeySecurityToken = accessKeySecurityToken;
     }
 
-    public static AccessKeyConfiguration configuration(String accessKeyId, String accessKeySecret,
+    public static AccessKey accessKey(String accessKeyId, String accessKeySecret,
         String accessKeySecurityToken) {
-        return new AccessKeyConfiguration(accessKeyId, accessKeySecret, accessKeySecurityToken);
+        return new AccessKey(accessKeyId, accessKeySecret, accessKeySecurityToken);
     }
 
     public String getAccessKeyId() {
