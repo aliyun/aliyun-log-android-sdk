@@ -1,4 +1,4 @@
-package com.aliyun.sls.android.otel.common;
+package com.aliyun.sls.android.otel.common.utils;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;

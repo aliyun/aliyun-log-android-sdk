@@ -8,6 +8,7 @@ import java.util.Locale;
 import android.content.Context;
 import android.text.TextUtils;
 import com.aliyun.sls.android.crashreporter.otel.CrashReporterOTel;
+import com.aliyun.sls.android.otel.common.AttributesHelper;
 import com.aliyun.sls.android.otel.common.Configuration;
 import com.aliyun.sls.android.otel.common.ConfigurationManager;
 import com.aliyun.sls.android.otel.common.ConfigurationManager.ConfigurationDelegate;
@@ -56,10 +57,11 @@ public class CrashFileHelper {
         }
 
         LogParserResult result = LogParser.getInstance().parser(context, file, type);
-        onLogParsedEnd(type, file, result);
+        onLogParsedEnd(context, type, file, result);
     }
 
-    private void onLogParsedEnd(final String type, final File file, final LogParserResult result) {
+    private void onLogParsedEnd(final Context context, final String type, final File file,
+        final LogParserResult result) {
         //if (options.debuggable) {
         //    v(TAG, SLSLog.format("onLogParsedEnd. type: %s, content length: %d", type, content.length()));
         //}
@@ -101,6 +103,7 @@ public class CrashFileHelper {
             .setAttribute("ex.sub_type", type)
             .setAttribute("ex.id", id)
             .setAttribute("ex.catId", catId)
+            .setAllAttributes(AttributesHelper.create(context))
             .setAttribute("uid", null != configuration ? configuration.getUid() : "");
 
         builder.startSpan().end();

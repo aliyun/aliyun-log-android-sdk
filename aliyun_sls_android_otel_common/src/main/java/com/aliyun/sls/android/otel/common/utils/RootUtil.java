@@ -1,4 +1,4 @@
-package com.aliyun.sls.android.otel.common;
+package com.aliyun.sls.android.otel.common.utils;
 
 import java.io.BufferedReader;
 import java.io.File;

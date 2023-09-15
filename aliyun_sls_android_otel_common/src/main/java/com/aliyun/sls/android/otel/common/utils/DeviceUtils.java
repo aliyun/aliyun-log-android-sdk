@@ -3,7 +3,7 @@
 // (powered by Fernflower decompiler)
 //
 
-package com.aliyun.sls.android.otel.common;
+package com.aliyun.sls.android.otel.common.utils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,6 +16,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
+import com.aliyun.sls.android.otel.common.SLSLog;
 import com.aliyun.sls.android.otel.common.utdid.Utdid;
 
 /**

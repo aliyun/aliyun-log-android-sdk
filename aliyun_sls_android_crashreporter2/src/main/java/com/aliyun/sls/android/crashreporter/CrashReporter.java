@@ -7,6 +7,7 @@ import android.content.Context;
 import android.os.Bundle;
 import com.aliyun.sls.android.crashreporter.otel.CrashReporterOTel;
 import com.aliyun.sls.android.crashreporter.parser.CrashFileHelper;
+import com.aliyun.sls.android.otel.common.AttributesHelper;
 import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.ICrashClient;
 
@@ -88,6 +89,7 @@ public final class CrashReporter {
 
             CrashReporterOTel.spanBuilder("app.start")
                 .setAttribute("t", "pv")
+                .setAllAttributes(AttributesHelper.create(application.getApplicationContext()))
                 .startSpan()
                 .end();
 
