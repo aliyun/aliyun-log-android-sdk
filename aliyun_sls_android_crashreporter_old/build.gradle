@@ -2,12 +2,12 @@ apply plugin:  'com.android.library'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.0"
+    buildToolsVersion "29.0.3"
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "0.1.0"
+        versionName "2.0.6.1"
 
         buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
         buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
@@ -34,16 +34,14 @@ android {
 }
 
 dependencies {
+    testImplementation(project(':testable'))
+    testImplementation testImplementation(project(':aliyun_sls_android_crashreporter_old',))
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.annotation:annotation:1.6.0'
-
-    implementation project(":aliyun_sls_android_exporter_otlp")
-    implementation project(":aliyun_sls_android_otel_common")
-
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.22.0"))
-    implementation("io.opentelemetry:opentelemetry-api")
-    implementation('io.opentelemetry:opentelemetry-sdk')
-    implementation("io.opentelemetry:opentelemetry-semconv")
+    implementation project(":aliyun_sls_android_producer")
+    implementation project(":aliyun_sls_android_core")
+    implementation project(":aliyun_sls_android_ot")
+    implementation project(":aliyun_sls_android_trace")
 }
 
 ext {
