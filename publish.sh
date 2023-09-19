@@ -70,8 +70,8 @@ do
 # android build command
   ./gradlew :$module:clean                                                               # clean project first
   ./gradlew :$module:assembleRelease                                                     # assembleRelease
-#  ./gradlew :$module:publishToSonatype closeAndReleaseStagingRepository                  # publish aar to maven central
-  ./gradlew :$module:publishToMavenLocal                                                # publish aar to maven central
+  ./gradlew :$module:publishToSonatype closeAndReleaseStagingRepository                  # publish aar to maven central
+#  ./gradlew :$module:publishToMavenLocal                                                # publish aar to maven central
 
 done
 
