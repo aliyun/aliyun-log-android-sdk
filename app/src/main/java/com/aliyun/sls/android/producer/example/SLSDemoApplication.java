@@ -21,13 +21,17 @@ import com.aliyun.sls.android.core.configuration.Credentials.TracerCredentials.T
 import com.aliyun.sls.android.core.configuration.UserInfo;
 import com.aliyun.sls.android.core.sender.Sender.Callback;
 import com.aliyun.sls.android.core.utdid.Utdid;
+import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.okhttp.OKHttp3InstrumentationDelegate;
 import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
 import com.aliyun.sls.android.okhttp.OkHttp3Configuration;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
-import com.aliyun.sls.android.ot.Resource;
 import com.aliyun.sls.android.ot.Span;
+import com.aliyun.sls.android.otel.common.AccessKey;
+import com.aliyun.sls.android.otel.common.ConfigurationManager;
+import com.aliyun.sls.android.otel.common.Environment;
+import com.aliyun.sls.android.otel.common.Workspace;
 import com.aliyun.sls.android.producer.BuildConfig;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
@@ -57,9 +61,30 @@ public class SLSDemoApplication extends MultiDexApplication {
             PreferenceUtils.overrideConfig(this);
         }
 
-        //if (true) {
-        //    return;
-        //}
+        if (true) {
+            ConfigurationManager.getInstance().setProvider(
+                scope -> AccessKey.accessKey(
+                    PreferenceUtils.getAccessKeyId(SLSDemoApplication.this),
+                    PreferenceUtils.getAccessKeySecret(SLSDemoApplication.this),
+                    PreferenceUtils.getAccessKeyToken(SLSDemoApplication.this)),
+                scope -> Workspace.workspace(
+                    //"https://cn-shanghai.log.aliyuncs.com",
+                    //"test-uem",
+                    //"sls-uem-test"),
+                    "https://cn-hangzhou.log.aliyuncs.com",
+                    "sls-aysls-rum-mobile",
+                    "yuanbo-test-007"),
+                scope -> {
+                    Environment environment = Environment.environment();
+                    environment.setEnv("dev");
+                    environment.setUid("123456789");
+                    return environment;
+                }
+            );
+
+            CrashReporter.init(this, true);
+            return;
+        }
 
         initOTel();
 
@@ -92,8 +117,8 @@ public class SLSDemoApplication extends MultiDexApplication {
             configuration.debuggable = true;
             configuration.spanProvider = new ISpanProvider() {
                 @Override
-                public Resource provideResource() {
-                    return Resource.of("other_resource_key", "other_resource_value");
+                public com.aliyun.sls.android.ot.Resource provideResource() {
+                    return com.aliyun.sls.android.ot.Resource.of("other_resource_key", "other_resource_value");
                 }
 
                 @Override

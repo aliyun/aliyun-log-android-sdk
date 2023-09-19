@@ -45,6 +45,8 @@ function module_name() {
     *crashreporter*)              echo "aliyun_sls_android_crashreporter";;
     *network_diagnosis*)          echo "aliyun_sls_android_network_diagnosis";;
     *okhttp*)                     echo "aliyun_sls_android_okhttp";;
+    *otel_common*)                echo "aliyun_sls_android_otel_common";;
+    *exporter_otlp*)              echo "aliyun_sls_android_exporter_otlp";;
     *ot-ktx*)                     echo "aliyun_sls_android_ot_ktx";;
     *ot*)                         echo "aliyun_sls_android_ot";;
     *producer*)                   echo "aliyun_sls_android_producer";;
@@ -68,8 +70,8 @@ do
 # android build command
   ./gradlew :$module:clean                                                               # clean project first
   ./gradlew :$module:assembleRelease                                                     # assembleRelease
-  ./gradlew :$module:publishToSonatype closeAndReleaseStagingRepository                  # publish aar to maven central
-#  ./gradlew :$module:publishToMavenLocal                                                # publish aar to maven central
+#  ./gradlew :$module:publishToSonatype closeAndReleaseStagingRepository                  # publish aar to maven central
+  ./gradlew :$module:publishToMavenLocal                                                # publish aar to maven central
 
 done
 
