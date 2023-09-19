@@ -49,6 +49,8 @@ function module_name() {
     *ot*)                         echo "aliyun_sls_android_ot";;
     *producer*)                   echo "aliyun_sls_android_producer";;
     *trace*)                      echo "aliyun_sls_android_trace";;
+    *otel_common*)                echo "aliyun_sls_android_otel_common";;
+    *exporter_otlp*)              echo "aliyun_sls_android_exporter_otlp";;
     *)                            echo "not_support";;
   esac
 }
@@ -68,8 +70,8 @@ do
 # android build command
   ./gradlew :$module:clean                                                               # clean project first
   ./gradlew :$module:assembleRelease                                                     # assembleRelease
-  ./gradlew :$module:publishToSonatype closeAndReleaseStagingRepository                  # publish aar to maven central
-#  ./gradlew :$module:publishToMavenLocal                                                # publish aar to maven central
+#  ./gradlew :$module:publishToSonatype closeAndReleaseStagingRepository                  # publish aar to maven central
+  ./gradlew :$module:publishToMavenLocal                                                # publish aar to maven central
 
 done
 
