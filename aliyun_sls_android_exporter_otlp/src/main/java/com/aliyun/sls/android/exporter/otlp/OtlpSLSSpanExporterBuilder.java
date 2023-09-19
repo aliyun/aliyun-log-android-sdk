@@ -5,14 +5,21 @@ package com.aliyun.sls.android.exporter.otlp;
  * @date 2023/9/7
  */
 public final class OtlpSLSSpanExporterBuilder {
+    private String scope;
     private String endpoint;
     private String project;
     private String logstore;
     private String accessKeyId;
     private String accessKeySecret;
     private String accessKeyToken;
+    private boolean isPersistentFlush;
 
     public OtlpSLSSpanExporterBuilder() {
+    }
+
+    public OtlpSLSSpanExporterBuilder setScope(String scope) {
+        this.scope = scope;
+        return this;
     }
 
     public OtlpSLSSpanExporterBuilder setEndpoint(String endpoint) {
@@ -37,8 +44,22 @@ public final class OtlpSLSSpanExporterBuilder {
         return this;
     }
 
+    public OtlpSLSSpanExporterBuilder setPersistentFlush(boolean force) {
+        this.isPersistentFlush = force;
+        return this;
+    }
+
     public OtlpSLSSpanExporter build() {
-        return new OtlpSLSSpanExporter("uem", endpoint, project, logstore, accessKeyId, accessKeySecret, accessKeyToken);
+        return new OtlpSLSSpanExporter(
+            scope,
+            endpoint,
+            project,
+            logstore,
+            isPersistentFlush,
+            accessKeyId,
+            accessKeySecret,
+            accessKeyToken
+        );
     }
 
 }

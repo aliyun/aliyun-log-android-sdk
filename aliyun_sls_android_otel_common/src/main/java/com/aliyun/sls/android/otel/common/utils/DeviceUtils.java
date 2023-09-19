@@ -16,7 +16,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
-import com.aliyun.sls.android.otel.common.SLSLog;
 import com.aliyun.sls.android.otel.common.utdid.Utdid;
 
 /**

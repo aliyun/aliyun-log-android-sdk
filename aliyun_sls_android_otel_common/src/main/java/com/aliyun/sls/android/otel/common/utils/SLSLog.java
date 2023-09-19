@@ -1,4 +1,4 @@
-package com.aliyun.sls.android.otel.common;
+package com.aliyun.sls.android.otel.common.utils;
 
 import android.util.Log;
 
@@ -8,40 +8,25 @@ import android.util.Log;
  */
 public final class SLSLog {
     private static final String TAG = "SLSAndroid";
-    private static int level = Log.INFO;
-
-    public static void setLevel(int level) {
-        SLSLog.level = level;
-    }
 
     public static void v(String module, Object msg) {
-        if (level <= Log.VERBOSE) {
-            Log.v(TAG, format(module, msg));
-        }
+        Log.v(TAG, format(module, msg));
     }
 
     public static void d(String module, Object msg) {
-        if (level <= Log.DEBUG) {
-            Log.d(TAG, format(module, msg));
-        }
+        Log.d(TAG, format(module, msg));
     }
 
     public static void i(String module, Object msg) {
-        if (level <= Log.INFO) {
-            Log.i(TAG, format(module, msg));
-        }
+        Log.i(TAG, format(module, msg));
     }
 
     public static void w(String module, Object msg) {
-        if (level <= Log.WARN) {
-            Log.w(TAG, format(module, msg));
-        }
+        Log.w(TAG, format(module, msg));
     }
 
     public static void e(String module, Object msg) {
-        if (level <= Log.ERROR) {
-            Log.e(TAG, format(module, msg));
-        }
+        Log.e(TAG, format(module, msg));
     }
 
     private static String format(String module, Object msg) {

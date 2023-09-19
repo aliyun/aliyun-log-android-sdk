@@ -9,12 +9,14 @@ import android.content.Context;
 import android.text.TextUtils;
 import com.aliyun.sls.android.crashreporter.otel.CrashReporterOTel;
 import com.aliyun.sls.android.otel.common.AttributesHelper;
-import com.aliyun.sls.android.otel.common.Configuration;
 import com.aliyun.sls.android.otel.common.ConfigurationManager;
-import com.aliyun.sls.android.otel.common.ConfigurationManager.ConfigurationDelegate;
+import com.aliyun.sls.android.otel.common.ConfigurationManager.EnvironmentProvider;
+import com.aliyun.sls.android.otel.common.Environment;
+import com.aliyun.sls.android.otel.common.utils.SLSLog;
 import io.opentelemetry.api.trace.SpanBuilder;
 
-import static android.util.Log.w;
+import static com.aliyun.sls.android.otel.common.utils.SLSLog.v;
+import static com.aliyun.sls.android.otel.common.utils.SLSLog.w;
 import static java.lang.String.format;
 
 /**
@@ -28,14 +30,20 @@ public class CrashFileHelper {
     public static final String PATH_ITRACE_LOGS = PATH_ROOT + File.separator + "itrace_logs";
     public static final String PATH_ITRACE_TAGS = PATH_ROOT + File.separator + "itrace_tags";
 
-    public static void scanAndReport(Context context) {
-        CrashFileHelper helper = new CrashFileHelper();
+    private boolean debuggable;
+
+    private CrashFileHelper(boolean debuggable) {
+        this.debuggable = debuggable;
+    }
+
+    public static void scanAndReport(Context context, boolean debuggable) {
+        CrashFileHelper helper = new CrashFileHelper(debuggable);
         final File crashLogFile = new File(context.getFilesDir(), PATH_ITRACE_LOGS);
         helper.scanAndReport(context, crashLogFile);
     }
 
-    public static void parseCrashFile(Context context, File file, String type) {
-        CrashFileHelper helper = new CrashFileHelper();
+    public static void parseCrashFile(Context context, File file, String type, boolean debuggable) {
+        CrashFileHelper helper = new CrashFileHelper(debuggable);
         helper.parseTraceFile(context, type, file);
     }
 
@@ -62,9 +70,9 @@ public class CrashFileHelper {
 
     private void onLogParsedEnd(final Context context, final String type, final File file,
         final LogParserResult result) {
-        //if (options.debuggable) {
-        //    v(TAG, SLSLog.format("onLogParsedEnd. type: %s, content length: %d", type, content.length()));
-        //}
+        if (debuggable) {
+            v(TAG, SLSLog.format("onLogParsedEnd. start, type: %s", type));
+        }
 
         String time = result.getString("time");
         String id = result.getString("id");
@@ -94,8 +102,8 @@ public class CrashFileHelper {
             //);
         }
 
-        ConfigurationDelegate delegate = ConfigurationManager.getInstance().getConfigurationDelegate();
-        final Configuration configuration = null != delegate ? delegate.getConfiguration("uem") : null;
+        EnvironmentProvider provider = ConfigurationManager.getInstance().getEnvironmentProvider();
+        final Environment environment = null != provider ? provider.getEnvironment("uem") : null;
         builder.setAttribute("state", type)
             //.setAttribute("page.name")
             .setAttribute("t", "error")
@@ -104,36 +112,16 @@ public class CrashFileHelper {
             .setAttribute("ex.id", id)
             .setAttribute("ex.catId", catId)
             .setAllAttributes(AttributesHelper.create(context))
-            .setAttribute("uid", null != configuration ? configuration.getUid() : "");
+            .setAttribute("uid", null != environment ? environment.getUid() : "");
 
         builder.startSpan().end();
-        //
-        //final String topActivity = AppUtils.getTopActivity();
-        //final String eventName = "Application crashed";
-        //SpanBuilder builder = SLSAndroidRum.spanBuilder(eventName)
-        //    .setStart(start)
-        //    .addAttribute(
-        //        Attribute.of(
-        //            Pair.create("title", eventName),
-        //            Pair.create("state", type),
-        //            Pair.create("page.name", TextUtils.isEmpty(topActivity) ? "" : topActivity),
-        //            Pair.create("t", "error"),
-        //            Pair.create("ex.type", "crash"),
-        //            Pair.create("ex.sub_type", type),
-        //            Pair.create("ex.id", id),
-        //            Pair.create("ex.catId", catId),
-        //            Pair.create("ex.file", file.getName())
-        //        )
-        //    )
-        //    .addAttribute(attributes);
-        //Span span = builder.build();
-        //final boolean ret = span.end();
-        //if (ret) {
-        //    //noinspection ResultOfMethodCallIgnored
-        //    file.delete();
-        //} else {
-        //    w(TAG, "send crash span to log producer error.");
-        //}
+
+        CrashReporterOTel.getTracerProvider().forceFlush();
+        //noinspection ResultOfMethodCallIgnored
+        file.delete();
+        if (debuggable) {
+            v(TAG, SLSLog.format("onLogParsedEnd. finish"));
+        }
     }
 
     private String obtainTime(String info) {

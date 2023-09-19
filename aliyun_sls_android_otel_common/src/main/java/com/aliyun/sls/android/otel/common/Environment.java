@@ -4,17 +4,17 @@ package com.aliyun.sls.android.otel.common;
  * @author yulong.gyl
  * @date 2023/9/14
  */
-public class Configuration {
+public class Environment {
     private String env;
     private String uid;
     private String utdid;
     private String channel;
 
-    private Configuration() {
+    private Environment() {
     }
 
-    public static Configuration configuration() {
-        return new Configuration();
+    public static Environment environment() {
+        return new Environment();
     }
 
     public String getEnv() {

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import com.aliyun.sls.android.crashreporter.otel.CrashReporterOTel;
 import com.aliyun.sls.android.crashreporter.parser.CrashFileHelper;
 import com.aliyun.sls.android.otel.common.AttributesHelper;
+import com.aliyun.sls.android.otel.common.utils.AppUtils;
 import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.ICrashClient;
 
@@ -21,23 +22,36 @@ public final class CrashReporter {
     public static final String PATH_ITRACE_LOGS = PATH_ROOT + File.separator + "itrace_logs";
     public static final String PATH_ITRACE_TAGS = PATH_ROOT + File.separator + "itrace_tags";
 
-    private final Application application;
-
     private CrashApi crashApi;
 
-    public CrashReporter(Application application) {
-        this.application = application;
+    private static final class Holder {
+        private static final CrashReporter INSTANCE = new CrashReporter();
     }
 
-    public void init(boolean debuggable) {
-        CrashReporterOTel.getInstance().initOtel(application.getApplicationContext());
+    private CrashReporter() {
+        //no instance
+    }
 
-        String fileDirName = application.getFilesDir().getName();
+    public static void init(Application application) {
+        CrashReporter.init(application, false);
+    }
+
+    public static void init(Application application, boolean debuggable) {
+        Holder.INSTANCE.initInternal(application, debuggable);
+    }
+
+    private void initInternal(Application application, boolean debuggable) {
+        final Context context = application.getApplicationContext();
+
+        CrashReporterOTel.getInstance().initOtel(context);
+
+        String fileDirName = context.getFilesDir().getName();
+
         final Bundle args = new Bundle();
+        args.putString("mAppId", "sls-inside");
+        args.putBoolean("mDebug", debuggable && AppUtils.debuggable(context));
         // 路径配置
         args.putBoolean("mBackupLogs", false);
-        args.putBoolean("mBackupLogs", debuggable);
-        //args.putString("mLogsBackupPathName", new File(rootPath, "backup").getAbsolutePath());
         args.putString("mTagFilesFolderName", fileDirName + File.separator + PATH_ITRACE_TAGS);
         args.putString("mCrashLogsFolderName", fileDirName + File.separator + PATH_ITRACE_LOGS);
 
@@ -59,55 +73,57 @@ public final class CrashReporter {
         args.putBoolean("mEncryptLog", false);
         // 关闭压缩
         args.putBoolean("mZipLog", false);
-        //args.putString("mJavaCrashLogFileName", "java_" + System.currentTimeMillis() + "_java.log");
-        //args.putString("mNativeCrashLogFileName", "native_" + System.currentTimeMillis() + "_jni.log");
-        //args.putString("mUnexpCrashLogFileName", "unexp_" + System.currentTimeMillis() + "_unexp.log");
-
         args.putBoolean("useApplicationContext", true);
 
         // 不上报, 通过 sls 上报
         args.putBoolean("mEnableStatReport", true);
         args.putBoolean("mSyncUploadSetupCrashLogs", false);
         args.putBoolean("mSyncUploadLogs", false);
-        //args.putLong("mDisableSignals", (1 << 14) | (1 << 1));
-        //args.putLong("mDisableBackgroundSignals", 1 << 14);
         args.putInt("uploadLogDelaySeconds", -1);
         args.putInt("mInfoSaveFrequency", 3);
 
         // 防止 uc 计算 crc
-        //args.putString("mBuildId", AppUtils.getAppVersion(application));
+        args.putString("mBuildId", AppUtils.getAppVersion(context));
+
+        // 错误分析文件数量限制设置
+        args.putInt("mMaxCustomLogFilesCount", Integer.MAX_VALUE);
+        args.putInt("mMaxCustomLogCountPerTypePerDay", Integer.MAX_VALUE);
+        args.putInt("mMaxUploadCustomLogCountPerDay", Integer.MAX_VALUE);
 
         //final String appId = options.instanceId;
-        crashApi = CrashApi.createInstanceEx(application, "sls-internal", false, args,
-            new InternalCrashClient(application));
-        crashApi.setCrashStatReporter((uuid, stat) -> {
-            //if (options.debuggable) {
-            //    SLSLog.v(TAG, "report dau stat, stat: " + stat);
-            //}
-
-            CrashFileHelper.scanAndReport(application);
-
-            CrashReporterOTel.spanBuilder("app.start")
-                .setAttribute("t", "pv")
-                .setAllAttributes(AttributesHelper.create(application.getApplicationContext()))
-                .startSpan()
-                .end();
-
-            return true;
-        });
+        crashApi = CrashApi.createInstanceEx(context,
+            "sls-inside",
+            false,
+            args,
+            new InternalCrashClient(context, debuggable)
+        );
+        //crashApi.setCrashStatReporter((uuid, stat) -> {
+        //    CrashFileHelper.scanAndReport(context, debuggable);
+        //    return true;
+        //});
         crashApi.setForeground(true);
+
+        CrashReporterOTel.spanBuilder("app.start")
+            .setAttribute("t", "pv")
+            .setAllAttributes(AttributesHelper.create(context))
+            .startSpan()
+            .end();
+
+        CrashFileHelper.scanAndReport(context, debuggable);
     }
 
     private static class InternalCrashClient implements ICrashClient {
-        private Context context;
+        private final Context context;
+        private final boolean debuggable;
 
-        public InternalCrashClient(Context context) {
+        public InternalCrashClient(Context context, boolean debuggable) {
             this.context = context;
+            this.debuggable = debuggable;
         }
 
         @Override
         public void onLogGenerated(File file, String s) {
-            CrashFileHelper.parseCrashFile(this.context, file, s);
+            CrashFileHelper.parseCrashFile(this.context, file, s, debuggable);
         }
 
         @Override

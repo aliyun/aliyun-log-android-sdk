@@ -10,7 +10,7 @@ import java.util.Map;
 import android.text.TextUtils;
 import com.aliyun.sls.android.otel.common.AccessKey;
 import com.aliyun.sls.android.otel.common.ConfigurationManager;
-import com.aliyun.sls.android.otel.common.ConfigurationManager.AccessKeyDelegate;
+import com.aliyun.sls.android.otel.common.ConfigurationManager.AccessKeyProvider;
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
@@ -49,6 +49,7 @@ public class OtlpSLSSpanExporter implements SpanExporter {
     private String endpoint;
     private String project;
     private String logstore;
+    private boolean isPersistentFlush = false;
     private String accessKeyId;
     private String accessKeySecret;
     private String accessKeyToken;
@@ -58,12 +59,13 @@ public class OtlpSLSSpanExporter implements SpanExporter {
         return new OtlpSLSSpanExporterBuilder();
     }
 
-    public OtlpSLSSpanExporter(String scope, String endpoint, String project, String logstore, String accessKeyId,
-        String accessKeySecret, String accessKeyToken) {
+    OtlpSLSSpanExporter(String scope, String endpoint, String project, String logstore, boolean isPersistentFlush,
+        String accessKeyId, String accessKeySecret, String accessKeyToken) {
         this.scope = scope;
         this.endpoint = endpoint;
         this.project = project;
         this.logstore = logstore;
+        this.isPersistentFlush = isPersistentFlush;
         this.accessKeyId = accessKeyId;
         this.accessKeySecret = accessKeySecret;
         this.accessKeyToken = accessKeyToken;
@@ -82,11 +84,11 @@ public class OtlpSLSSpanExporter implements SpanExporter {
                     v(TAG,
                         "client onCall. result: " + LogProducerResult.fromInt(resultCode) + ", error: " + errorMessage);
 
-                    final AccessKeyDelegate delegate = ConfigurationManager.getInstance().getAccessKeyDelegate();
-                    if (null == delegate) {
+                    final AccessKeyProvider provider = ConfigurationManager.getInstance().getAccessKeyProvider();
+                    if (null == provider) {
                         return;
                     }
-                    final AccessKey accessKey = delegate.getAccessKey(scope);
+                    final AccessKey accessKey = provider.getAccessKey(scope);
                     if (null == accessKey) {
                         return;
                     }
@@ -130,7 +132,7 @@ public class OtlpSLSSpanExporter implements SpanExporter {
         }
         config.setPersistentFilePath(rootPath + "/data");
         // 是否每次AddLog强制刷新，高可靠性场景建议打开
-        config.setPersistentForceFlush(1);
+        config.setPersistentForceFlush(this.isPersistentFlush ? 1 : 0);
         // 持久化文件滚动个数，建议设置成10。
         config.setPersistentMaxFileCount(10);
         // 每个持久化文件的大小，建议设置成1-10M

@@ -5,21 +5,21 @@ package com.aliyun.sls.android.otel.common;
  * @date 2023/9/13
  */
 public class ConfigurationManager {
-    public interface AccessKeyDelegate {
+    public interface AccessKeyProvider {
         AccessKey getAccessKey(String scope);
     }
 
-    public interface ResourceDelegate {
-        Resource getResource(String scope);
+    public interface WorkspaceProvider {
+        Workspace getResource(String scope);
     }
 
-    public interface ConfigurationDelegate {
-        Configuration getConfiguration(String scope);
+    public interface EnvironmentProvider {
+        Environment getEnvironment(String scope);
     }
 
-    private AccessKeyDelegate accessKeyDelegate;
-    private ResourceDelegate resourceDelegate;
-    private ConfigurationDelegate configurationDelegate;
+    private AccessKeyProvider accessKeyProvider;
+    private WorkspaceProvider workspaceProvider;
+    private EnvironmentProvider environmentProvider;
 
     private static final class Holder {
         private static final ConfigurationManager INSTANCE = new ConfigurationManager();
@@ -33,22 +33,22 @@ public class ConfigurationManager {
         return Holder.INSTANCE;
     }
 
-    public void setDelegate(AccessKeyDelegate accessKeyDelegate, ResourceDelegate resourceDelegate,
-        ConfigurationDelegate configurationDelegate) {
-        this.accessKeyDelegate = accessKeyDelegate;
-        this.resourceDelegate = resourceDelegate;
-        this.configurationDelegate = configurationDelegate;
+    public void setProvider(AccessKeyProvider accessKeyProvider, WorkspaceProvider workspaceProvider,
+        EnvironmentProvider environmentProvider) {
+        this.accessKeyProvider = accessKeyProvider;
+        this.workspaceProvider = workspaceProvider;
+        this.environmentProvider = environmentProvider;
     }
 
-    public AccessKeyDelegate getAccessKeyDelegate() {
-        return accessKeyDelegate;
+    public AccessKeyProvider getAccessKeyProvider() {
+        return accessKeyProvider;
     }
 
-    public ResourceDelegate getResourceDelegate() {
-        return resourceDelegate;
+    public WorkspaceProvider getWorkspaceProvider() {
+        return workspaceProvider;
     }
 
-    public ConfigurationDelegate getConfigurationDelegate() {
-        return configurationDelegate;
+    public EnvironmentProvider getEnvironmentProvider() {
+        return environmentProvider;
     }
 }

@@ -29,9 +29,9 @@ import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
 import com.aliyun.sls.android.ot.Span;
 import com.aliyun.sls.android.otel.common.AccessKey;
-import com.aliyun.sls.android.otel.common.Configuration;
 import com.aliyun.sls.android.otel.common.ConfigurationManager;
-import com.aliyun.sls.android.otel.common.Resource;
+import com.aliyun.sls.android.otel.common.Environment;
+import com.aliyun.sls.android.otel.common.Workspace;
 import com.aliyun.sls.android.producer.BuildConfig;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
@@ -62,27 +62,27 @@ public class SLSDemoApplication extends MultiDexApplication {
         }
 
         if (true) {
-            ConfigurationManager.getInstance().setDelegate(
+            ConfigurationManager.getInstance().setProvider(
                 scope -> AccessKey.accessKey(
                     PreferenceUtils.getAccessKeyId(SLSDemoApplication.this),
                     PreferenceUtils.getAccessKeySecret(SLSDemoApplication.this),
                     PreferenceUtils.getAccessKeyToken(SLSDemoApplication.this)),
-                scope -> Resource.resource(
+                scope -> Workspace.workspace(
                     //"https://cn-shanghai.log.aliyuncs.com",
                     //"test-uem",
                     //"sls-uem-test"),
                     "https://cn-hangzhou.log.aliyuncs.com",
                     "sls-aysls-rum-mobile",
-                    "yuanbo-test-2"),
+                    "yuanbo-test-007"),
                 scope -> {
-                    Configuration configuration = Configuration.configuration();
-                    configuration.setEnv("dev");
-                    configuration.setUid("123456789");
-                    return configuration;
+                    Environment environment = Environment.environment();
+                    environment.setEnv("dev");
+                    environment.setUid("123456789");
+                    return environment;
                 }
             );
 
-            new CrashReporter(this).init(true);
+            CrashReporter.init(this, true);
             return;
         }
 
