@@ -91,11 +91,13 @@ dependencies {
 //    implementation 'io.github.aliyun-sls:sls-android-ot:1.0.8.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-ot-ktx:1.0.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-network-diagnosis:2.1.0@aar'
-//    implementation 'io.github.aliyun-sls:sls-android-crashreporter:2.0.6.1@aar'
+//    implementation 'io.github.aliyun-sls:android-crashreporter:1.0.0@aar'
+//    implementation 'io.github.aliyun-sls:android-exporter-otlp:1.0.0@aar'
+//    implementation 'io.github.aliyun-sls:android-otel-common:1.0.0@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-blockdetection:1.0.3.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-trace:1.0.7@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-okhttp:1.0.7.1@aar'
-//    implementation 'io.github.aliyun-sls:sls-android-webview-instrumentation:1.0.0@aar'
+//    implementation 'io.github.aliyun-sls:sls-android-webview-instrumentation:1.1.0@aar'
 //    // sls-android-webview-instrumentation 需要
 //    implementation 'org.jsoup:jsoup:1.13.1'
 
