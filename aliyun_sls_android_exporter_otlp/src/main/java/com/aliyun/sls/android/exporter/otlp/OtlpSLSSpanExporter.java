@@ -26,7 +26,6 @@ import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import org.jetbrains.annotations.Contract;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -54,7 +53,6 @@ public class OtlpSLSSpanExporter implements SpanExporter {
     private String accessKeySecret;
     private String accessKeyToken;
 
-    @Contract(value = " -> new", pure = true)
     public static OtlpSLSSpanExporterBuilder builder() {
         return new OtlpSLSSpanExporterBuilder();
     }
