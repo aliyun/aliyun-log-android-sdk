@@ -71,9 +71,9 @@ public class SLSDemoApplication extends MultiDexApplication {
                     //"https://cn-shanghai.log.aliyuncs.com",
                     //"test-uem",
                     //"sls-uem-test"),
-                    "https://cn-hangzhou.log.aliyuncs.com",
-                    "sls-aysls-rum-mobile",
-                    "yuanbo-test-007"),
+                    "https://cn-beijing.log.aliyuncs.com",
+                    "qs-demos",
+                    "sls-mall"),
                 scope -> {
                     Environment environment = Environment.environment();
                     environment.setEnv("dev");
