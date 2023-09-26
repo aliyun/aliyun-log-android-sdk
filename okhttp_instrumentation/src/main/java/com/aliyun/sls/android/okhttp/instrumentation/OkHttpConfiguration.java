@@ -7,7 +7,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
@@ -141,23 +140,11 @@ public final class OkHttpConfiguration {
             builder.interceptors().add(0, CONTEXT_INTERCEPTOR_OBJ);
             builder.interceptors().add(1, new ConnectionErrorSpanInterceptor(instrumenter));
 
-            OpenTelemetry telemetry = OkHttpConfiguration.telemetry;
-            // use GlobalOpenTelemetry default.
-            if (null == telemetry) {
-                telemetry = GlobalOpenTelemetry.get();
-            }
-
             builder.networkInterceptors().add(new TracingInterceptor(instrumenter, telemetry.getPropagators()));
         }
     }
 
     private static Instrumenter<Request, Response> makeNewInstrumenter() {
-        OpenTelemetry telemetry = OkHttpConfiguration.telemetry;
-        // use GlobalOpenTelemetry default.
-        if (null == telemetry) {
-            telemetry = GlobalOpenTelemetry.get();
-        }
-
         if (null == telemetry) {
             return null;
         }
