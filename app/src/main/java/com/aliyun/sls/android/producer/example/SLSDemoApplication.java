@@ -25,6 +25,7 @@ import com.aliyun.sls.android.crashreporter.CrashReporter;
 import com.aliyun.sls.android.okhttp.OKHttp3InstrumentationDelegate;
 import com.aliyun.sls.android.okhttp.OKHttp3Tracer;
 import com.aliyun.sls.android.okhttp.OkHttp3Configuration;
+import com.aliyun.sls.android.okhttp.instrumentation.OkHttpConfiguration;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProvider;
 import com.aliyun.sls.android.ot.Span;
@@ -35,15 +36,23 @@ import com.aliyun.sls.android.otel.common.Workspace;
 import com.aliyun.sls.android.producer.BuildConfig;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.common.AttributesBuilder;
+import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
+import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * @author gordon
@@ -60,6 +69,9 @@ public class SLSDemoApplication extends MultiDexApplication {
         if (BuildConfig.CONFIG_ENABLE) {
             PreferenceUtils.overrideConfig(this);
         }
+        initOTel();
+
+        new Thread(() -> httpRequest()).start();
 
         if (true) {
             ConfigurationManager.getInstance().setProvider(
@@ -68,12 +80,12 @@ public class SLSDemoApplication extends MultiDexApplication {
                     PreferenceUtils.getAccessKeySecret(SLSDemoApplication.this),
                     PreferenceUtils.getAccessKeyToken(SLSDemoApplication.this)),
                 scope -> Workspace.workspace(
-                    //"https://cn-shanghai.log.aliyuncs.com",
-                    //"test-uem",
-                    //"sls-uem-test"),
-                    "https://cn-beijing.log.aliyuncs.com",
-                    "qs-demos",
-                    "sls-mall"),
+                    "https://cn-hangzhou.log.aliyuncs.com",
+                    "sls-aysls-rum-mobile",
+                    "mobile-uem-test"),
+                    //"https://cn-beijing.log.aliyuncs.com",
+                    //"qs-demos",
+                    //"sls-mall"),
                 scope -> {
                     Environment environment = Environment.environment();
                     environment.setEnv("dev");
@@ -85,8 +97,6 @@ public class SLSDemoApplication extends MultiDexApplication {
             CrashReporter.init(this, true);
             return;
         }
-
-        initOTel();
 
         Credentials credentials = new Credentials();
         credentials.instanceId = "androd-dev-f1a8";
@@ -261,6 +271,26 @@ public class SLSDemoApplication extends MultiDexApplication {
         }
     }
 
+    private void httpRequest() {
+        io.opentelemetry.api.trace.Span span = GlobalOpenTelemetry.getTracer("Android")
+            .spanBuilder("httpRequest")
+            .startSpan();
+
+        try (Scope ignored = span.makeCurrent()){
+            try {
+                new OkHttpClient.Builder().build().newCall(
+                    new Request.Builder()
+                        .url("http://sls-mall.caa227ac081f24f1a8556f33d69b96c99.cn-beijing.alicontainer.com/catalogue")
+                        .build()
+                ).execute();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } finally {
+            span.end();
+        }
+    }
+
     private void initOTel() {
         OtlpGrpcSpanExporter grpcSpanExporter = OtlpGrpcSpanExporter.builder()
             .setEndpoint("https://cn-beijing.log.aliyuncs.com:10010")
@@ -288,5 +318,25 @@ public class SLSDemoApplication extends MultiDexApplication {
             .setTracerProvider(tracerProvider)
             .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
             .buildAndRegisterGlobal();
+
+        OkHttpConfiguration.setOpenTelemetry(GlobalOpenTelemetry.get());
+        OkHttpConfiguration.setCaptureRequestHeaders(true);
+        OkHttpConfiguration.setCaptureResponseHeaders(true);
+        OkHttpConfiguration.setCaptureRequestBody(true);
+        OkHttpConfiguration.setCaptureResponseBody(true);
+        OkHttpConfiguration.addAttributesExtractor(
+            new AttributesExtractor<Request, Response>() {
+                @Override
+                public void onStart(AttributesBuilder attributes, Context parentContext, Request request) {
+
+                }
+
+                @Override
+                public void onEnd(AttributesBuilder attributes, Context context, Request request, Response response,
+                    Throwable error) {
+
+                }
+            }
+        );
     }
 }
