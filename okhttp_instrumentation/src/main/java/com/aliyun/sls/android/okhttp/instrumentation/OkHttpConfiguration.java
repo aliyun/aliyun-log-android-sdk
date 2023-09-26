@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
@@ -34,6 +35,7 @@ import okio.BufferedSource;
 /**
  * @author yulong.gyl
  * @date 2023/9/25
+ * @noinspection unused
  */
 public final class OkHttpConfiguration {
     static {
@@ -74,31 +76,51 @@ public final class OkHttpConfiguration {
         ATTRIBUTES_EXTRACTORS.add(httpHeadersAttributes);
     }
 
+    /**
+     * @noinspection unused
+     */
     public static void setOpenTelemetry(OpenTelemetry telemetry) {
         OkHttpConfiguration.telemetry = telemetry;
     }
 
+    /**
+     * @noinspection unused
+     */
     public static void addAttributesExtractor(AttributesExtractor<Request, Response> attributesExtractor) {
         ATTRIBUTES_EXTRACTORS.add(attributesExtractor);
     }
 
+    /**
+     * @noinspection unused
+     */
     public static void setCaptureRequestHeaders(boolean captureRequestHeaders) {
         httpHeadersAttributes.setCaptureRequestHeaders(captureRequestHeaders);
     }
 
+    /**
+     * @noinspection unused
+     */
     public static void setCaptureRequestBody(boolean captureRequestBody) {
         httpHeadersAttributes.setCaptureRequestBody(captureRequestBody);
     }
 
+    /**
+     * @noinspection unused
+     */
     public static void setCaptureResponseHeaders(boolean captureResponseHeaders) {
         httpHeadersAttributes.setCaptureResponseHeaders(captureResponseHeaders);
     }
 
+    /**
+     * @noinspection unused
+     */
     public static void setCaptureResponseBody(boolean captureResponseBody) {
         httpHeadersAttributes.setCaptureResponseBody(captureResponseBody);
     }
 
-    /** @noinspection unused*/
+    /**
+     * @noinspection unused
+     */
     public static Request injectNewCall(Request request) {
         if (null != contextsByRequest) {
             contextsByRequest.set(request, Context.current());
@@ -106,7 +128,9 @@ public final class OkHttpConfiguration {
         return request;
     }
 
-    /** @noinspection unused*/
+    /**
+     * @noinspection unused
+     */
     public static void injectNewBuilder(OkHttpClient.Builder builder) {
         if (!builder.interceptors().contains(CONTEXT_INTERCEPTOR_OBJ)) {
             final Instrumenter<Request, Response> instrumenter = makeNewInstrumenter();
@@ -117,11 +141,23 @@ public final class OkHttpConfiguration {
             builder.interceptors().add(0, CONTEXT_INTERCEPTOR_OBJ);
             builder.interceptors().add(1, new ConnectionErrorSpanInterceptor(instrumenter));
 
+            OpenTelemetry telemetry = OkHttpConfiguration.telemetry;
+            // use GlobalOpenTelemetry default.
+            if (null == telemetry) {
+                telemetry = GlobalOpenTelemetry.get();
+            }
+
             builder.networkInterceptors().add(new TracingInterceptor(instrumenter, telemetry.getPropagators()));
         }
     }
 
     private static Instrumenter<Request, Response> makeNewInstrumenter() {
+        OpenTelemetry telemetry = OkHttpConfiguration.telemetry;
+        // use GlobalOpenTelemetry default.
+        if (null == telemetry) {
+            telemetry = GlobalOpenTelemetry.get();
+        }
+
         if (null == telemetry) {
             return null;
         }
