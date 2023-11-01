@@ -108,6 +108,7 @@ public class CrashReporterFeature extends SdkFeature {
         }
 
         crashApi.updateCustomInfo(createCrashBundle(configuration, credentials));
+        crashApi.disableLog(0x10000000);
     }
 
     @Override
@@ -163,6 +164,7 @@ public class CrashReporterFeature extends SdkFeature {
         String fileDirName = context.getFilesDir().getName();
 
         final Bundle args = new Bundle();
+        args.putString("crver", "2.0");
         args.putString("mAppId", getAppIdByInstanceId(appId));
         args.putBoolean("mDebug", configuration.debuggable && AppUtils.debuggable(context));
         // 路径配置
@@ -272,6 +274,8 @@ public class CrashReporterFeature extends SdkFeature {
                 return null;
             }
         });
+
+        crashApi.disableLog(0x10000000);
         crashApi.setCrashStatReporter((uuid, stat) -> {
             reportState(uuid, stat);
             reportCrash();

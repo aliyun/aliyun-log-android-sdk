@@ -49,6 +49,7 @@ public final class CrashReporter {
 
         final Bundle args = new Bundle();
         args.putString("mAppId", "sls-inside");
+        args.putString("crver", "2.0");
         args.putBoolean("mDebug", debuggable && AppUtils.debuggable(context));
         // 路径配置
         args.putBoolean("mBackupLogs", false);
@@ -97,6 +98,7 @@ public final class CrashReporter {
             args,
             new InternalCrashClient(context, debuggable)
         );
+        crashApi.disableLog(0x10000000);
         //crashApi.setCrashStatReporter((uuid, stat) -> {
         //    CrashFileHelper.scanAndReport(context, debuggable);
         //    return true;
