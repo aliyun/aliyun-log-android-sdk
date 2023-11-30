@@ -7,7 +7,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.1.0"
 
         buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
         buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
@@ -39,10 +39,10 @@ dependencies {
 
     implementation project(":aliyun_sls_android_producer")
 
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.22.0"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.30.0"))
     implementation("io.opentelemetry:opentelemetry-api")
     implementation('io.opentelemetry:opentelemetry-sdk')
-    implementation("io.opentelemetry:opentelemetry-semconv")
+    implementation("io.opentelemetry:opentelemetry-semconv:1.30.0-alpha")
 }
 
 ext {

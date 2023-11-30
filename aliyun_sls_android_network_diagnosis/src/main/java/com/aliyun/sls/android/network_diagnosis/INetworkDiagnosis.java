@@ -6,6 +6,12 @@ import java.util.Map;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 
+import com.alibaba.netspeed.network.FlowNode;
+
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
+
 /**
  * @author gordon
  * @date 2022/7/22
@@ -110,6 +116,8 @@ public interface INetworkDiagnosis {
     }
 
     // region setup
+    void setupTracer(SdkTracerProviderBuilder builder);
+
     void setPolicyDomain(String domain);
 
     void disableExNetworkInfo();
@@ -138,6 +146,8 @@ public interface INetworkDiagnosis {
         public Object context;
         public boolean multiplePortsDetect = true;
         public Map<String, String> extension;
+
+        public FlowNode flowNode;
     }
 
     class HttpRequest extends PingRequest {
@@ -150,6 +160,8 @@ public interface INetworkDiagnosis {
             timeout = 15 * DEFAULT_TIMEOUT; // timeout 30s
         }
     }
+
+    void setOpenTelemetrySdk(OpenTelemetry openTelemetrySdk);
 
     @Deprecated
     void http(String url);

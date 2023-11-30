@@ -11,6 +11,10 @@ import com.alibaba.netspeed.network.MtrConfig;
 import com.alibaba.netspeed.network.PingConfig;
 import com.alibaba.netspeed.network.TcpPingConfig;
 
+import com.aliyun.sls.android.exporter.otlp.OtlpSLSSpanExporter;
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
+import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+
 /**
  * @author gordon
  * @date 2023/4/6
@@ -35,6 +39,11 @@ public class NetSpeedDiagnosis implements IDiagnosis {
     @Override
     public void registerLogger(Object context, Logger logger) {
         Diagnosis.registerLogger(context, logger);
+    }
+
+    public void setupTracer(SdkTracerProviderBuilder builder) {
+        OtlpSLSSpanExporter exporter = Diagnosis.genExporter("", "", "", "", "", null);
+        builder.addSpanProcessor(BatchSpanProcessor.builder(exporter).build());
     }
 
     @Override

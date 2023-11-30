@@ -18,6 +18,7 @@ import com.aliyun.sls.android.producer.LogProducerException;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.api.trace.SpanId;
 import io.opentelemetry.api.trace.TraceState;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.common.InstrumentationLibraryInfo;
@@ -294,7 +295,11 @@ public class OtlpSLSSpanExporter implements SpanExporter {
         put(log, "kind", span.getKind().name());
         put(log, "traceID", span.getTraceId());
         put(log, "spanID", span.getSpanId());
-        put(log, "parentSpanID", span.getParentSpanId());
+        if (SpanId.getInvalid().equalsIgnoreCase(span.getParentSpanId())) {
+            put(log, "parentSpanID", "");
+        } else {
+            put(log, "parentSpanID", span.getParentSpanId());
+        }
 
         if (null != span.getLinks()) {
             put(log, "links", linksToLog(span.getLinks()));

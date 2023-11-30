@@ -9,7 +9,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.1.0"
 
         buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
         buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
@@ -40,20 +40,20 @@ android {
 
 dependencies {
     testImplementation(project(':testable'))
-    testImplementation(platform("io.opentelemetry:opentelemetry-bom:1.22.0"))
+    testImplementation(platform("io.opentelemetry:opentelemetry-bom:1.30.0"))
     testImplementation("io.opentelemetry:opentelemetry-api")
     testImplementation('io.opentelemetry:opentelemetry-sdk')
-    testImplementation("io.opentelemetry:opentelemetry-semconv")
+    testImplementation("io.opentelemetry:opentelemetry-semconv:1.30.0-alpha")
     testImplementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
     implementation project(":aliyun_sls_android_producer")
     implementation project(":aliyun_sls_android_otel_common")
 
     implementation 'androidx.annotation:annotation:1.6.0'
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.22.0"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.30.0"))
     implementation("io.opentelemetry:opentelemetry-api")
     implementation('io.opentelemetry:opentelemetry-sdk')
-    implementation("io.opentelemetry:opentelemetry-semconv")
+    implementation("io.opentelemetry:opentelemetry-semconv:1.30.0-alpha")
 }
 
 ext {
