@@ -41,11 +41,6 @@ public class NetSpeedDiagnosis implements IDiagnosis {
         Diagnosis.registerLogger(context, logger);
     }
 
-    public void setupTracer(SdkTracerProviderBuilder builder) {
-        OtlpSLSSpanExporter exporter = Diagnosis.genExporter("", "", "", "", "", null);
-        builder.addSpanProcessor(BatchSpanProcessor.builder(exporter).build());
-    }
-
     @Override
     public void setPolicyDomain(String domain) {
         Diagnosis.setPolicyDomain(domain);

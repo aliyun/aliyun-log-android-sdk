@@ -11,6 +11,8 @@ import android.text.TextUtils;
 import com.aliyun.sls.android.otel.common.AccessKey;
 import com.aliyun.sls.android.otel.common.ConfigurationManager;
 import com.aliyun.sls.android.otel.common.ConfigurationManager.AccessKeyProvider;
+import com.aliyun.sls.android.otel.common.ConfigurationManager.WorkspaceProvider;
+import com.aliyun.sls.android.otel.common.Workspace;
 import com.aliyun.sls.android.producer.Log;
 import com.aliyun.sls.android.producer.LogProducerClient;
 import com.aliyun.sls.android.producer.LogProducerConfig;
@@ -80,33 +82,60 @@ public class OtlpSLSSpanExporter implements SpanExporter {
         try {
             this.client = new LogProducerClient(config,
                 (resultCode, reqId, errorMessage, logBytes, compressedBytes) -> {
-                    v(TAG,
-                        "client onCall. result: " + LogProducerResult.fromInt(resultCode) + ", error: " + errorMessage);
+                    final LogProducerResult code = LogProducerResult.fromInt(resultCode);
+                    v(TAG,"client onCall. result: " + code + ", error: " + errorMessage);
 
-                    final AccessKeyProvider provider = ConfigurationManager.getInstance().getAccessKeyProvider();
-                    if (null == provider) {
-                        return;
-                    }
-                    final AccessKey accessKey = provider.getAccessKey(scope);
-                    if (null == accessKey) {
-                        return;
-                    }
+                    if (code == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
+                        updateAccessKey();
 
-                    final String accessKeyId = accessKey.getAccessKeyId();
-                    final String accessKeySecret = accessKey.getAccessKeySecret();
-                    final String accessKeyToken = accessKey.getAccessKeySecurityToken();
-                    if (TextUtils.isEmpty(accessKeyToken)) {
-                        config.setAccessKeyId(accessKeyId);
-                        config.setAccessKeySecret(accessKeySecret);
-                    } else {
-                        config.resetSecurityToken(accessKey.getAccessKeyId(),
-                            accessKey.getAccessKeySecret(),
-                            accessKey.getAccessKeySecurityToken()
-                        );
+                        final WorkspaceProvider provider = ConfigurationManager.getInstance().getWorkspaceProvider();
+                        if (null == provider) {
+                            return;
+                        }
+
+                        final Workspace workspace = provider.getResource(scope);
+                        if (null == workspace) {
+                            return;
+                        }
+
+                        final String endpoint = workspace.getEndpoint();
+                        final String project = workspace.getProject();
+                        final String logstore = workspace.getInstanceId();
+
+                        config.setEndpoint(endpoint);
+                        config.setProject(project);
+                        config.setLogstore(logstore);
+                    } else if (code == LogProducerResult.LOG_PRODUCER_SEND_UNAUTHORIZED) {
+                        updateAccessKey();
                     }
                 });
         } catch (LogProducerException e) {
             e(TAG, "new LogProducerClient() case error. e: " + e);
+        }
+    }
+
+    private void updateAccessKey() {
+        final AccessKeyProvider provider = ConfigurationManager.getInstance().getAccessKeyProvider();
+        if (null == provider) {
+            return;
+        }
+
+        final AccessKey accessKey = provider.getAccessKey(scope);
+        if (null == accessKey) {
+            return;
+        }
+
+        final String accessKeyId = accessKey.getAccessKeyId();
+        final String accessKeySecret = accessKey.getAccessKeySecret();
+        final String accessKeyToken = accessKey.getAccessKeySecurityToken();
+        if (TextUtils.isEmpty(accessKeyToken)) {
+            config.setAccessKeyId(accessKeyId);
+            config.setAccessKeySecret(accessKeySecret);
+        } else {
+            config.resetSecurityToken(accessKey.getAccessKeyId(),
+                accessKey.getAccessKeySecret(),
+                accessKey.getAccessKeySecurityToken()
+            );
         }
     }
 

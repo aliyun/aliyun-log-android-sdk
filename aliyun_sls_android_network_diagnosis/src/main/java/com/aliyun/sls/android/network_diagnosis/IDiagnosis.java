@@ -26,8 +26,6 @@ public interface IDiagnosis {
 
     void registerLogger(Object context, Logger logger);
 
-    void setupTracer(SdkTracerProviderBuilder builder);
-
     void setPolicyDomain(String domain);
 
     void disableExNetworkInfo();

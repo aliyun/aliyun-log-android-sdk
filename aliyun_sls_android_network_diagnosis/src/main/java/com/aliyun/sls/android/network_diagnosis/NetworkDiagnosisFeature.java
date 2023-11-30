@@ -29,6 +29,7 @@ import com.aliyun.sls.android.core.sender.SdkSender;
 import com.aliyun.sls.android.core.sender.Sender;
 import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.core.utils.AppUtils;
+import com.aliyun.sls.android.network_diagnosis.trace.NetworkDiagnosisHelper;
 import com.aliyun.sls.android.network_diagnosis.trace.TraceNode;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProcessor;
@@ -133,6 +134,12 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(networkDiagnosisCredentials.secretKey);
         }
 
+        NetworkDiagnosisHelper.updateWorkspace(
+            networkDiagnosisCredentials.endpoint,
+            networkDiagnosisCredentials.project,
+            networkDiagnosisCredentials.instanceId
+        );
+
         diagnosis.preInit(
             networkDiagnosisCredentials.secretKey,
             utdid.getUtdid(context),
@@ -202,7 +209,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
 
     @Override
     public void setupTracer(SdkTracerProviderBuilder builder) {
-        diagnosis.setupTracer(builder);
+        NetworkDiagnosisHelper.setupTracer(builder);
     }
 
     @Override
