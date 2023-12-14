@@ -1,6 +1,6 @@
 #!/bin/sh
 # 定义版本号
-version=2.6.13
+version=2.7.1
 moduleName=aliyun-log-android-sdk
 
 ./gradlew :aliyun_sls_android_producer:clean -Pversion=${version} -PmoduleName=${moduleName}

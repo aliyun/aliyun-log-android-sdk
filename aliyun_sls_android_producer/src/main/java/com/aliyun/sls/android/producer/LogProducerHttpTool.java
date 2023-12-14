@@ -60,10 +60,21 @@ public class LogProducerHttpTool {
     }
 
     @VisibleForTesting
-    public static int processResponse(HttpURLConnection connection) throws Exception {
+    public static LogHttpResponse processResponse(HttpURLConnection connection) throws Exception {
+        String requestId = connection.getHeaderField("x-log-requestid");
+        if (null == requestId) {
+            requestId = "";
+        }
+
+        LogHttpResponse httpResponse = new LogHttpResponse();
+        httpResponse.setRequestId(requestId);
+        httpResponse.setErrorMessage("");
+
         int responseCode = connection.getResponseCode();
+        httpResponse.setStatusCode(responseCode);
+
         if (responseCode / 100 == 2) {
-            return responseCode;
+            return httpResponse;
         }
 
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
@@ -74,15 +85,18 @@ public class LogProducerHttpTool {
         }
         in.close();
 
+        httpResponse.setErrorMessage(response.toString());
+
         // if 400 response code and x-log-requestid in response header, this request may be blocked.
         // we should return -1 that sdk will re-upload data to sls
         if (LogProducerHttpTool.shouldRetrySendData(connection)) {
             Log.w(TAG, "request may have been blocked. it will be retried. errorCode: " + response);
-            return -1;
+            httpResponse.setStatusCode(-1);
+            return httpResponse;
         }
 
         Log.w(TAG, "code: " + responseCode + ", response: " + response);
-        return responseCode;
+        return httpResponse;
     }
 
     @VisibleForTesting
@@ -100,11 +114,11 @@ public class LogProducerHttpTool {
         }
     }
 
-    public static int android_http_post(String urlString, String[] header, byte[] body) {
+    public static LogHttpResponse android_http_post(String urlString, String[] header, byte[] body) {
         return android_http_post(urlString, "POST", header, body);
     }
 
-    public static int android_http_post(String urlString, String method, String[] header, byte[] body) {
+    public static LogHttpResponse android_http_post(String urlString, String method, String[] header, byte[] body) {
         try {
             HttpURLConnection httpConn = createConnection(urlString, method, header);
 
@@ -115,7 +129,11 @@ public class LogProducerHttpTool {
             return processResponse(httpConn);
         } catch (Exception ex) {
             Log.w(TAG, "exception: " + ex.getLocalizedMessage());
-            return -1;
+            LogHttpResponse httpResponse = new LogHttpResponse();
+            httpResponse.setStatusCode(-1);
+            httpResponse.setErrorMessage(ex.getMessage());
+
+            return httpResponse;
         }
     }
 }

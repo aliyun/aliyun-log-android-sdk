@@ -9,12 +9,16 @@ static jclass cls_foo = NULL;
 static jmethodID mid_http_post = NULL;
 JavaVM *g_VM;
 ALooper *main_thread_looper;
+static jmethodID http_response_get_status_code;
+static jmethodID http_response_get_request_id;
+static jmethodID http_response_get_error_message;
 
 int os_http_post(const char *url,
                  char **header_array,
                  int header_count,
                  const void *data,
-                 int data_len) {
+                 int data_len,
+                 post_log_result *http_response) {
     if (mid_http_post == NULL || cls_foo == NULL)
         return 400;
 
@@ -51,7 +55,23 @@ int os_http_post(const char *url,
     jbyteArray body = env->NewByteArray(data_len);
     env->SetByteArrayRegion(body, 0, data_len, static_cast<const jbyte *>(data));
 
-    int res = env->CallStaticIntMethod(cls_foo, mid_http_post, jurl, header, body);
+    jobject log_http_response = env->CallStaticObjectMethod(cls_foo, mid_http_post, jurl, header, body);
+
+    jint res = env->CallIntMethod(log_http_response, http_response_get_status_code);
+    jstring request_id = (jstring)env->CallObjectMethod(log_http_response, http_response_get_request_id);
+    jstring error_message = (jstring)env->CallObjectMethod(log_http_response, http_response_get_error_message);
+    const char *request_id_str = env->GetStringUTFChars(request_id, 0);
+    const char *error_message_str = env->GetStringUTFChars(error_message, 0);
+
+    http_response->statusCode = res;
+    http_response->requestID = (char *)malloc(strlen(request_id_str) + 1);
+    strcpy(http_response->requestID, request_id_str);
+
+    http_response->errorMessage = (char *)malloc(strlen(error_message_str) + 1);
+    strcpy(http_response->errorMessage, error_message_str);
+
+    env->ReleaseStringUTFChars(request_id, request_id_str);
+    env->ReleaseStringUTFChars(error_message, error_message_str);
 
     env->DeleteLocalRef(jurl);
     env->DeleteLocalRef(header);
@@ -75,10 +95,15 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     cls_foo = (jclass) env->NewGlobalRef(cls);
     if (cls_foo != NULL) {
         mid_http_post = env->GetStaticMethodID(cls_foo, "android_http_post",
-                                               "(Ljava/lang/String;[Ljava/lang/String;[B)I");
+                                               "(Ljava/lang/String;[Ljava/lang/String;[B)Lcom/aliyun/sls/android/producer/LogHttpResponse;");
     }
 
     log_set_http_post_func(os_http_post);
+
+    jclass log_http_response_class = env->FindClass("com/aliyun/sls/android/producer/LogHttpResponse");
+    http_response_get_status_code = env->GetMethodID(log_http_response_class, "getStatusCode", "()I");
+    http_response_get_request_id = env->GetMethodID(log_http_response_class, "getRequestId", "()Ljava/lang/String;");
+    http_response_get_error_message = env->GetMethodID(log_http_response_class, "getErrorMessage", "()Ljava/lang/String;");
 
     result = JNI_VERSION_1_4;
     return result;
