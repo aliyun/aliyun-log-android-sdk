@@ -42,10 +42,10 @@ dependencies {
     implementation project(":aliyun_sls_android_exporter_otlp")
     implementation project(":aliyun_sls_android_otel_common")
 
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.22.0"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.30.0"))
     implementation("io.opentelemetry:opentelemetry-api")
     implementation('io.opentelemetry:opentelemetry-sdk')
-    implementation("io.opentelemetry:opentelemetry-semconv")
+    implementation("io.opentelemetry:opentelemetry-semconv:1.30.0-alpha")
 }
 
 ext {

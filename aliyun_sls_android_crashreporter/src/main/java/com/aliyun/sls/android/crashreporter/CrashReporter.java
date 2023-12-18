@@ -67,7 +67,7 @@ public final class CrashReporter {
         args.putInt("mAnrTraceStrategy", 2);
 
         // crash 不再冒泡
-        args.putBoolean("mCallJavaDefaultHandler", false);
+        args.putBoolean("mCallJavaDefaultHandler", true);
         args.putBoolean("mCallNativeDefaultHandler", true);
 
         // 关闭加密
