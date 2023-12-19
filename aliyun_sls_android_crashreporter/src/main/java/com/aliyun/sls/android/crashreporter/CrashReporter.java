@@ -1,6 +1,13 @@
 package com.aliyun.sls.android.crashreporter;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.app.Application;
 import android.content.Context;
@@ -11,6 +18,11 @@ import com.aliyun.sls.android.otel.common.AttributesHelper;
 import com.aliyun.sls.android.otel.common.utils.AppUtils;
 import com.uc.crashsdk.export.CrashApi;
 import com.uc.crashsdk.export.ICrashClient;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.common.AttributesBuilder;
+import io.opentelemetry.api.trace.SpanBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * @author yulong.gyl
@@ -21,6 +33,8 @@ public final class CrashReporter {
     private static final String PATH_ROOT = "sls_rum" + File.separator + "crashreporter";
     public static final String PATH_ITRACE_LOGS = PATH_ROOT + File.separator + "itrace_logs";
     public static final String PATH_ITRACE_TAGS = PATH_ROOT + File.separator + "itrace_tags";
+
+    private static Pattern sStackTracePattern = Pattern.compile("at (.*$)", Pattern.MULTILINE);
 
     private CrashApi crashApi;
 
@@ -38,6 +52,79 @@ public final class CrashReporter {
 
     public static void init(Application application, boolean debuggable) {
         Holder.INSTANCE.initInternal(application, debuggable);
+    }
+
+    public static void addLog(String log) {
+        addLog(new HashMap<String, String>(1) {
+            {
+                put("content", log);
+            }
+        });
+    }
+
+    public static void addLog(Map<String, String> logs) {
+        if (null == logs || logs.isEmpty()) {
+            return;
+        }
+
+        AttributesBuilder attributesBuilder = Attributes.builder();
+        for (Entry<String, String> entry : logs.entrySet()) {
+            attributesBuilder.put("log." + entry.getKey(), entry.getValue());
+        }
+
+        CrashReporterOTel.spanBuilder("log")
+            .setAttribute("t", "log")
+            .setAllAttributes(attributesBuilder.build())
+            .startSpan()
+            .end();
+    }
+
+    public static void reportException(Throwable e) {
+        reportException("exception", e, null);
+    }
+
+    public static void reportException(String name, Throwable e, Map<String, String> properties) {
+        if (null == e) {
+            return;
+        }
+
+        final String stacktrace = stacktrace2String(e);
+        Matcher matcher = sStackTracePattern.matcher(stacktrace);
+        String code = "";
+        if (matcher.find()) {
+            code = matcher.group(1);
+        }
+
+        final SpanBuilder builder = CrashReporterOTel.spanBuilder("exception");
+        builder.setAttribute("t", "exception")
+            .setAttribute("ex.name", name)
+            .setAttribute("ex.type", e.getClass().getName())
+            .setAttribute("ex.message", e.getMessage())
+            .setAttribute("ex.code", code)
+            .setAttribute("ex.stacktrace", stacktrace);
+
+        if (null != properties && !properties.isEmpty()) {
+            for (Entry<String, String> entry : properties.entrySet()) {
+                builder.setAttribute("ex." + entry.getKey(), entry.getValue());
+            }
+        }
+
+        builder.startSpan().end();
+    }
+
+    private static String stacktrace2String(Throwable e) {
+        StringWriter writer = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(writer);
+        e.printStackTrace(printWriter);
+        return writer.toString();
+    }
+
+    private static void putOpt(JSONObject object, String key, Object value) {
+        try {
+            object.putOpt(key, value);
+        } catch (JSONException e) {
+            // ignore
+        }
     }
 
     private void initInternal(Application application, boolean debuggable) {
