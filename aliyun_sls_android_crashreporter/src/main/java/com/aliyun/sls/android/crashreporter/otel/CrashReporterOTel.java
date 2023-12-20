@@ -106,7 +106,9 @@ public final class CrashReporterOTel {
                     // workspace
                     .put("workspace", null != workspace ? workspace.getInstanceId() : "")
                     // env
-                    .put("deployment.environment", null != environment ? environment.getEnv() : "default").build())
+                    .put("deployment.environment", null != environment ? environment.getEnv() : "default")
+                    .put("deployment.channel", null != environment ? environment.getChannel() : "default")
+                    .build())
                 )
             )
             .build();

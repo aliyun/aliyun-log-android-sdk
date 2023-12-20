@@ -111,7 +111,7 @@ public class CrashFileHelper {
             .setAttribute("ex.sub_type", type)
             .setAttribute("ex.id", id)
             .setAttribute("ex.catId", catId)
-            .setAllAttributes(AttributesHelper.create(context))
+            .setAllAttributes(AttributesHelper.create(context, "uem"))
             .setAttribute("uid", null != environment ? environment.getUid() : "");
 
         builder.startSpan().end();

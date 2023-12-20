@@ -37,6 +37,7 @@ public final class CrashReporter {
     private static Pattern sStackTracePattern = Pattern.compile("at (.*$)", Pattern.MULTILINE);
 
     private CrashApi crashApi;
+    private Context context;
 
     private static final class Holder {
         private static final CrashReporter INSTANCE = new CrashReporter();
@@ -75,6 +76,7 @@ public final class CrashReporter {
         CrashReporterOTel.spanBuilder("log")
             .setAttribute("t", "log")
             .setAllAttributes(attributesBuilder.build())
+            .setAllAttributes(AttributesHelper.create(Holder.INSTANCE.context, "uem"))
             .startSpan()
             .end();
     }
@@ -109,6 +111,7 @@ public final class CrashReporter {
             }
         }
 
+        builder.setAllAttributes(AttributesHelper.create(Holder.INSTANCE.context, "uem"));
         builder.startSpan().end();
     }
 
@@ -119,16 +122,8 @@ public final class CrashReporter {
         return writer.toString();
     }
 
-    private static void putOpt(JSONObject object, String key, Object value) {
-        try {
-            object.putOpt(key, value);
-        } catch (JSONException e) {
-            // ignore
-        }
-    }
-
     private void initInternal(Application application, boolean debuggable) {
-        final Context context = application.getApplicationContext();
+        this.context = application.getApplicationContext();
 
         CrashReporterOTel.getInstance().initOtel(context);
 
@@ -194,7 +189,7 @@ public final class CrashReporter {
 
         CrashReporterOTel.spanBuilder("app.start")
             .setAttribute("t", "pv")
-            .setAllAttributes(AttributesHelper.create(context))
+            .setAllAttributes(AttributesHelper.create(context, "uem"))
             .startSpan()
             .end();
 
