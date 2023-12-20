@@ -83,7 +83,9 @@ public class OtlpSLSSpanExporter implements SpanExporter {
             this.client = new LogProducerClient(config,
                 (resultCode, reqId, errorMessage, logBytes, compressedBytes) -> {
                     final LogProducerResult code = LogProducerResult.fromInt(resultCode);
-                    v(TAG,"client onCall. result: " + code + ", error: " + errorMessage);
+                    v(TAG, String.format(
+                        "exporter send done. scope: %s, result: %s, project: %s, logstore: %s, error: %s",
+                        scope, code, config.getProject(), config.getLogstore(), errorMessage));
 
                     if (code == LogProducerResult.LOG_PRODUCER_PARAMETERS_INVALID) {
                         updateAccessKey();
