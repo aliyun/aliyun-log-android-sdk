@@ -14,9 +14,12 @@ public final class AttributesHelper {
         //no instance
     }
 
-    public static Attributes create(Context context) {
+    public static Attributes create(Context context, String scope) {
+        Environment environment = ConfigurationManager.getInstance().getEnvironmentProvider().getEnvironment(scope);
+        final String uid = null != environment ? environment.getUid() : "";
         return Attributes.builder()
             .put("net.access", DeviceUtils.getAccessName(context))
+            .put("uid", uid)
             .build();
     }
 }

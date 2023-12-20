@@ -5,10 +5,10 @@ package com.aliyun.sls.android.otel.common;
  * @date 2023/9/14
  */
 public class Environment {
-    private String env;
+    private String env = "default";
     private String uid;
     private String utdid;
-    private String channel;
+    private String channel = "default";
 
     private Environment() {
     }
