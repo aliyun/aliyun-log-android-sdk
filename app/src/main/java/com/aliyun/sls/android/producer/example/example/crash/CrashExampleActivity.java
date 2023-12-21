@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,18 +47,18 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
 
         // register onClick() event
         int[] btnIds = new int[] {
-                R.id.java_null_ptr, R.id.java_oom, R.id.java_fd_leak,
-                R.id.java_class_cast, R.id.java_number_format, R.id.java_out_of_bounds,
-                R.id.native_crash, R.id.native_heap_corruption, R.id.native_fd_leak,
-                R.id.native_abort, R.id.native_stack_overflow, R.id.native_oom,
-                R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr, R.id.custom_log,
-                R.id.jank, R.id.switchFeature, R.id.switchBlockFeature, R.id.dynamic_update
+            R.id.java_null_ptr, R.id.java_oom, R.id.java_fd_leak,
+            R.id.java_class_cast, R.id.java_number_format, R.id.java_out_of_bounds,
+            R.id.native_crash, R.id.native_heap_corruption, R.id.native_fd_leak,
+            R.id.native_abort, R.id.native_stack_overflow, R.id.native_oom,
+            R.id.unexp_kill_process, R.id.unexp_exit, R.id.unexp_anr, R.id.custom_log,
+            R.id.jank, R.id.switchFeature, R.id.switchBlockFeature, R.id.dynamic_update,
+            R.id.custom_exception
         };
         for (int btnId : btnIds) {
             findViewById(btnId).setOnClickListener(this);
         }
     }
-
 
     @Override
     public void onClick(View view) {
@@ -132,43 +133,28 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
                         e.printStackTrace();
                     }
                 }
-            case R.id.custom_log: {
+            case R.id.custom_exception: {
+                CrashReporter.reportException(new IllegalArgumentException("自定义异常"));
                 try {
-                    String tst = null;
-                    tst.length();
+                    String sts = null;
+                    sts.length();
                 } catch (Throwable t) {
-                    t.printStackTrace();
-
-                    //CrashReporter.reportError("custom", t);
+                    CrashReporter.reportException("自定义异常", t, new HashMap<String, String>() {
+                        {
+                            put("ext_param", "ext_value");
+                        }
+                    });
                 }
-
-                //Credentials credentials = new Credentials();
-                //credentials.instanceId = "yuanbo-test-1111";
-                //credentials.accessKeyId = PreferenceUtils.getAccessKeyId(this);
-                //credentials.accessKeySecret = PreferenceUtils.getAccessKeySecret(this);
-                //credentials.securityToken = PreferenceUtils.getAccessKeyToken(this);
-                //SLSAndroid.setCredentials(credentials);
-                //
-                //UserInfo info = new UserInfo();
-                //info.uid = "11111111";
-                //info.channel = "beta";
-                //info.addExt("tt", "vv");
-                //SLSAndroid.setUserInfo(info);
-                //
-                //Map<String, String> params = new HashMap<>();
-                //params.put("position", "1");
-                //Map<String, String> params2 = new HashMap<>();
-                //params2.put("position", "2");
-                //CrashReporter.addCustomError("MyTest", params);
-                //CrashReporter.addCustomError("MyTest2", params2);
-                //getWindow().getDecorView().postDelayed(new Runnable() {
-                //    @Override
-                //    public void run() {
-                //        Map<String, String> params2 = new HashMap<>();
-                //        params2.put("position", "3");
-                //        CrashReporter.addCustomError("MyTest3", params2);
-                //    }
-                //}, 1000);
+                break;
+            }
+            case R.id.custom_log: {
+                CrashReporter.addLog("自定义日志");
+                CrashReporter.addLog(new HashMap<String, String>() {
+                    {
+                        put("key1", "自定义日志1");
+                        put("key2", "自定义日志2");
+                    }
+                });
                 break;
             }
             case R.id.jank: {
@@ -276,7 +262,7 @@ public class CrashExampleActivity extends BaseActivity implements View.OnClickLi
             } catch (OutOfMemoryError t) {
                 if (size < kMinSize) {
                     Log.w(TAG, String.format(Locale.US,
-                            "=Total %d bytes", totalAllocSize));
+                        "=Total %d bytes", totalAllocSize));
                     throw t;
                 }
                 size /= 2;

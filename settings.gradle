@@ -6,6 +6,10 @@ pluginManagement {
 //        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 
         mavenLocal()
+        mavenCentral()
+        google()
+        jcenter()
+
         // aliyun maven
         // mirror of google()
         maven { url 'https://maven.aliyun.com/repository/google' }
@@ -29,6 +33,10 @@ dependencyResolutionManagement {
 //        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
 //        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
 //        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+
+        mavenCentral()
+        google()
+        jcenter()
 
         // aliyun maven
         // mirror of google()
