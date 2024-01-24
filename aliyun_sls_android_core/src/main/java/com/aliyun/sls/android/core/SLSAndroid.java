@@ -268,6 +268,11 @@ public final class SLSAndroid {
         SLSLog.i(TAG, "start init features");
 
         for (Feature feature : features) {
+            if (null == feature) {
+                SLSLog.e(TAG, "init feature fail. feature is null.");
+                continue;
+            }
+
             feature.initialize(context, credentials, configuration);
             SLSLog.i(TAG, "init feature success, feature: " + feature.name());
         }
