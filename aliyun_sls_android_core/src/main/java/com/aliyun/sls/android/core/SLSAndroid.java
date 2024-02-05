@@ -248,6 +248,7 @@ public final class SLSAndroid {
         try {
             Feature feature = (Feature)Class.forName(clazzName).newInstance();
             if (null == feature) {
+                SLSLog.e(TAG, "pre init feature fail. feature is null.");
                 return;
             }
 
@@ -322,6 +323,11 @@ public final class SLSAndroid {
 
         // set all Feature's credentials
         for (Feature feature : features) {
+            if (null == feature) {
+                SLSLog.e(TAG, "set feature credentials fail. feature is null.");
+                continue;
+            }
+
             feature.setCredentials(credentials);
         }
     }
@@ -336,6 +342,11 @@ public final class SLSAndroid {
         }
 
         for (Feature feature : features) {
+            if (null == feature) {
+                SLSLog.e(TAG, "register feature credentials callback fail. feature is null.");
+                continue;
+            }
+
             feature.setCallback(callback);
         }
     }
