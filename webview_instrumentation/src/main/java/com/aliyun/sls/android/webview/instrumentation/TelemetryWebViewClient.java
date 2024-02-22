@@ -28,15 +28,18 @@ public class TelemetryWebViewClient extends ProxyWebViewClient {
 
     @SuppressLint("RequiresFeature")
     public TelemetryWebViewClient(WebViewInstrumentation instrumentation) {
-        super(WebViewCompat.getWebViewClient(instrumentation.webView));
+        super(instrumentation.webViewClient);
         this.instrumentation = instrumentation;
     }
 
     @Nullable
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        Log.d(TAG,
-            "shouldInterceptRequest. path: " + request.getUrl().getPath() + "url: " + request.getUrl().toString());
+        if (instrumentation.configuration.debuggable()) {
+            Log.d(TAG, "shouldInterceptRequest. path: " + request.getUrl().getPath()
+                + ", url: " + request.getUrl().toString()
+            );
+        }
 
         if (!instrumentation.configuration.shouldInstrument(request)) {
             return super.shouldInterceptRequest(view, request);

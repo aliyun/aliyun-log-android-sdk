@@ -2,6 +2,7 @@ package com.aliyun.sls.android.webview.instrumentation.jsbridge;
 
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
+import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentationConfiguration;
 import com.aliyun.sls.android.webview.instrumentation.instrumentation.IWebRequestInstrumentation;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -177,7 +178,7 @@ public class OTelJSITests {
     }
 
     private OTelJSI createOTelJSIInstance() {
-        return new OTelJSI(new IWebRequestInstrumentation() {
+        return new OTelJSI(new WebViewInstrumentationConfiguration(null), new IWebRequestInstrumentation() {
             @Override
             public void createdRequest(WebRequestInfo info) {
 

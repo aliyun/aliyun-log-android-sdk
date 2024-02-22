@@ -46,7 +46,7 @@ public class WebViewInstrumentationConfiguration {
     }
 
     public boolean debuggable() {
-        return true;
+        return false;
     }
 
 }
