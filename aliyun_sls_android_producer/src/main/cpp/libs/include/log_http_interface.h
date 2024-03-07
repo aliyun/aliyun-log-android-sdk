@@ -15,7 +15,8 @@ void log_set_http_post_func(int (*f)(const char *url,
                                      char **header_array,
                                      int header_count,
                                      const void *data,
-                                     int data_len));
+                                     int data_len,
+                                     post_log_result *http_response));
 
 /**
  * register get time function for get log time

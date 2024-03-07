@@ -34,9 +34,9 @@ public class HttpClient {
         final String requestId = new Date().getTime() + Math.floor(Math.random() * 100000) + "";
         try {
             URL url = new URL(request.getUrl().toString());
-            String httpUrl = request.getUrl().toString() +
-                (TextUtils.isEmpty(url.getQuery()) ? "?" : "&") +
-                "otel_flag=web";
+            String httpUrl = request.getUrl().toString()
+                + (TextUtils.isEmpty(url.getQuery()) ? "?" : "&")
+                + "otel_flag=web";
             url = new URL(httpUrl);
 
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();

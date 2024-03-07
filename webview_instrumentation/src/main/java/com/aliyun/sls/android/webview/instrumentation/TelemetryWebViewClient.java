@@ -2,15 +2,16 @@ package com.aliyun.sls.android.webview.instrumentation;
 
 import java.io.InputStream;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.webkit.WebViewCompat;
 import com.aliyun.sls.android.webview.instrumentation.httpclient.HttpClient;
 import com.aliyun.sls.android.webview.instrumentation.utils.Utils;
 import org.jsoup.Jsoup;
@@ -21,22 +22,27 @@ import org.jsoup.select.Elements;
  * @author yulong.gyl
  * @date 2023/6/21
  */
-public class TelemetryWebViewClient extends WebViewClient {
+public class TelemetryWebViewClient extends ProxyWebViewClient {
     private static final String TAG = "TelemetryWebViewClient";
     WebViewInstrumentation instrumentation;
 
+    @SuppressLint("RequiresFeature")
     public TelemetryWebViewClient(WebViewInstrumentation instrumentation) {
+        super(instrumentation.webViewClient);
         this.instrumentation = instrumentation;
     }
 
     @Nullable
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        Log.d(TAG,
-            "shouldInterceptRequest. path: " + request.getUrl().getPath() + "url: " + request.getUrl().toString());
+        if (instrumentation.configuration.debuggable()) {
+            Log.d(TAG, "shouldInterceptRequest. path: " + request.getUrl().getPath()
+                + ", url: " + request.getUrl().toString()
+            );
+        }
 
         if (!instrumentation.configuration.shouldInstrument(request)) {
-            return null;
+            return super.shouldInterceptRequest(view, request);
         }
 
         final WebResourceResponse response;

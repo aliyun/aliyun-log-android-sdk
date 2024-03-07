@@ -10,6 +10,8 @@ import com.alibaba.netspeed.network.MtrConfig;
 import com.alibaba.netspeed.network.PingConfig;
 import com.alibaba.netspeed.network.TcpPingConfig;
 
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
+
 /**
  * @author gordon
  * @date 2023/4/6

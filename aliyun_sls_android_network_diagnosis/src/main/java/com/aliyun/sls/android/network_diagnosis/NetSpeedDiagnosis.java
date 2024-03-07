@@ -11,6 +11,10 @@ import com.alibaba.netspeed.network.MtrConfig;
 import com.alibaba.netspeed.network.PingConfig;
 import com.alibaba.netspeed.network.TcpPingConfig;
 
+import com.aliyun.sls.android.exporter.otlp.OtlpSLSSpanExporter;
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
+import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+
 /**
  * @author gordon
  * @date 2023/4/6

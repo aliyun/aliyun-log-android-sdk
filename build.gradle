@@ -4,12 +4,17 @@ buildscript {
     ext {
         agp_version = "4.2.2"
         kotlin_version = "1.8.0"
+        booster_version = "1.0.0-beta.6"
     }
     repositories {
+        mavenLocal()
         // sonatype
-//        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-//        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
-//        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+
+        mavenCentral()
+        google()
 
         // aliyun maven
         // mirror of google()
@@ -29,6 +34,8 @@ buildscript {
         classpath "com.android.tools.build:gradle:${agp_version}"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
+        classpath "io.github.aliyun-sls:android-gradle-plugin:$booster_version"
+//        classpath "com.didiglobal.booster:booster-transform-thread:$booster_version"
 //        classpath "io.github.gradle-nexus:publish-plugin:1.1.0"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -40,14 +47,20 @@ buildscript {
 
 plugins {
     id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+    id 'com.android.library' version '4.2.2' apply false
 }
 
 allprojects { project ->
     repositories {
+        mavenLocal()
         // sonatype
 //        maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
 //        maven { url 'https://oss.sonatype.org/content/repositories/public/' }
 //        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+
+        mavenCentral()
+        google()
+        jcenter()
 
         // aliyun maven
         // mirror of google()

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-android'
+apply plugin: 'io.github.aliyun-sls'
 
 //apply plugin: 'kotlin-android-extensions'
 
@@ -12,11 +13,12 @@ android {
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
 
+        // 通用配置
         buildConfigField "boolean", "CONFIG_ENABLE", project.hasProperty("CONFIG_ENABLE") ? "${CONFIG_ENABLE}" : "false"
         buildConfigField "String", "PLUGIN_APPID", project.hasProperty("PLUGIN_APPID") ? "\"${PLUGIN_APPID}\"" : "\"\""
         buildConfigField "String", "END_POINT", project.hasProperty("END_POINT") ? "\"${END_POINT}\"" : "\"\""
@@ -25,7 +27,15 @@ android {
         buildConfigField "String", "ACCESS_KEYID", project.hasProperty("ACCESS_KEYID") ? "\"${ACCESS_KEYID}\"" : "\"\""
         buildConfigField "String", "ACCESS_KEY_SECRET", project.hasProperty("ACCESS_KEY_SECRET") ? "\"${ACCESS_KEY_SECRET}\"" : "\"\""
         buildConfigField "String", "ACCESS_KEY_TOKEN", project.hasProperty("ACCESS_KEY_TOKEN") ? "\"${ACCESS_KEY_TOKEN}\"" : "\"\""
+        // 网络质量分析器使用
+        buildConfigField "String", "ACCESS_KEYID2", project.hasProperty("ACCESS_KEYID2") ? "\"${ACCESS_KEYID2}\"" : "\"\""
+        buildConfigField "String", "ACCESS_KEY_SECRET2", project.hasProperty("ACCESS_KEY_SECRET2") ? "\"${ACCESS_KEY_SECRET2}\"" : "\"\""
+        buildConfigField "String", "ACCESS_KEY_TOKEN2", project.hasProperty("ACCESS_KEY_TOKEN2") ? "\"${ACCESS_KEY_TOKEN2}\"" : "\"\""
         buildConfigField "String", "NETWORK_SECKEY", project.hasProperty("NETWORK_SECKEY") ? "\"${NETWORK_SECKEY}\"" : "\"\""
+        // 用户全栈可观测
+        buildConfigField "String", "UEM_INSTANCEID", project.hasProperty("UEM_INSTANCEID") ? "\"${UEM_INSTANCEID}\"" : "\"\""
+        buildConfigField "String", "UEM_ENDPOINT", project.hasProperty("UEM_ENDPOINT") ? "\"${UEM_ENDPOINT}\"" : "\"\""
+        buildConfigField "String", "UEM_PROJECT", project.hasProperty("UEM_PROJECT") ? "\"${UEM_PROJECT}\"" : "\"\""
         ndk {
             // Specifies the ABI configurations of your native
             // libraries Gradle should build and package with your app.
@@ -39,8 +49,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildFeatures {
         viewBinding true
@@ -82,18 +92,26 @@ dependencies {
     implementation project(':aliyun_sls_android_trace')
     implementation project(':aliyun_sls_android_okhttp')
     implementation project(':aliyun_sls_android_ot_ktx')
-    implementation project(':webview_instrumentation')
+    implementation project(':aliyun_sls_android_otel_common')
+    implementation project(':aliyun_sls_android_exporter_otlp')
 
-//    implementation 'io.github.aliyun-sls:aliyun-log-android-sdk:2.7.0@aar'
-//    implementation 'io.github.aliyun-sls:sls-android-core:1.0.8@aar'
+//    implementation project(':webview_instrumentation')
+//    implementation project(':okhttp_instrumentation')
+
+//    implementation 'io.github.aliyun-sls:aliyun-log-android-sdk:2.7.1@aar'
+//    implementation 'io.github.aliyun-sls:sls-android-core:1.0.9@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-ot:1.0.8.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-ot-ktx:1.0.1@aar'
-//    implementation 'io.github.aliyun-sls:sls-android-network-diagnosis:2.1.0@aar'
-//    implementation 'io.github.aliyun-sls:sls-android-crashreporter:2.0.6.1@aar'
+//    implementation 'io.github.aliyun-sls:sls-android-network-diagnosis:2.2.1@aar'
+//    implementation 'io.github.aliyun-sls:android-crashreporter:1.1.0@aar'
+//    implementation 'io.github.aliyun-sls:android-exporter-otlp:1.1.2@aar'
+//    implementation 'io.github.aliyun-sls:android-otel-common:1.1.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-blockdetection:1.0.3.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-trace:1.0.7@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-okhttp:1.0.7.1@aar'
-//    implementation 'io.github.aliyun-sls:sls-android-webview-instrumentation:1.0.0@aar'
+//    implementation 'io.github.aliyun-sls:sls-android-webview-instrumentation:1.1.0@aar'
+//    implementation 'io.github.aliyun-sls:sls-android-webview-instrumentation:1.1.0@aar'
+//    implementation 'io.github.aliyun-sls:android-okhttp-instrumentation:1.0.0-beta.1@aar'
 //    // sls-android-webview-instrumentation 需要
 //    implementation 'org.jsoup:jsoup:1.13.1'
 
@@ -113,18 +131,19 @@ dependencies {
 
 
     // provided to assist with synchronizing versions of dependencies
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.22.0"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.30.0"))
     // apis
     implementation("io.opentelemetry:opentelemetry-api")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:1.30.0")
     implementation("io.opentelemetry:opentelemetry-context")
-    implementation("io.opentelemetry:opentelemetry-api-logs")
+//    implementation("io.opentelemetry:opentelemetry-api-logs")
     // api extensions
     implementation("io.opentelemetry:opentelemetry-extension-kotlin")
     // sdks
     implementation('io.opentelemetry:opentelemetry-sdk')
     implementation('io.opentelemetry:opentelemetry-sdk-logs')
     // semantic conventions
-    implementation("io.opentelemetry:opentelemetry-semconv")
+    implementation("io.opentelemetry:opentelemetry-semconv:1.30.0-alpha")
     // exporters
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 //    implementation("io.opentelemetry:opentelemetry-exporter-otlp-logs")

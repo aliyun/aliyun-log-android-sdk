@@ -5,6 +5,7 @@ import android.webkit.JavascriptInterface;
 import androidx.annotation.VisibleForTesting;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
+import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentationConfiguration;
 import com.aliyun.sls.android.webview.instrumentation.instrumentation.IWebRequestInstrumentation;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,19 +16,28 @@ import org.json.JSONObject;
  */
 @SuppressWarnings("unused")
 public class OTelJSI {
-    private static final String TAG = "DoKitJSI";
+    private static final String TAG = "OTelJSI";
 
+    private final WebViewInstrumentationConfiguration configuration;
     private final IWebRequestInstrumentation requestInstrumentation;
 
-    public OTelJSI(IWebRequestInstrumentation requestInstrumentation) {
+    public OTelJSI(WebViewInstrumentationConfiguration configuration,
+        IWebRequestInstrumentation requestInstrumentation) {
+        this.configuration = configuration;
         this.requestInstrumentation = requestInstrumentation;
     }
 
     @JavascriptInterface
     public void fetch(String requestId, String url, String method, String origin, String headers, String body) {
-        Log.d(TAG,
-            "fetch. requestId: " + requestId + ", method: " + method + ", headers: " + headers + ", body: " + body
-                + ", url: " + url + ", origin: " + origin);
+        if (configuration.debuggable()) {
+            Log.d(TAG, "fetch. requestId: " + requestId
+                + ", method: " + method
+                + ", headers: " + headers
+                + ", body: " + body
+                + ", url: " + url
+                + ", origin: " + origin
+            );
+        }
         WebRequestInfo webRequestInfo = PayloadManager.getInstance().get(requestId);
         if (null == webRequestInfo) {
             webRequestInfo = new WebRequestInfo();
@@ -62,7 +72,14 @@ public class OTelJSI {
 
     @JavascriptInterface
     public void open(String requestId, String url, String method, String origin) {
-        Log.d(TAG, "open. requestId: " + requestId + ", method: " + method + ", url: " + url + ", origin: " + origin);
+        if (configuration.debuggable()) {
+            Log.d(TAG, "open. requestId: " + requestId
+                + ", method: " + method
+                + ", url: " + url
+                + ", origin: " + origin
+            );
+        }
+
         WebRequestInfo webRequestInfo = PayloadManager.getInstance().get(requestId);
         if (null == webRequestInfo) {
             webRequestInfo = new WebRequestInfo();
@@ -77,7 +94,13 @@ public class OTelJSI {
 
     @JavascriptInterface
     public void setRequestHeader(String requestId, String key, String value) {
-        Log.d(TAG, "setRequestHeader. requestId: " + requestId + ", key: " + key + ", value: " + value);
+        if (configuration.debuggable()) {
+            Log.d(TAG, "setRequestHeader. requestId: " + requestId
+                + ", key: " + key
+                + ", value: " + value
+            );
+        }
+
         WebRequestInfo webRequestInfo = PayloadManager.getInstance().get(requestId);
         if (null == webRequestInfo) {
             webRequestInfo = new WebRequestInfo();
@@ -102,7 +125,10 @@ public class OTelJSI {
 
     @JavascriptInterface
     public void overrideMimeType(String requestId, String mimeType) {
-        Log.d(TAG, "overrideMimeType. requestId: " + requestId + ", mimeType: " + mimeType);
+        if (configuration.debuggable()) {
+            Log.d(TAG, "overrideMimeType. requestId: " + requestId + ", mimeType: " + mimeType);
+        }
+
         WebRequestInfo webRequestInfo = PayloadManager.getInstance().get(requestId);
         if (null != webRequestInfo) {
             webRequestInfo.mimeType = mimeType;
@@ -111,7 +137,10 @@ public class OTelJSI {
 
     @JavascriptInterface
     public void send(String requestId, String body) {
-        Log.d(TAG, "send. requestId: " + requestId + ", body: " + body);
+        if (configuration.debuggable()) {
+            Log.d(TAG, "send. requestId: " + requestId + ", body: " + body);
+        }
+
         WebRequestInfo requestInfo = PayloadManager.getInstance().get(requestId);
         if (null != requestInfo) {
             requestInfo.body = body;
@@ -121,8 +150,13 @@ public class OTelJSI {
 
     @JavascriptInterface
     public void handleResponse(String requestId, int status, String statusText, String text, String headers) {
-        Log.d(TAG, "handleResponse. requestId: " + requestId + ", status: " + status + ", statusText: " + statusText
-            + ", headers: " + headers + ", response: " + text.substring(0, Math.min(128, text.length())));
+        if (configuration.debuggable()) {
+            Log.d(TAG, "handleResponse. requestId: " + requestId
+                + ", status: " + status
+                + ", statusText: " + statusText
+                + ", headers: " + headers
+                + ", response: " + text.substring(0, Math.min(128, text.length())));
+        }
 
         WebRequestInfo info = PayloadManager.getInstance().get(requestId);
         if (null != info) {

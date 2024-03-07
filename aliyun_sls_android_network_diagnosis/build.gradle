@@ -7,7 +7,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
-        versionName "2.1.1"
+        versionName "2.2.2"
 
         buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
         buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':aliyun_sls_android_exporter_otlp')
     testImplementation(project(':testable'))
     testImplementation(project(":aliyun_sls_android_network_diagnosis"))
     testImplementation("com.squareup.okhttp3:okhttp:3.11.0")
@@ -43,6 +44,10 @@ dependencies {
     implementation project(":aliyun_sls_android_producer")
     implementation project(":aliyun_sls_android_core")
     implementation project(":aliyun_sls_android_ot")
+
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.30.0"))
+    // sdks
+    implementation('io.opentelemetry:opentelemetry-sdk')
 }
 
 ext {

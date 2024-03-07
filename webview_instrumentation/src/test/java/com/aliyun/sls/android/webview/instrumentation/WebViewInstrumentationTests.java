@@ -2,7 +2,6 @@ package com.aliyun.sls.android.webview.instrumentation;
 
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation.WebViewInstrumentationConfiguration;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import org.junit.Before;
 import org.junit.Test;

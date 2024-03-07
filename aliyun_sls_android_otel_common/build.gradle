@@ -1,0 +1,57 @@
+apply plugin:  'com.android.library'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.1.1"
+
+        buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+        buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        abortOnError false
+    }
+    sourceSets {
+        main.jniLibs.srcDirs = ['libs']
+    }
+}
+
+dependencies {
+    testImplementation(project(':testable'))
+    testImplementation(project(":aliyun_sls_android_core"))
+
+    implementation project(":aliyun_sls_android_producer")
+
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.30.0"))
+    implementation("io.opentelemetry:opentelemetry-api")
+    implementation('io.opentelemetry:opentelemetry-sdk')
+    implementation("io.opentelemetry:opentelemetry-semconv:1.30.0-alpha")
+}
+
+ext {
+    moduleVersion = android.defaultConfig.versionName
+    moduleName = 'android-otel-common'
+}
+
+//==== 以下是将android library上传到maven central的脚本
+apply from: "${project.rootProject.file('maven-publish.gradle')}"
+
+//==== jacoco coverage reporter for module
+apply from: "${project.rootProject.file('jacoco/modules.gradle')}"

@@ -4,7 +4,9 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.netspeed.network.DetectConfig;
 import com.alibaba.netspeed.network.DnsConfig;
+import com.alibaba.netspeed.network.FlowNode;
 import com.alibaba.netspeed.network.HttpConfig;
 import com.alibaba.netspeed.network.Logger;
 import com.alibaba.netspeed.network.MtrConfig;
@@ -17,6 +19,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Pair;
 import androidx.annotation.VisibleForTesting;
+import com.aliyun.sls.android.core.SLSAndroid;
 import com.aliyun.sls.android.core.SLSLog;
 import com.aliyun.sls.android.core.configuration.Configuration;
 import com.aliyun.sls.android.core.configuration.Credentials;
@@ -26,12 +29,23 @@ import com.aliyun.sls.android.core.sender.SdkSender;
 import com.aliyun.sls.android.core.sender.Sender;
 import com.aliyun.sls.android.core.utdid.Utdid;
 import com.aliyun.sls.android.core.utils.AppUtils;
+import com.aliyun.sls.android.network_diagnosis.trace.NetworkDiagnosisHelper;
+import com.aliyun.sls.android.network_diagnosis.trace.TraceNode;
 import com.aliyun.sls.android.ot.Attribute;
 import com.aliyun.sls.android.ot.ISpanProcessor;
 import com.aliyun.sls.android.ot.SpanBuilder;
 import com.aliyun.sls.android.producer.LogProducerConfig;
 import com.aliyun.sls.android.producer.internal.HttpHeader;
 import com.aliyun.sls.android.producer.internal.LogProducerHttpHeaderInjector;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.ReadWriteSpan;
+import io.opentelemetry.sdk.trace.ReadableSpan;
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,9 +65,16 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
     private IDiagnosis diagnosis;
     private Utdid utdid;
 
+    private OpenTelemetry openTelemetrySdk;
+
     public NetworkDiagnosisFeature() {
         this.diagnosis = new NetSpeedDiagnosis();
         this.utdid = Utdid.getInstance();
+    }
+
+    @Override
+    public void setOpenTelemetrySdk(OpenTelemetry openTelemetrySdk) {
+        this.openTelemetrySdk = openTelemetrySdk;
     }
 
     @VisibleForTesting
@@ -112,6 +133,12 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (!TextUtils.isEmpty(networkDiagnosisCredentials.secretKey)) {
             networkDiagnosisCredentials.instanceId = getIPAIdBySecretKey(networkDiagnosisCredentials.secretKey);
         }
+
+        NetworkDiagnosisHelper.updateWorkspace(
+            networkDiagnosisCredentials.endpoint,
+            networkDiagnosisCredentials.project,
+            networkDiagnosisCredentials.instanceId
+        );
 
         diagnosis.preInit(
             networkDiagnosisCredentials.secretKey,
@@ -178,6 +205,11 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         }
 
         networkDiagnosisSender.setCredentials(credentials);
+    }
+
+    @Override
+    public void setupTracer(SdkTracerProviderBuilder builder) {
+        NetworkDiagnosisHelper.setupTracer(builder);
     }
 
     @Override
@@ -293,6 +325,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
+        final TraceNode node = new TraceNode(openTelemetrySdk, "http", request, context);
         final HttpConfig config = new HttpConfig(
             TASK_ID_GENERATOR.generate(),
             request.domain,
@@ -312,6 +345,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                     response.content = result;
                     callback.onComplete(response);
                 }
+                node.end();
                 return 0;
             },
             request.context
@@ -320,6 +354,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != request.extension) {
             config.setDetectExtension(new HashMap<>(request.extension));
         }
+        node.setDetectConfig(config);
         diagnosis.startHttpPing(config);
     }
     // endregion
@@ -377,6 +412,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
+        final TraceNode node = new TraceNode(openTelemetrySdk, "ping", pingRequest, context);
         final PingConfig config = new PingConfig(
             TASK_ID_GENERATOR.generate(),
             pingRequest.domain,
@@ -387,6 +423,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 if (null != callback) {
                     callback.onComplete(Response.response(context, Type.PING, result));
                 }
+                node.end();
                 return 0;
             },
             pingRequest.context
@@ -396,6 +433,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != pingRequest.extension) {
             config.setDetectExtension(new HashMap<>(pingRequest.extension));
         }
+        node.setDetectConfig(config);
         diagnosis.startPing(config);
     }
     // endregion
@@ -442,6 +480,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
+        final TraceNode node = new TraceNode(openTelemetrySdk, "tcpping", request, context);
         final TcpPingConfig config = new TcpPingConfig(
             TASK_ID_GENERATOR.generate(),
             request.domain,
@@ -452,14 +491,18 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 if (null != callback) {
                     callback.onComplete(Response.response(context, Type.TCPPING, result));
                 }
+                node.end();
                 return 0;
             },
             request.context
         );
+
         config.setMultiplePortsDetect(enableMultiplePortsDetect || request.multiplePortsDetect);
         if (null != request.extension) {
             config.setDetectExtension(new HashMap<>(request.extension));
         }
+        node.setDetectConfig(config);
+
         diagnosis.startTcpPing(config);
     }
 
@@ -520,6 +563,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
+        final TraceNode node = new TraceNode(openTelemetrySdk, "mtr", request, context);
         final MtrConfig config = new MtrConfig(
             TASK_ID_GENERATOR.generate(),
             request.domain,
@@ -531,6 +575,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 if (null != callback) {
                     callback.onComplete(Response.response(context, Type.MTR, result));
                 }
+                node.end();
                 return 0;
             },
             request.context
@@ -541,6 +586,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
         if (null != request.extension) {
             config.setDetectExtension(new HashMap<>(request.extension));
         }
+        node.setDetectConfig(config);
         diagnosis.startMtr(config);
     }
     // endregion
@@ -596,6 +642,7 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
             return;
         }
 
+        final TraceNode node = new TraceNode(openTelemetrySdk, "dns", dnsRequest, context);
         final DnsConfig config = new DnsConfig(
             TASK_ID_GENERATOR.generate(),
             dnsRequest.nameServer,
@@ -606,14 +653,18 @@ public class NetworkDiagnosisFeature extends SdkFeature implements INetworkDiagn
                 if (null != callback) {
                     callback.onComplete(Response.response(context, Type.DNS, result));
                 }
+                node.end();
                 return 0;
             },
             dnsRequest.context
         );
+
         config.setMultiplePortsDetect(enableMultiplePortsDetect || dnsRequest.multiplePortsDetect);
         if (null != dnsRequest.extension) {
             config.setDetectExtension(new HashMap<>(dnsRequest.extension));
         }
+        node.setDetectConfig(config);
+
         diagnosis.startDns(config);
     }
     // endregion

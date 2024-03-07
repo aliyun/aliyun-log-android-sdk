@@ -3,6 +3,9 @@ package com.aliyun.sls.android.network_diagnosis;
 import java.util.Map;
 
 import androidx.annotation.VisibleForTesting;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 
 /**
  * @author gordon
@@ -13,6 +16,9 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
     @VisibleForTesting
     public INetworkDiagnosis networkDiagnosis;
 
+    @VisibleForTesting
+    public OpenTelemetry openTelemetrySdk;
+
     private static class Holder {
         private static final NetworkDiagnosis INSTANCE = new NetworkDiagnosis();
     }
@@ -20,10 +26,28 @@ public final class NetworkDiagnosis implements INetworkDiagnosis {
     /* package */
     void setNetworkDiagnosis(INetworkDiagnosis networkDiagnosis) {
         this.networkDiagnosis = networkDiagnosis;
+        if (checkNetworkDiagnosis()) {
+            this.networkDiagnosis.setOpenTelemetrySdk(this.openTelemetrySdk);
+        }
     }
 
     public static NetworkDiagnosis getInstance() {
         return Holder.INSTANCE;
+    }
+
+    @Override
+    public void setOpenTelemetrySdk(OpenTelemetry openTelemetrySdk) {
+        this.openTelemetrySdk = openTelemetrySdk;
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.setOpenTelemetrySdk(this.openTelemetrySdk);
+        }
+    }
+
+    @Override
+    public void setupTracer(SdkTracerProviderBuilder builder) {
+        if (checkNetworkDiagnosis()) {
+            networkDiagnosis.setupTracer(builder);
+        }
     }
 
     @VisibleForTesting

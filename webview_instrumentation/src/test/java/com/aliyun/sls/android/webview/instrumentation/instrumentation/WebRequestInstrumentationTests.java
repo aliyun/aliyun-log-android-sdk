@@ -5,7 +5,7 @@ import android.webkit.WebView;
 import com.aliyun.sls.android.webview.instrumentation.PayloadManager.WebRequestInfo;
 import com.aliyun.sls.android.webview.instrumentation.TelemetryTestHelper;
 import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation;
-import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentation.WebViewInstrumentationConfiguration;
+import com.aliyun.sls.android.webview.instrumentation.WebViewInstrumentationConfiguration;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import org.json.JSONObject;
 import org.junit.Assert;

@@ -30,6 +30,7 @@ import com.aliyun.sls.android.network_diagnosis.INetworkDiagnosis.TcpPingRequest
 import com.aliyun.sls.android.network_diagnosis.NetworkDiagnosis;
 import com.aliyun.sls.android.producer.example.BaseActivity;
 import com.aliyun.sls.android.producer.R;
+import com.aliyun.sls.android.producer.example.example.ExampleHelper.NetworkLink;
 
 /**
  * @author gordon
@@ -217,6 +218,11 @@ public class NetworkExample extends BaseActivity {
                 }
             });
         });
+
+        findViewById(R.id.example_extension_demo).setOnClickListener(v -> {
+            new NetworkLink().start();
+        });
+
     }
 
     private void auto(View v) {
@@ -224,10 +230,10 @@ public class NetworkExample extends BaseActivity {
 
         final String domain = endpoints.get(index);
         final String url = "https://" + domain;
-        //SLSNetDiagnosis.getInstance().ping(domain);
-        //SLSNetDiagnosis.getInstance().http(url);
-        //SLSNetDiagnosis.getInstance().tcpPing(domain, 80);
-        //SLSNetDiagnosis.getInstance().mtr(domain);
+        NetworkDiagnosis.getInstance().ping(domain);
+        NetworkDiagnosis.getInstance().http(url);
+        NetworkDiagnosis.getInstance().tcpPing(domain, 80);
+        NetworkDiagnosis.getInstance().mtr(domain);
 
         index += 1;
         if (index >= endpoints.size()) {

@@ -55,7 +55,7 @@ typedef struct _log_producer_config
     int32_t destroyFlusherWaitTimeoutSec;
     int32_t destroySenderWaitTimeoutSec;
 
-    int32_t compressType; // 0 no compress, 1 lz4, 2 zstd
+    int32_t compressType; // 0 no compress, 1 lz4
     int32_t ntpTimeOffset;
     int using_https; // 0 http, 1 https
 
@@ -74,6 +74,10 @@ typedef struct _log_producer_config
 
     int32_t dropUnauthorizedLog; // 1 true, 0 false, default 0
     int32_t callbackFromSenderThread; // 1 true, 0 false, default 1int32_t callbackFromSenderThread;
+    int32_t webTracking; // 1 webtracking, default 0
+
+    int32_t mode; // 0, LoadBalance; 1, KeyShard
+    char *shardKey;
 
     void *user_params; // user params pass to c
 
@@ -258,7 +262,7 @@ LOG_EXPORT void log_producer_config_set_destroy_sender_wait_sec(log_producer_con
 /**
  * set compress type, default 1 (lz4)
  * @param config
- * @param compress_type only support 2 or 1 or 0. 2 -> zstd, 1 -> lz4, 0 -> no compress
+ * @param compress_type only support 1 or 0. 1 -> lz4, 0 -> no compress
  */
 LOG_EXPORT void log_producer_config_set_compress_type(log_producer_config * config, int32_t compress_type);
 
@@ -340,6 +344,10 @@ LOG_EXPORT void log_producer_config_set_drop_unauthorized_log(log_producer_confi
  * @param callback_from_sender_thread
  */
 LOG_EXPORT void log_producer_config_set_callback_from_sender_thread(log_producer_config * config, int32_t callback_from_sender_thread);
+
+LOG_EXPORT void log_producer_config_set_use_webtracking(log_producer_config * config, int32_t webtracking);
+
+LOG_EXPORT void log_producer_config_set_mode(log_producer_config *config, int32_t mode);
 
 LOG_EXPORT void log_producer_config_set_shardkey(log_producer_config *config, const char *shardKey);
 

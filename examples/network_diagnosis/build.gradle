@@ -1,0 +1,45 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+    defaultConfig {
+        applicationId "com.aliyunsls.examples.network_diagnosis"
+        minSdkVersion 24
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0.3"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
+
+        ndk {
+            // Specifies the ABI configurations of your native
+            // libraries Gradle should build and package with your app.
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    sourceSets {
+        main.jniLibs.srcDirs = ['libs']
+    }
+}
+
+dependencies {
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+
+    implementation 'io.github.aliyun-sls:aliyun-log-android-sdk:2.7.1@aar' // 建议使用最新版本
+    implementation 'io.github.aliyun-sls:sls-android-core:1.0.10@aar' // 建议使用最新版本
+    implementation 'io.github.aliyun-sls:sls-android-ot:1.0.8.1@aar' // 建议使用最新版本
+    implementation 'io.github.aliyun-sls:sls-android-network-diagnosis:2.2.2@aar' // 建议使用最新版本
+}

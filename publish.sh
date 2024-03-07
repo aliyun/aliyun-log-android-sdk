@@ -44,7 +44,10 @@ function module_name() {
     *core*)                       echo "aliyun_sls_android_core";;
     *crashreporter*)              echo "aliyun_sls_android_crashreporter";;
     *network_diagnosis*)          echo "aliyun_sls_android_network_diagnosis";;
+    *okhttp_instrumentation*)     echo "okhttp_instrumentation";;
     *okhttp*)                     echo "aliyun_sls_android_okhttp";;
+    *otel_common*)                echo "aliyun_sls_android_otel_common";;
+    *exporter_otlp*)              echo "aliyun_sls_android_exporter_otlp";;
     *ot-ktx*)                     echo "aliyun_sls_android_ot_ktx";;
     *ot*)                         echo "aliyun_sls_android_ot";;
     *producer*)                   echo "aliyun_sls_android_producer";;
