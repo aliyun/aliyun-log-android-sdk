@@ -13,7 +13,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0.1"
+        versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
@@ -94,11 +94,12 @@ dependencies {
     implementation project(':aliyun_sls_android_ot_ktx')
     implementation project(':aliyun_sls_android_otel_common')
     implementation project(':aliyun_sls_android_exporter_otlp')
+
 //    implementation project(':webview_instrumentation')
 //    implementation project(':okhttp_instrumentation')
 
 //    implementation 'io.github.aliyun-sls:aliyun-log-android-sdk:2.7.1@aar'
-//    implementation 'io.github.aliyun-sls:sls-android-core:1.0.8@aar'
+//    implementation 'io.github.aliyun-sls:sls-android-core:1.0.9@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-ot:1.0.8.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-ot-ktx:1.0.1@aar'
 //    implementation 'io.github.aliyun-sls:sls-android-network-diagnosis:2.2.1@aar'

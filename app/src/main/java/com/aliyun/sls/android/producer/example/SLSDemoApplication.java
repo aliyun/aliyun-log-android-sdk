@@ -25,8 +25,9 @@ import com.aliyun.sls.android.otel.common.Workspace;
 import com.aliyun.sls.android.producer.BuildConfig;
 import com.aliyun.sls.android.producer.LogProducerResult;
 import com.aliyun.sls.android.producer.example.example.ExampleHelper;
-import com.aliyun.sls.android.producer.example.example.ExampleHelper.Device;
 import com.aliyun.sls.android.producer.example.example.ExampleHelper.NetworkLink;
+import com.aliyun.sls.android.producer.example.example.ExampleHelper.V2XDemo;
+import com.aliyun.sls.android.producer.example.example.OTelHelper;
 import com.aliyun.sls.android.producer.example.utils.PreferenceUtils;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
@@ -164,8 +165,12 @@ public class SLSDemoApplication extends MultiDexApplication {
         //redirectLog();
 
         initOTel();
+
+        OTelHelper.init(this);
+
         //new Thread(() -> httpRequest()).start();
         new NetworkLink().start();
+        new V2XDemo().start(this);
     }
 
     private void redirectLog() {

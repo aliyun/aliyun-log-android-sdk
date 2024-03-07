@@ -38,6 +38,7 @@ public class WebViewInstrumentationActivity extends AppCompatActivity {
         loadUrlWithHeaders();
         loadData();
         loadDataWithBaseURL(webView);
+        addImageArrayClickListener(webView);
     }
 
     private void webViewFromMethodParameter(WebView webView, String url) {
@@ -66,5 +67,22 @@ public class WebViewInstrumentationActivity extends AppCompatActivity {
 
     private void loadDataWithBaseURL(WebView webView) {
         webView.loadDataWithBaseURL(url, "", "", "", "");
+    }
+
+    private void addImageArrayClickListener(WebView webView) {
+        webView.loadUrl("javascript:(function(){" +
+            "var objs = document.getElementsByTagName(\"img\"); " +
+            "var array=new Array(); " +
+            "for(var j=0;j<objs.length;j++){" +
+            "    array[j]=objs[j].src; " +
+            "}" +
+            "for(var i=0;i<objs.length;i++)  " +
+            "{"
+            + "    objs[i].onclick=function()  " +
+            "    {  "
+            + "        window.imagelistener.openImage(this.src,array);  " +
+            "    }  " +
+            "}" +
+            "})()");
     }
 }
