@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="初始化和设置" />
+
+        <Button
+            android:id="@+id/main_init"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="初始化" />
+
+        <Button
+            android:id="@+id/main_update"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="参数更新" />
+
+        <Button
+            android:id="@+id/main_preinit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="初始化（隐私合规）" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="探测类型" />
+
+        <Button
+            android:id="@+id/main_ping"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ping" />
+
+        <Button
+            android:id="@+id/main_tcpping"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="tcpping" />
+
+        <Button
+            android:id="@+id/main_dns"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="dns" />
+
+        <Button
+            android:id="@+id/main_mtr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="mtr" />
+
+        <Button
+            android:id="@+id/main_http"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="http" />
+    </LinearLayout>
+</ScrollView>

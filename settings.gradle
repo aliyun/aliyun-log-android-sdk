@@ -71,3 +71,6 @@ include ':webview_instrumentation'
 include ':aliyun_sls_android_exporter_otlp'
 include ':aliyun_sls_android_otel_common'
 include ':okhttp_instrumentation'
+
+include ':examples'
+include ':examples:network_diagnosis'
