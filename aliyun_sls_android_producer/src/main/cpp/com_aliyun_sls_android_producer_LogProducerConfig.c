@@ -370,8 +370,14 @@ unsigned int set_get_time_unix_func() {
     }
 
     JNIEnv *env = NULL;
-    if ((*g_VM)->AttachCurrentThread(g_VM, &env, NULL) != JNI_OK) {
-        return time(NULL);
+    int attached = 0;
+    jint res = (*g_VM)->GetEnv(g_VM, (void **) &env, JNI_VERSION_1_6);
+    if (res == JNI_EDETACHED) {
+        if((*g_VM)->AttachCurrentThread(g_VM, &env, NULL) != JNI_OK) {
+            aos_warn_log("set_get_time_unix_func AttachCurrentThread failed");
+            return time(NULL);
+        }
+        attached = 1;
     }
     //通过全局变量g_obj 获取到要回调的类
     jclass java_class = (*env)->GetObjectClass(env, g_time_func);
@@ -389,7 +395,9 @@ unsigned int set_get_time_unix_func() {
     //执行回调
     jlong time_unix = (*env)->CallLongMethod(env, g_time_func, java_callback_id);
     //释放当前线程
-    (*g_VM)->DetachCurrentThread(g_VM);
+    if (attached) {
+        (*g_VM)->DetachCurrentThread(g_VM);
+    }
     env = NULL;
     return time_unix;
 }
